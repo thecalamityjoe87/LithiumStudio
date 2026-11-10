@@ -1,9 +1,11 @@
 [submodule "external/tracktion_engine"]
 	path = external/tracktion_engine
 	url = https://github.com/Tracktion/tracktion_engine.git
+	ignore = dirty
 [submodule "external/sfizz"]
 	path = external/sfizz
 	url = https://github.com/sfztools/sfizz.git
+	ignore = dirty
 [submodule "external/miniz"]
 	path = external/miniz
 	url = https://github.com/richgel999/miniz.git
