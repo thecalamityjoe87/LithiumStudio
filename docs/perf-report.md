@@ -1,4 +1,4 @@
-# Ikaros Studio: performance and stability report
+# Lithium Studio: performance and stability report
 
 October 2026, milestone 12 code; the fixes in section 6 are milestone 13. Measured on the development laptop: Intel Core Ultra 7 155U (2 P-cores at
 4.8 GHz with hyper-threading = CPUs 0-3, 8 E-cores at 3.8 GHz = CPUs 4-11, 2 low-power E-cores at 2.1 GHz =
