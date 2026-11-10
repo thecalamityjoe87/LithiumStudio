@@ -8,7 +8,7 @@
 
 namespace tracktion { inline namespace engine { class Edit; } }
 
-namespace ikaros
+namespace lithium
 {
 
 namespace platform { class FileLock; }
@@ -23,7 +23,7 @@ namespace platform { class FileLock; }
         open in another copy of the app.
       - A few seconds after the user stops making changes (and at most
         once a minute), it writes a recovery copy of the session. It never
-        touches the user's saved .iksession: only Save does that.
+        touches the user's saved .lisession: only Save does that.
       - While recording, it notes which files the takes go into, and writes
         MIDI to disk as it's played (audio already goes to disk as it's
         recorded), so a crash mid-take keeps what was played.
@@ -123,4 +123,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE (Autosaver)
 };
 
-} // namespace ikaros
+} // namespace lithium

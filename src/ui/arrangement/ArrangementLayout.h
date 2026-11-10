@@ -8,7 +8,7 @@
 #include "ui/theme/Tokens.h"
 #include "ui/theme/TrackColours.h"
 
-namespace ikaros::arrangement
+namespace lithium::arrangement
 {
 
 inline constexpr int headerWidth = tokens::size::trackHeaderWidth;
@@ -32,7 +32,7 @@ inline constexpr int columnRight = headerWidth - 1 - columnPadding;   // the rig
 // The "TRACKS" and "SECTIONS" labels.
 inline juce::Font columnLabelFont()
 {
-    return fonts::uiSemiBold (tokens::textSize::xs).withExtraKerningFactor (0.1f);
+    return fonts::caption (tokens::textSize::sm).withExtraKerningFactor (0.1f);
 }
 
 inline int columnLabelWidth (const juce::String& text)
@@ -64,4 +64,4 @@ void forEachVisibleBar (const ArrangementView::Geometry& geo, int width, int str
     });
 }
 
-} // namespace ikaros::arrangement
+} // namespace lithium::arrangement

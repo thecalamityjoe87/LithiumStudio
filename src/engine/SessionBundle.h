@@ -4,18 +4,18 @@
 #include <atomic>
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
 /**
-    Packing and unpacking .iksession files: a whole session (its data, every
+    Packing and unpacking .lisession files: a whole session (its data, every
     audio file it uses and its preview picture) in one file, like
     GarageBand's .band, that can move between Linux, Windows and macOS.
 
     A bundle is a ZIP archive (ZIP64 when it's over 4 GB) laid out like this:
 
-        mimetype                "application/x-ikaros-session", stored first and
+        mimetype                "application/x-lithium-session", stored first and
                                 uncompressed, so a file can be recognised from
                                 its first bytes
         bundle.json             format version, the app version that saved it,
@@ -36,15 +36,19 @@ namespace ikaros
 class SessionBundle
 {
 public:
-    static constexpr const char* extension = ".iksession";
-    static constexpr const char* mimeType = "application/x-ikaros-session";
+    static constexpr const char* extension = ".lisession";
+    static constexpr const char* mimeType = "application/x-lithium-session";
+
+    /** Bundles saved before the app was renamed (Ikaros Studio). They're the
+        same format: they open as they are, and Save writes back to them. */
+    static constexpr const char* previousExtension = ".iksession";
     static constexpr const char* sessionEntry = "Session.tracktionedit";
     static constexpr const char* previewEntry = "Preview.png";
     static constexpr const char* viewEntry = "View.xml";
     static constexpr const char* infoEntry = "bundle.json";
     static constexpr const char* audioFolder = "Audio";
 
-    /** True if the file has the .iksession extension. */
+    /** True if the file has the .lisession (or the earlier .iksession) extension. */
     static bool isBundleFile (const juce::File&);
 
     //==============================================================================
@@ -81,4 +85,4 @@ public:
     static juce::String makePortableFileName (const juce::String& name);
 };
 
-} // namespace ikaros
+} // namespace lithium

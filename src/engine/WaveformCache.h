@@ -10,7 +10,7 @@
 // Forward declaration only, so this header stays Tracktion-free (see AudioEngine.h).
 namespace tracktion { inline namespace engine { class WaveAudioClip; } }
 
-namespace ikaros
+namespace lithium
 {
 
 /** The quietest and loudest sample (-1..1) in a slice of audio. */
@@ -99,4 +99,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE (WaveformCache)
 };
 
-} // namespace ikaros
+} // namespace lithium

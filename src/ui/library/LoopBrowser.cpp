@@ -7,10 +7,10 @@
 #include "ui/library/PreviewButton.h"
 #include "ui/state/DragTypes.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -222,7 +222,7 @@ public:
         g.drawText (item.name, content.withTrimmedRight (6), juce::Justification::centredLeft, true);
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, r, size::radius);
+            LithiumLookAndFeel::drawFocusRing (g, r, size::radius);
     }
 
     void mouseDown (const juce::MouseEvent& e) override
@@ -817,7 +817,7 @@ void LoopBrowser::confirmRemove (const Item& item)
 //==============================================================================
 void LoopBrowser::paintOverChildren (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("LoopBrowser::paintOverChildren");
+    LITHIUM_PERF_PAINT ("LoopBrowser::paintOverChildren");
     // Magnifier inside the search field (its left indent leaves room).
     icons::draw (g, Icon::search, searchField.getBounds().removeFromLeft (34).toFloat().translated (2.0f, 0.0f),
                  searchField.isEnabled() ? theme().textSecondary : theme().borderStrong, 15.0f, 1.8f);
@@ -825,13 +825,13 @@ void LoopBrowser::paintOverChildren (juce::Graphics& g)
 
 void LoopBrowser::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("LoopBrowser");
+    LITHIUM_PERF_PAINT ("LoopBrowser");
     g.fillAll (theme().librarySidebarBg);
     g.setColour (theme().divider);
     g.fillRect (getLocalBounds().removeFromRight (1));
 
     g.setColour (theme().textSecondary);
-    g.setFont (fonts::uiBold (textSize::xs).withExtraKerningFactor (0.1f));
+    g.setFont (fonts::caption (textSize::sm).withExtraKerningFactor (0.1f));
     g.drawText (heading, headingArea, juce::Justification::centredLeft, true);
 
     if (rows.isEmpty())
@@ -916,4 +916,4 @@ void LoopBrowser::resized()
     layoutList();
 }
 
-} // namespace ikaros
+} // namespace lithium

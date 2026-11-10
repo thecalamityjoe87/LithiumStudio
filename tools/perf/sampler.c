@@ -3,11 +3,11 @@
     can't attach.
 
     Build:  gcc -O2 -shared -fPIC -o sampler.so tools/perf/sampler.c -ldl -lpthread -lrt
-    Use:    LD_PRELOAD=$PWD/sampler.so IKAROS_SAMPLER_OUT=prof.txt "Ikaros Studio" ...
+    Use:    LD_PRELOAD=$PWD/sampler.so LITHIUM_SAMPLER_OUT=prof.txt "Ikaros Studio" ...
     Read:   python3 tools/perf/symbolize.py prof.txt
 
     Every thread gets a timer that runs on that thread's own CPU time (like
-    perf's task-clock): after each IKAROS_SAMPLER_US microseconds (default
+    perf's task-clock): after each LITHIUM_SAMPLER_US microseconds (default
     1000) of CPU the thread has used, the kernel interrupts it with SIGPROF
     and the handler records its stack. So a thread that's busy 50% of the time
     gets half as many samples as one that's busy all the time, and idle
@@ -126,7 +126,7 @@ static int active;   // only in the app (LD_PRELOAD also reaches xvfb-run, Xvfb.
 
 __attribute__ ((constructor)) static void start (void)
 {
-    // IKAROS_SAMPLER_COMM picks the process by its name (default: the app's).
+    // LITHIUM_SAMPLER_COMM picks the process by its name (default: the app's).
     char comm[64] = "";
     FILE* f = fopen ("/proc/self/comm", "r");
 
@@ -138,15 +138,15 @@ __attribute__ ((constructor)) static void start (void)
         fclose (f);
     }
 
-    const char* wanted = getenv ("IKAROS_SAMPLER_COMM") != NULL ? getenv ("IKAROS_SAMPLER_COMM") : "Ikaros Studio";
+    const char* wanted = getenv ("LITHIUM_SAMPLER_COMM") != NULL ? getenv ("LITHIUM_SAMPLER_COMM") : "Ikaros Studio";
 
     if (strcmp (comm, wanted) != 0)
         return;
 
     active = 1;
 
-    if (getenv ("IKAROS_SAMPLER_US") != NULL)
-        intervalNs = atol (getenv ("IKAROS_SAMPLER_US")) * 1000;
+    if (getenv ("LITHIUM_SAMPLER_US") != NULL)
+        intervalNs = atol (getenv ("LITHIUM_SAMPLER_US")) * 1000;
 
     samples = calloc (maxSamples, sizeof (Sample));
 
@@ -174,12 +174,12 @@ __attribute__ ((destructor)) static void finish (void)
     for (int i = 0; i < numThreads; ++i)
         timer_delete (threads[i].timer);
 
-    const char* path = getenv ("IKAROS_SAMPLER_OUT");
+    const char* path = getenv ("LITHIUM_SAMPLER_OUT");
     char fallback[64];
 
     if (path == NULL)
     {
-        snprintf (fallback, sizeof (fallback), "/tmp/ikaros-sampler-%d.txt", (int) getpid());
+        snprintf (fallback, sizeof (fallback), "/tmp/lithium-sampler-%d.txt", (int) getpid());
         path = fallback;
     }
 

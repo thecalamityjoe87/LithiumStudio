@@ -9,7 +9,7 @@
  #include <unistd.h>
 #endif
 
-namespace ikaros::platform
+namespace lithium::platform
 {
 
 #if JUCE_WINDOWS
@@ -86,4 +86,4 @@ bool FileLock::isHeld (const juce::File& file)
 
 #endif
 
-} // namespace ikaros::platform
+} // namespace lithium::platform

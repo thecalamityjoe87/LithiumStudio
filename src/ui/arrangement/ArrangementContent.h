@@ -6,7 +6,7 @@
 #include "ui/arrangement/ArrangementAutomation.h" // ...and the automation drawn over them
 #include "ui/arrangement/ArrangementOverlays.h"   // ...and holds a DropZone by value
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -62,4 +62,4 @@ private:
     AddTrackButton addTrackButton;   // under the last track header
 };
 
-} // namespace ikaros
+} // namespace lithium

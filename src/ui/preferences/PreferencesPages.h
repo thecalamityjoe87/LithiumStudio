@@ -6,7 +6,7 @@
 #include "ui/preferences/ThemePicker.h"
 #include "ui/widgets/FolderField.h"
 
-namespace ikaros
+namespace lithium
 {
 
 // The pages of the Preferences window, one per section. Each reads its
@@ -142,4 +142,4 @@ private:
     std::unique_ptr<ShortcutList> shortcuts;
 };
 
-} // namespace ikaros
+} // namespace lithium

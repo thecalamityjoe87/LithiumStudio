@@ -1,7 +1,7 @@
 #include "app/AppMenuModel.h"
 #include "app/CommandIDs.h"
 
-namespace ikaros
+namespace lithium
 {
 
 AppMenuModel::AppMenuModel (juce::ApplicationCommandManager& cm) : commands (cm)
@@ -159,4 +159,4 @@ juce::PopupMenu AppMenuModel::getMenuForIndex (int, const juce::String& name)
     return m;
 }
 
-} // namespace ikaros
+} // namespace lithium

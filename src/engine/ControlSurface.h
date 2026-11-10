@@ -9,7 +9,7 @@
 #include <map>
 #include <memory>
 
-namespace ikaros
+namespace lithium
 {
 
 /** A Mackie Control surface: a controller's "MCU" port (see isMackiePort),
@@ -120,4 +120,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ControlSurface)
 };
 
-} // namespace ikaros
+} // namespace lithium

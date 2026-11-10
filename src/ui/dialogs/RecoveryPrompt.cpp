@@ -1,7 +1,7 @@
 #include "ui/dialogs/RecoveryPrompt.h"
 #include "ui/dialogs/AlertDialog.h"
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -75,7 +75,7 @@ namespace
         const auto session = remaining.front();
         auto options = juce::MessageBoxOptions()
                            .withTitle ("Recover unsaved work?")
-                           .withMessage ("Ikaros Studio quit unexpectedly while \"" + session.name + "\" was open. "
+                           .withMessage ("Lithium Studio quit unexpectedly while \"" + session.name + "\" was open. "
                                          "Its work was saved automatically " + describeTime (session.savedAt) + ".\n\n"
                                          "Recover it, or discard the unsaved work?")
                            .withButton ("Recover", 1)
@@ -121,4 +121,4 @@ void RecoveryPrompt::show (juce::Component& parent, AudioEngine& engine, std::fu
     ask (SafeParent (&parent), engine, engine.findRecoverableSessions(), std::move (done));
 }
 
-} // namespace ikaros
+} // namespace lithium

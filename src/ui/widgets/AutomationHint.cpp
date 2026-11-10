@@ -3,7 +3,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -199,7 +199,7 @@ void setAutomatedLook (juce::Slider& s, bool automated)
 {
     if ((bool) s.getProperties()["automated"] != automated)
     {
-        s.getProperties().set ("automated", automated);   // read by IkarosLookAndFeel
+        s.getProperties().set ("automated", automated);   // read by LithiumLookAndFeel
         s.repaint();
     }
 }
@@ -221,4 +221,4 @@ void showAutomationHint (AudioEngine& engine, juce::Component& control, TrackId 
                       });
 }
 
-} // namespace ikaros
+} // namespace lithium

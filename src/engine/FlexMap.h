@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 /** One warp marker, in seconds: where a moment of the recording is in its
@@ -261,4 +261,4 @@ namespace flexmap
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

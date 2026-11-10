@@ -7,7 +7,7 @@
 #include <array>
 #include <optional>
 
-namespace ikaros
+namespace lithium
 {
 
 /** The drum pieces the Drummer plays. The groove library (see
@@ -114,4 +114,4 @@ struct DrummerInfo
     juce::String kit;           // the library sound (SoundInfo::id) a new Drummer track plays
 };
 
-} // namespace ikaros
+} // namespace lithium

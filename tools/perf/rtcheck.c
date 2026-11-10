@@ -2,11 +2,11 @@
     shouldn't (Linux, GCC or Clang; a stand-in for Clang's RealtimeSanitizer).
 
     Build:  gcc -O2 -shared -fPIC -o rtcheck.so tools/perf/rtcheck.c -ldl -lpthread
-    Use:    IKAROS_PERF=1 LD_PRELOAD=$PWD/rtcheck.so IKAROS_RTCHECK_OUT=rt.txt "Ikaros Studio" ...
+    Use:    LITHIUM_PERF=1 LD_PRELOAD=$PWD/rtcheck.so LITHIUM_RTCHECK_OUT=rt.txt "Ikaros Studio" ...
     Read:   python3 tools/perf/symbolize.py rt.txt
 
-    PerfMonitor calls ikaros_rtcheck_enter() at the start of each audio
-    callback and ikaros_rtcheck_leave() at the end. In between, on that
+    PerfMonitor calls lithium_rtcheck_enter() at the start of each audio
+    callback and lithium_rtcheck_leave() at the end. In between, on that
     thread only, this counts calls to malloc/free & co., mutex/rwlock/condition
     waits, semaphores, sleeps and file I/O, and keeps a stack trace of a
     sample of them. Everything is written out when the app exits.
@@ -97,13 +97,13 @@ static void note (int event)
     inHook = 0;
 }
 
-void ikaros_rtcheck_enter (void)
+void lithium_rtcheck_enter (void)
 {
     inRealtime = 1;
     eventsThisCallback = 0;
 }
 
-void ikaros_rtcheck_leave (void)
+void lithium_rtcheck_leave (void)
 {
     inRealtime = 0;
     atomic_fetch_add_explicit (&callbacks, 1, memory_order_relaxed);
@@ -216,12 +216,12 @@ __attribute__ ((destructor)) static void writeReport (void)
     if (atomic_load (&callbacks) == 0)
         return;
 
-    const char* path = getenv ("IKAROS_RTCHECK_OUT");
+    const char* path = getenv ("LITHIUM_RTCHECK_OUT");
     char fallback[64];
 
     if (path == NULL)
     {
-        snprintf (fallback, sizeof (fallback), "/tmp/ikaros-rtcheck-%d.txt", (int) getpid());
+        snprintf (fallback, sizeof (fallback), "/tmp/lithium-rtcheck-%d.txt", (int) getpid());
         path = fallback;
     }
 

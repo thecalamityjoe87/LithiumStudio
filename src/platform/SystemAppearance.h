@@ -3,7 +3,7 @@
 #include <functional>
 #include <memory>
 
-namespace ikaros::platform
+namespace lithium::platform
 {
 
 /*  Whether the desktop is set to dark mode, for Preferences > Appearance >
@@ -37,4 +37,4 @@ private:
     std::unique_ptr<Portal> portal;   // Linux only; null elsewhere
 };
 
-} // namespace ikaros::platform
+} // namespace lithium::platform

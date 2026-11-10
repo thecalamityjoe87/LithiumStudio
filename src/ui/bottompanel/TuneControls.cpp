@@ -6,7 +6,7 @@
 #include "ui/theme/Tokens.h"
 #include "ui/toolbar/LcdDisplay.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -471,9 +471,9 @@ void TuneControls::paint (juce::Graphics& g)
 {
     // Section captions, in small capitals.
     g.setColour (theme().textSecondary);
-    g.setFont (fonts::uiSemiBold (textSize::sm).withExtraKerningFactor (0.08f));
+    g.setFont (fonts::caption (textSize::sm).withExtraKerningFactor (0.08f));
     g.drawText ("NOTES IT CAN LAND ON", notesLabel, juce::Justification::centredLeft);
     g.drawText ("INPUT " + arrow + " TARGET", readoutLabel, juce::Justification::centredRight);
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -14,7 +14,7 @@
 
 namespace te = tracktion;   // the conventional short alias used in Tracktion's own examples
 
-namespace ikaros::detail
+namespace lithium::detail
 {
 
 // Extra properties we store on each track's ValueTree. Tracktion saves
@@ -302,4 +302,4 @@ inline bool isRoutedMidiInput (te::InputDevice& d)
         || (d.getDeviceType() == te::InputDevice::virtualMidiDevice && d.getName() == keyboardDeviceName);
 }
 
-} // namespace ikaros::detail
+} // namespace lithium::detail

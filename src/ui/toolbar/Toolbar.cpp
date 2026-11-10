@@ -7,7 +7,7 @@
 #include "ui/theme/Tokens.h"
 #include "ui/widgets/Decibels.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -137,7 +137,7 @@ void Toolbar::update (bool libraryVisible)
 
 void Toolbar::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("Toolbar");
+    LITHIUM_PERF_PAINT ("Toolbar");
     g.fillAll (theme().toolbarBg);
     g.setColour (theme().toolbarBorder);
     g.fillRect (getLocalBounds().removeFromBottom (1));
@@ -204,7 +204,7 @@ juce::String Toolbar::getTooltip()
         tip << "\n\n" << (realtimeBadge
                 ? "RT: real-time audio is on. Sound comes first on this computer, so small buffer sizes play cleanly."
                 : "Real-time audio is off: other programs can hold up the sound, so small buffer sizes may crackle. "
-                  "(Ikaros asks the system's RealtimeKit service for it.)");
+                  "(Lithium Studio asks the system's RealtimeKit service for it.)");
 
     return tip;
 }
@@ -247,4 +247,4 @@ void Toolbar::resized()
     speakerArea = right.removeFromRight (speakerWidth).withSizeKeepingCentre (speakerWidth, speakerWidth);
 }
 
-} // namespace ikaros
+} // namespace lithium

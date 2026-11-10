@@ -11,7 +11,7 @@
  #include <unistd.h>
 #endif
 
-namespace ikaros::platform
+namespace lithium::platform
 {
 
 bool refreshAudioDeviceLists (juce::AudioDeviceManager& manager, HardwareWatch& watch)
@@ -314,4 +314,4 @@ bool keepOnFastestCores (std::int64_t threadId)
    #endif
 }
 
-} // namespace ikaros::platform
+} // namespace lithium::platform

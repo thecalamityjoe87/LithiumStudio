@@ -1,6 +1,6 @@
 #include "engine/AmpStyles.h"
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -92,4 +92,4 @@ int getDefaultAmpVoiceFor (const juce::String& trackIcon)
     return 0;   // Clean
 }
 
-} // namespace ikaros
+} // namespace lithium

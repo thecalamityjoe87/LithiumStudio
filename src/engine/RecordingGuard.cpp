@@ -4,7 +4,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -339,4 +339,4 @@ AudioDeviceStatus RecordingGuard::getDeviceStatus() const
     return s;
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -8,7 +8,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace detail;
@@ -218,7 +218,7 @@ void InputRouter::routeAudioInputs()
     auto& dm = owner.getTeEngine().getDeviceManager();
 
     // The inputs themselves (each channel on its own, plus stereo pairs) are
-    // laid out by IkarosEngineBehaviour::describeWaveDevices.
+    // laid out by LithiumEngineBehaviour::describeWaveDevices.
     bool devicesChanged = false;
 
     // Only the channels the audio device actually opened carry audio (with
@@ -299,7 +299,7 @@ void InputRouter::routeAudioInputs()
     }
 
     owner.getLiveWaveform().setInputChannels (takeChannels[0], takeChannels[1]);
-    const bool tunerMutes = tuner.isActive() && owner.getPreferences().get (ikaros::settings::muteWhileTuning);   // ikaros:: because the local `settings` hides the namespace
+    const bool tunerMutes = tuner.isActive() && owner.getPreferences().get (lithium::settings::muteWhileTuning);   // lithium:: because the local `settings` hides the namespace
 
     for (auto* instance : edit->getAllInputDevices())
     {
@@ -500,4 +500,4 @@ void InputRouter::allNotesOff()
             noteOff (n);
 }
 
-} // namespace ikaros
+} // namespace lithium

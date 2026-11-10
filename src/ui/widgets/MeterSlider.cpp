@@ -1,9 +1,9 @@
 #include "ui/widgets/MeterSlider.h"
 #include "ui/widgets/PaintProbe.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -29,7 +29,7 @@ void MeterSlider::setLevel (StereoLevel level)
 
 void MeterSlider::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("MeterSlider");
+    LITHIUM_PERF_PAINT ("MeterSlider");
     // juce::Slider normally asks the LookAndFeel to draw it. This draws it
     // itself: the meter bars across the handle's travel, then the handle.
     // getPositionOfValue gives the handle's x for a value, so the bars line
@@ -60,7 +60,7 @@ void MeterSlider::paint (juce::Graphics& g)
     g.fillEllipse (thumb);
 
     if (hasKeyboardFocus (false))
-        IkarosLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat().expanded (2.0f), size::radiusXs);
+        LithiumLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat().expanded (2.0f), size::radiusXs);
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -5,16 +5,16 @@
 
 #include <set>
 
-namespace ikaros
+namespace lithium
 {
 
 class MainComponent;
 
-/*  Debug-only stress harness (IKAROS_PERF=1, see docs/perf-report.md).
+/*  Debug-only stress harness (LITHIUM_PERF=1, see docs/perf-report.md).
 
     Started from the command line, e.g.
 
-        IKAROS_PERF=1 "Ikaros Studio" --perf-scenario=mix --perf-tracks=16
+        LITHIUM_PERF=1 "Lithium Studio" --perf-scenario=mix --perf-tracks=16
                                       --perf-buffer=256 --perf-rate=48000 --perf-seconds=30
 
     it builds a session from scratch (so runs are the same every time and
@@ -115,4 +115,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PerfHarness)
 };
 
-} // namespace ikaros
+} // namespace lithium

@@ -4,7 +4,7 @@
 #include "engine/TrackHelpers.h"
 #include <algorithm>
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace detail;
@@ -12,7 +12,7 @@ using namespace detail;
 namespace
 {
     // The sections live in the Edit's own ValueTree, which Tracktion saves
-    // as it is (unknown children included), so they're in the .iksession and
+    // as it is (unknown children included), so they're in the .lisession and
     // every change to them goes through the undo manager like any other edit.
     //
     //   EDIT
@@ -547,4 +547,4 @@ void SectionEditor::rearrange (const std::vector<Piece>& pieces)
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

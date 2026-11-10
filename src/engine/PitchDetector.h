@@ -4,7 +4,7 @@
 #include <optional>
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -77,4 +77,4 @@ struct NotePitch
     int getOctave() const noexcept      { return midiNote / 12 - 1; }
 };
 
-} // namespace ikaros
+} // namespace lithium

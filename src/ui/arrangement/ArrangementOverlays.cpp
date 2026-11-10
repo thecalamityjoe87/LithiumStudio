@@ -1,10 +1,10 @@
 #include "ui/arrangement/ArrangementOverlays.h"
 #include "ui/widgets/PaintProbe.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -19,7 +19,7 @@ ArrangementView::DropZone::DropZone()
 
 void ArrangementView::DropZone::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("ArrangementView::DropZone");
+    LITHIUM_PERF_PAINT ("ArrangementView::DropZone");
     auto r = getLocalBounds().toFloat().reduced (1.0f);
 
     juce::Path outline, dashed;
@@ -77,7 +77,7 @@ void ArrangementView::AddTrackButton::paintButton (juce::Graphics& g, bool isMou
     g.drawText (text, group, juce::Justification::centredLeft, false);
 
     if (hasKeyboardFocus (false))
-        IkarosLookAndFeel::drawFocusRing (g, r, size::radiusCard);
+        LithiumLookAndFeel::drawFocusRing (g, r, size::radiusCard);
 }
 
 //==============================================================================
@@ -134,7 +134,7 @@ void ArrangementView::Playhead::setX (float newX)
 
 void ArrangementView::Playhead::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("ArrangementView::Playhead");
+    LITHIUM_PERF_PAINT ("ArrangementView::Playhead");
     if (x < -8.0f || x > (float) getWidth() + 8.0f)
         return;
 
@@ -200,7 +200,7 @@ void ArrangementView::Overlay::clear()
 
 void ArrangementView::Overlay::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("ArrangementView::Overlay");
+    LITHIUM_PERF_PAINT ("ArrangementView::Overlay");
     for (auto& ghost : ghosts)
     {
         const auto ghostColour = theme().family (ghost.family);
@@ -232,4 +232,4 @@ void ArrangementView::Overlay::paint (juce::Graphics& g)
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

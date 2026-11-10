@@ -7,7 +7,7 @@
 #include <functional>
 #include <optional>
 
-namespace ikaros
+namespace lithium
 {
 
 class AudioEngine;
@@ -172,4 +172,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RegionEditor)
 };
 
-} // namespace ikaros
+} // namespace lithium

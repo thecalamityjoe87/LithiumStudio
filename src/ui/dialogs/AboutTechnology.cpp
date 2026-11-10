@@ -4,7 +4,7 @@
 #include "ui/theme/Theme.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -153,7 +153,7 @@ AboutTechnology::AboutTechnology()
                            "MIT", "https://github.com/sevagh/pitch-detection"));
     others.add (new Entry ("LAME", "LAME", "Encodes MP3 exports",
                            "LGPL", "https://lame.sourceforge.io"));
-    others.add (new Entry ("miniz", "mz", "Reads and writes .iksession files",
+    others.add (new Entry ("miniz", "mz", "Reads and writes .lisession files",
                            "MIT", "https://github.com/richgel999/miniz"));
     others.add (new Entry ("Lucide", "Lu", "Some of the instrument icons",
                            "ISC", "https://lucide.dev"));
@@ -210,8 +210,8 @@ void AboutTechnology::paint (juce::Graphics& g)
     g.setColour (theme().textSecondary);
     g.setFont (fonts::ui (textSize::sm));
     g.drawFittedText ("Click a project to visit its website. Credits and licenses are under Acknowledgements, "
-                      "and the full license texts are in the CREDITS file that comes with Ikaros Studio.",
+                      "and the full license texts are in the CREDITS file that comes with Lithium Studio.",
                       footer, juce::Justification::bottomLeft, 2, 1.0f);
 }
 
-} // namespace ikaros
+} // namespace lithium

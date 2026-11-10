@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -47,4 +47,4 @@ namespace drumkit
     juce::StringArray wordsOf (const juce::String& name);
 }
 
-} // namespace ikaros
+} // namespace lithium

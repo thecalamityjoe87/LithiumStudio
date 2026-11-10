@@ -2,11 +2,11 @@
 #include "engine/PedalStyles.h"
 #include "ui/bottompanel/PedalView.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 #include "ui/widgets/CachedShadow.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -77,7 +77,7 @@ public:
         }
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, pedal.expanded (2.0f), size::radiusCard);
+            LithiumLookAndFeel::drawFocusRing (g, pedal.expanded (2.0f), size::radiusCard);
     }
 
     bool keyPressed (const juce::KeyPress& key) override
@@ -383,7 +383,7 @@ void AddPedalDialog::Content::paint (juce::Graphics& g)
     {
         auto area = heading.area.withTrimmedLeft (tileMargin).withTrimmedTop (6);
         const auto name = heading.name.toUpperCase();
-        const auto nameFont = fonts::uiBold (textSize::sm).withExtraKerningFactor (0.08f);
+        const auto nameFont = fonts::caption (textSize::md).withExtraKerningFactor (0.08f);
 
         g.setColour (theme().textSecondary);
         g.setFont (nameFont);
@@ -397,4 +397,4 @@ void AddPedalDialog::Content::paint (juce::Graphics& g)
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -1,10 +1,10 @@
 #include "ui/bottompanel/NoiseGateView.h"
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/TrackColours.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -79,7 +79,7 @@ void NoiseGateView::refresh()
             threshold.setValue (gate.threshold, juce::dontSendNotification);
 
         threshold.setEnabled (gate.on);
-        IkarosLookAndFeel::setFamilyColour (threshold, colour::familyOf (*track));
+        LithiumLookAndFeel::setFamilyColour (threshold, colour::familyOf (*track));
         thresholdText = gate.thresholdText;
     }
 
@@ -128,4 +128,4 @@ void NoiseGateView::resized()
     hintArea = r.removeFromTop (32);
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -23,7 +23,7 @@
 #include <juce_graphics/juce_graphics.h>
 #include <array>
 
-namespace ikaros
+namespace lithium
 {
 
 struct ThemePalette
@@ -91,12 +91,12 @@ struct ThemePalette
 
     // The transport readout
     juce::Colour lcdBg, lcdBorder, lcdLabel;
-    // The bar · beat position: amber in both themes, like the playhead
+    // The bar · beat position: cyan in both themes, like the playhead
     // whose position it shows. The one exception to "the accent only means
     // on" below: it's the playhead's colour, not an "on" state.
     juce::Colour lcdValue;
     // The tuner's note, needle and cents once the string is in tune (they're
-    // lcdValue's amber until then).
+    // lcdValue's cyan until then).
     juce::Colour lcdInTune;
 
     // Text
@@ -115,7 +115,9 @@ struct ThemePalette
     // master's in the toolbar uses sliderTrack, the track headers' this one.
     juce::Colour volumeSliderTrack;
     juce::Colour thumb, meterThumbRing;
-    juce::Colour faderCap;            // the mixer's vertical faders
+    // The mixer's vertical faders: a small raised cap with a line across
+    // its middle, as on Lithium Drums.
+    juce::Colour faderCap, faderCapBorder, faderCapLine;
 
     // Knobs: the big Smart Controls knobs and the compact ones (pan, sends).
     juce::Colour knobBody, knobRim, knobPointer, knobTrack;
@@ -137,8 +139,6 @@ struct ThemePalette
 
     // The round play button on a hovered library sound
     juce::Colour previewFill, previewIcon;
-
-    juce::Colour logoOutline;         // keeps the dark logo tile visible on a dark title bar
 
     // The accent only ever means "on": active toggles (cycle, metronome,
     // count-in, a muted track's Mute, Flex, open automation), Play while
@@ -209,7 +209,7 @@ struct ThemePalette
 
         // Region bodies are the family colour at these alphas over the lane;
         // their headers are the full colour.
-        float regionBodyAlpha = 0.2f, regionBodySelectedAlpha = 0.28f;
+        float regionBodyAlpha = 0.32f, regionBodySelectedAlpha = 0.42f;
     };
 
     Arrangement arrangement;
@@ -227,4 +227,4 @@ const ThemePalette& theme();
 /** Makes a palette the active one. Doesn't repaint anything by itself. */
 void setActivePalette (const ThemePalette&);
 
-} // namespace ikaros
+} // namespace lithium

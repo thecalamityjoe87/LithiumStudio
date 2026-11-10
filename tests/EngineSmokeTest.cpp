@@ -1,6 +1,6 @@
 // Engine-layer smoke test: exercises AudioEngine + TrackController without any UI.
-// Build with -DIKAROS_BUILD_TESTS=ON, then run `ctest --test-dir build` or the
-// IkarosEngineSmokeTest binary directly.
+// Build with -DLITHIUM_BUILD_TESTS=ON, then run `ctest --test-dir build` or the
+// LithiumEngineSmokeTest binary directly.
 
 #include "engine/AudioEngine.h"
 #include "engine/AudioDeviceWatcher.h"
@@ -46,13 +46,13 @@
 #include <tuple>
 #include <iostream>
 
-using namespace ikaros;
+using namespace lithium;
 
 static int failures = 0;
 
 // Tracktion settings of our own, so the test never changes the app's (and
 // test plug-ins never show up in the real library).
-static const juce::String testSettings ("IkarosStudioSmokeTest");
+static const juce::String testSettings ("LithiumStudioSmokeTest");
 
 static void check (bool condition, const char* what)
 {
@@ -128,7 +128,7 @@ static juce::StringArray flatten (const juce::String& xml)
 // Checks a session snapshot (AudioEngine::getStateSnapshot) is the same as
 // the expected one, and if not prints what differs. After an undo, a
 // plug-in setting that wasn't stored before may now be stored,
-// at its old value: Ikaros stores a setting's value before the first change
+// at its old value: Lithium Studio stores a setting's value before the first change
 // to it (see setParameterUndoably) so undo has a value to go back to. It must
 // not still have the edited value, though (pass the edited snapshot as
 // "edited" to check that).
@@ -815,7 +815,7 @@ static void runRecordingSection (const juce::File& dir)
 
 // A long take of generated clicks, one a second: the take must hold every
 // one exactly a second apart (no drift, no lost samples), and memory must
-// stay flat. IKAROS_LONG_TAKE_MINUTES sets the length (default 20).
+// stay flat. LITHIUM_LONG_TAKE_MINUTES sets the length (default 20).
 //==============================================================================
 // Takes: cycle recording, recording over regions, choosing, deleting and
 // flattening takes, and takes in saved, exported and recovered sessions.
@@ -1015,7 +1015,7 @@ static void runTakesSection (const juce::File& dir)
 
     std::cout << "Saving and reopening\n";
     {
-        auto file = dir.getChildFile ("Takes.iksession");
+        auto file = dir.getChildFile ("Takes.lisession");
         takes.setCurrentTake (cycle, 3);
         pumpMessages();
         checkSaveAndReopen (engine, file);
@@ -1039,7 +1039,7 @@ static void runTakesSection (const juce::File& dir)
 
         check (wavsIn (AudioEngine::getSessionFileFor (file)) == 5, "every take's file is in the saved session");
 
-        auto copy = dir.getChildFile ("Takes Copy.iksession");
+        auto copy = dir.getChildFile ("Takes Copy.lisession");
         check (engine.saveSessionAs (copy) && wavsIn (AudioEngine::getSessionFileFor (copy)) == 5, "and in a copy saved with Save As");
         std::cout << "    (" << wavsIn (AudioEngine::getSessionFileFor (copy)) << " files in the copy)\n";
         check (near (loudness() / take1, 4.0f), "the reopened region plays its current take");
@@ -1353,7 +1353,7 @@ static void runTakesSection (const juce::File& dir)
 
 static void runLongRecordingSection()
 {
-    const auto minutes = juce::jmax (1, juce::SystemStats::getEnvironmentVariable ("IKAROS_LONG_TAKE_MINUTES", "20").getIntValue());
+    const auto minutes = juce::jmax (1, juce::SystemStats::getEnvironmentVariable ("LITHIUM_LONG_TAKE_MINUTES", "20").getIntValue());
     std::cout << "A " << minutes << " minute take\n";
 
     AudioEngine engine { testSettings, false };
@@ -1803,7 +1803,7 @@ static void runEffectsSection (const juce::File& dir)
 // and remembered on this computer when the session closes, saved or not.
 static void runViewsSection (const juce::File& dir)
 {
-    const auto songA = dir.getChildFile ("Views A.iksession"), songB = dir.getChildFile ("Views B.iksession");
+    const auto songA = dir.getChildFile ("Views A.lisession"), songB = dir.getChildFile ("Views B.lisession");
 
     // The UI's view, reduced to one number.
     int shown = 1;
@@ -2068,9 +2068,9 @@ static void runPreferencesSection (const juce::File& dir)
 
         {
             check (! engine.getSounds().findPack ("ikaros-studio.test").has_value(), "the test sound pack isn't in the library at first");
-            prefs.set (settings::userSoundsFolder, juce::File (IKAROS_TEST_FIXTURES).getFullPathName());
+            prefs.set (settings::userSoundsFolder, juce::File (LITHIUM_TEST_FIXTURES).getFullPathName());
             check (engine.getSounds().findPack ("ikaros-studio.test").has_value()
-                     && engine.getPackStore().getInstallFolder() == juce::File (IKAROS_TEST_FIXTURES),
+                     && engine.getPackStore().getInstallFolder() == juce::File (LITHIUM_TEST_FIXTURES),
                    "choosing a sound pack folder loads the packs in it, and downloads go there");
             prefs.set (settings::userSoundsFolder, "");
         }
@@ -4717,7 +4717,7 @@ static void runPedalsSection (const juce::File& dir)
         // render_references.sh plays this much silence first and leaves it
         // out (the originals fade in, and their knobs glide to the settings).
         constexpr int preroll = 48000, blockSize = 512;
-        const auto folder = juce::File (IKAROS_TEST_FIXTURES).getChildFile ("pedals");
+        const auto folder = juce::File (LITHIUM_TEST_FIXTURES).getChildFile ("pedals");
 
         auto readWav = [] (const juce::File& file)
         {
@@ -4858,7 +4858,7 @@ static void runPedalsSection (const juce::File& dir)
         juce::AudioBuffer<float> guitar (1, 96000);
         guitar.clear();
         juce::WavAudioFormat wav;
-        const auto fixture = juce::File (IKAROS_TEST_FIXTURES).getChildFile ("pedals/di_guitar.wav");
+        const auto fixture = juce::File (LITHIUM_TEST_FIXTURES).getChildFile ("pedals/di_guitar.wav");
 
         if (std::unique_ptr<juce::AudioFormatReader> reader { wav.createReaderFor (fixture.createInputStream().release(), true) })
             reader->read (&guitar, 0, 96000, 0, true, false);
@@ -4942,7 +4942,7 @@ static void runPedalsSection (const juce::File& dir)
         juce::AudioBuffer<float> audio (2, 96000);
         audio.clear();
         juce::WavAudioFormat wav;
-        const auto fixture = juce::File (IKAROS_TEST_FIXTURES).getChildFile ("pedals/di_guitar.wav");
+        const auto fixture = juce::File (LITHIUM_TEST_FIXTURES).getChildFile ("pedals/di_guitar.wav");
 
         if (std::unique_ptr<juce::AudioFormatReader> reader { wav.createReaderFor (fixture.createInputStream().release(), true) })
             reader->read (&audio, 0, 96000, 0, true, true);   // the mono file into both channels
@@ -5023,7 +5023,7 @@ static void runPedalsSection (const juce::File& dir)
         juce::StringArray types;
 
         for (auto& style : getPedalStyles())
-            if (style.pluginType.startsWith ("ikaros") && types.size() < EffectsController::maxEffectsPerTrack)
+            if (style.pluginType.startsWith ("lithium") && types.size() < EffectsController::maxEffectsPerTrack)
                 types.add (style.pluginType);
 
         for (auto& type : types)
@@ -5378,7 +5378,7 @@ static void runAmpSection (const juce::File& dir)
 
     std::cout << "Sound\n";
     {
-        const auto di = readAudioFile (juce::File (IKAROS_TEST_FIXTURES).getChildFile ("pedals/di_guitar.wav"));
+        const auto di = readAudioFile (juce::File (LITHIUM_TEST_FIXTURES).getChildFile ("pedals/di_guitar.wav"));
         check (di.getNumSamples() == 96000, "(the DI guitar is two seconds long)");
         auto* edit = TestAudioDevice::getEditOf (engine);
         constexpr int blockSize = 512;
@@ -5567,7 +5567,7 @@ static void runAmpSection (const juce::File& dir)
     {
         // Saved and exported by the app before this milestone (see
         // tests/fixtures/sessions/README).
-        const auto fixtures = juce::File (IKAROS_TEST_FIXTURES).getChildFile ("sessions");
+        const auto fixtures = juce::File (LITHIUM_TEST_FIXTURES).getChildFile ("sessions");
         const auto session = dir.getChildFile ("Before Amp.iksession");
         fixtures.getChildFile ("Before Amp.iksession").copyFileTo (session);
         check (engine.openSession (session), "(open)");
@@ -6061,7 +6061,7 @@ static void runDrummerSection (const juce::File& dir)
     check (drummerEditor.getSettings (region).has_value() && drummerEditor.getSettings (region)->drummer == "rock"
              && list.front().name == "Rock", "it's the Rock drummer");
     check (info && info->soundId == DrummerEditor::fallbackKit && drummerEditor.getMissingKitPack (drums) == "ikaros-studio.avl-red-zeppelin",
-           "until its kit is downloaded it plays the Ikaros Basics kit, and offers the download");
+           "until its kit is downloaded it plays the Lithium Basics kit, and offers the download");
 
     SectionId firstSection = 0;
     checkUndoRoundTrip (engine, "Add Section", [&] { firstSection = sections.addSection (2); });   // bars 2 to 10
@@ -6355,7 +6355,7 @@ static void runDrummerSection (const juce::File& dir)
 
     std::cout << "Sessions from before the Drummer\n";
     {
-        const auto fixtures = juce::File (IKAROS_TEST_FIXTURES).getChildFile ("sessions");
+        const auto fixtures = juce::File (LITHIUM_TEST_FIXTURES).getChildFile ("sessions");
         const auto session = dir.getChildFile ("Before Drummer.iksession");
         fixtures.getChildFile ("Before Amp.iksession").copyFileTo (session);   // saved before milestone 9, so before the Drummer too
         check (engine.openSession (session), "(open)");
@@ -6879,7 +6879,7 @@ static void runTuneSection (const juce::File& dir)
     pumpMessages();
 
     {
-        const auto file = dir.getChildFile ("Tune.iksession");
+        const auto file = dir.getChildFile ("Tune.lisession");
         check (engine.saveSessionAs (file), "(save)");
         engine.beginUndoStep ("Tune Key");
         effects.setTuneKey (voice, tuneId, 2);
@@ -7231,7 +7231,7 @@ static void runPitchSection (const juce::File& dir)
     check (pitch.finishRendering (120000), "(the renders finish)");
     pumpMessages();
     const auto treeBefore = pitchTree();
-    const auto sessionFile = dir.getChildFile ("Pitch.iksession");
+    const auto sessionFile = dir.getChildFile ("Pitch.lisession");
     check (engine.saveSessionAs (sessionFile), "(save)");
     check (engine.openSession (AudioEngine::getSessionFileFor (sessionFile)), "(reopen)");
     pumpMessages();
@@ -7292,7 +7292,7 @@ static void runPitchSection (const juce::File& dir)
     // Sessions from before this milestone open unchanged.
     std::cout << "Sessions from before Pitch mode\n";
     {
-        const auto fixtures = juce::File (IKAROS_TEST_FIXTURES).getChildFile ("sessions");
+        const auto fixtures = juce::File (LITHIUM_TEST_FIXTURES).getChildFile ("sessions");
         const auto session = dir.getChildFile ("Before Amp.iksession");
         fixtures.getChildFile ("Before Amp.iksession").copyFileTo (session);
         check (engine.openSession (session), "(open)");
@@ -7423,10 +7423,10 @@ int main (int argc, char* argv[])
         return (only.isEmpty() || only == section) && ! skipped.contains (section);
     };
 
-    // The test plug-ins (built with -DIKAROS_BUILD_TEST_PLUGINS=ON), if any.
+    // The test plug-ins (built with -DLITHIUM_BUILD_TEST_PLUGINS=ON), if any.
     const auto testPlugins = args.isEmpty() ? juce::File() : juce::File (args[0]);
 
-    auto dir = juce::File::getSpecialLocation (juce::File::tempDirectory).getChildFile ("IkarosSmokeTest");
+    auto dir = juce::File::getSpecialLocation (juce::File::tempDirectory).getChildFile ("LithiumSmokeTest");
     dir.deleteRecursively();
     dir.createDirectory();
 
@@ -7437,13 +7437,13 @@ int main (int argc, char* argv[])
     // recovery) go in a local data folder of the test's (see
     // platform::getLocalDataFolder).
    #if JUCE_WINDOWS
-    _putenv_s ("IKAROS_USER_SOUNDS_DIR", userSounds.toRawUTF8());
+    _putenv_s ("LITHIUM_USER_SOUNDS_DIR", userSounds.toRawUTF8());
    #else
     const auto localData = dir.getChildFile ("Local Data").getFullPathName();
-    setenv ("IKAROS_USER_SOUNDS_DIR", userSounds.toRawUTF8(), 1);
+    setenv ("LITHIUM_USER_SOUNDS_DIR", userSounds.toRawUTF8(), 1);
     setenv ("XDG_DATA_HOME", localData.toRawUTF8(), 1);
    #endif
-    auto file = AudioEngine::getSessionFileFor (dir.getChildFile ("Smoke"));   // Smoke.iksession
+    auto file = AudioEngine::getSessionFileFor (dir.getChildFile ("Smoke"));   // Smoke.lisession
 
     if (runs ("main"))
     {
@@ -7816,12 +7816,12 @@ int main (int argc, char* argv[])
             auto recent = engine.getRecentSessions();
             check (! recent.empty() && recent.front().file == file && recent.front().name == "Smoke",
                    "a saved session goes to the top of the recent list");
-            check (file == dir.getChildFile ("Smoke.iksession") && engine.getSessionFile() == file,
-                   "a session is saved as one .iksession file");
+            check (file == dir.getChildFile ("Smoke.lisession") && engine.getSessionFile() == file,
+                   "a session is saved as one .lisession file");
 
             const auto mime = SessionBundle::readEntry (file, "mimetype").toString();
             const auto info = juce::JSON::parse (SessionBundle::readEntry (file, SessionBundle::infoEntry).toString());
-            check (mime == SessionBundle::mimeType && info["appVersion"].toString() == IKAROS_VERSION
+            check (mime == SessionBundle::mimeType && info["appVersion"].toString() == LITHIUM_VERSION
                      && SessionBundle::readEntry (file, SessionBundle::sessionEntry).getSize() > 0,
                    "the bundle holds its mimetype, bundle.json and the session");
 
@@ -7831,7 +7831,8 @@ int main (int argc, char* argv[])
             juce::MemoryBlock head;
             juce::FileInputStream (file).readIntoMemoryBlock (head, 80);
             check (head.toString().substring (0, 2) == "PK"
-                     && juce::String::fromUTF8 ((const char*) head.getData() + 30, 36) == "mimetypeapplication/x-ikaros-session",
+                     && juce::String::fromUTF8 ((const char*) head.getData() + 30, 8 + (int) std::strlen (SessionBundle::mimeType))
+                          == juce::String ("mimetype") + SessionBundle::mimeType,
                    "and its type can be recognised from its first bytes");
 
             // The preview the UI writes before saving goes into the bundle too.
@@ -8276,7 +8277,7 @@ int main (int argc, char* argv[])
             // Sessions saved before the fix have those invalid attributes;
             // they still open.
             {
-                auto broken = dir.getChildFile ("Broken Echo.iksession");
+                auto broken = dir.getChildFile ("Broken Echo.lisession");
                 auto brokenEdit = dir.getChildFile ("Broken Echo.tracktionedit");
                 brokenEdit.replaceWithText (savedEdit.replace ("<PLUGIN type=\"delay\"",
                                                                "<PLUGIN type=\"delay\" mix proportion=\"0.3\" 12=\"0.5\""));
@@ -8380,8 +8381,10 @@ int main (int argc, char* argv[])
         };
 
         auto songFile = AudioEngine::getSessionFileFor (dir.getChildFile ("Song"));
-        check (songFile == dir.getChildFile ("Song.iksession") && AudioEngine::getSessionFileFor (songFile) == songFile,
-               "Save As adds the .iksession extension (once)");
+        check (songFile == dir.getChildFile ("Song.lisession") && AudioEngine::getSessionFileFor (songFile) == songFile,
+               "Save As adds the .lisession extension (once)");
+        check (AudioEngine::getSessionFileFor (dir.getChildFile ("Old.iksession")) == dir.getChildFile ("Old.iksession"),
+               "a session saved before the rename (.iksession) keeps its name when saved");
         check (engine.saveSessionAs (dir.getChildFile ("Song")), "Save As");
         check (songFile.existsAsFile() && engine.getSessionFile() == songFile, "saved as that file");
         auto songAudio = contents (songFile);
@@ -8418,7 +8421,7 @@ int main (int argc, char* argv[])
                    "file names are made valid on every system (and other languages are kept)");
 
             // A bundle that tries to write outside its folder ("zip slip").
-            auto evil = dir.getChildFile ("Evil.iksession");
+            auto evil = dir.getChildFile ("Evil.lisession");
             {
                 mz_zip_archive zip;
                 mz_zip_zero_struct (&zip);
@@ -8446,7 +8449,7 @@ int main (int argc, char* argv[])
             check (tracks.effects().setSound (piano, "sampler:ikaros-studio.basics/Soft Piano"), "(a sampled piano)");
             tracks.regions().createChordRegion (piano, 0.0);
             pumpMessages();
-            auto portable = dir.getChildFile ("Portable.iksession");
+            auto portable = dir.getChildFile ("Portable.lisession");
             check (engine.saveSessionAs (portable), "(saved)");
 
             // Turn it into a session folder the way earlier versions saved
@@ -8480,7 +8483,7 @@ int main (int argc, char* argv[])
 
             check (engine.openSession (legacyFile), "a session folder from an earlier version opens");
             pumpMessages();
-            check (engine.getSessionName() == "Legacy" && engine.getSessionFile() == dir.getChildFile ("Legacy.iksession"),
+            check (engine.getSessionName() == "Legacy" && engine.getSessionFile() == dir.getChildFile ("Legacy.lisession"),
                    "it will be saved as a bundle next to its folder");
 
             TrackId legacyPiano = 0;
@@ -8501,11 +8504,11 @@ int main (int argc, char* argv[])
             check (engine.renderPeak (0.0, 4.0) > 0.01f, "the piano finds this computer's samples, and plays");
             check (audioWithWaveforms >= 4, "its audio loads from the old folder");
 
-            check (engine.saveSession() && dir.getChildFile ("Legacy.iksession").existsAsFile(), "saving writes the bundle");
+            check (engine.saveSession() && dir.getChildFile ("Legacy.lisession").existsAsFile(), "saving writes the bundle");
             check (listFolder (legacyDir) == before, "and leaves the old folder exactly as it was");
 
             legacyDir.deleteRecursively();
-            check (engine.openSession (dir.getChildFile ("Legacy.iksession")), "the new bundle opens on its own");
+            check (engine.openSession (dir.getChildFile ("Legacy.lisession")), "the new bundle opens on its own");
             pumpMessages();
             int stillThere = 0;
 
@@ -8599,12 +8602,12 @@ int main (int argc, char* argv[])
         std::cout << "Sound pack manifests\n";
         {
             auto& sounds = engine.getSounds();
-            sounds.addPackFolder (juce::File (IKAROS_TEST_FIXTURES));
+            sounds.addPackFolder (juce::File (LITHIUM_TEST_FIXTURES));
 
             auto basics = sounds.findPack ("ikaros-studio.basics");
-            check (basics && basics->bundled && basics->format == 2 && basics->name == "Ikaros Basics"
+            check (basics && basics->bundled && basics->format == 2 && basics->name == "Lithium Basics"
                      && basics->license == "CC0-1.0" && basics->credits.size() == 1,
-                   "Ikaros Basics has a format 2 pack.json, comes with the app, and is CC0");
+                   "Lithium Basics has a format 2 pack.json, comes with the app, and is CC0");
 
             auto test = sounds.findPack ("ikaros-studio.test");
             check (test && ! test->bundled && test->version == "1.2.3" && test->installedSize == 66282
@@ -8695,7 +8698,7 @@ int main (int argc, char* argv[])
             check (keys && keys->first == 0 && keys->second == 127, "(the test instrument covers every key)");
 
             const auto softOnly = dir.getChildFile ("Soft Only.sfz");
-            softOnly.replaceWithText ("<control> default_path=" + juce::File (IKAROS_TEST_FIXTURES)
+            softOnly.replaceWithText ("<control> default_path=" + juce::File (LITHIUM_TEST_FIXTURES)
                                           .getChildFile ("Test Pack/Instruments/Test Keys").getFullPathName() + "/\n"
                                       "note_offset=12\n"
                                       "<region> lokey=40 hikey=45 hivel=50 sample=soft.wav\n"
@@ -8828,9 +8831,9 @@ int main (int argc, char* argv[])
                    "the synth keeps its own knobs");
         }
 
-        // Optional: IKAROS_CHECK_PACKS=<folder of packs> plays every
+        // Optional: LITHIUM_CHECK_PACKS=<folder of packs> plays every
         // instrument in them (e.g. tools/packs/build_packs.py's build folder).
-        if (auto packsToCheck = juce::SystemStats::getEnvironmentVariable ("IKAROS_CHECK_PACKS", {}); packsToCheck.isNotEmpty())
+        if (auto packsToCheck = juce::SystemStats::getEnvironmentVariable ("LITHIUM_CHECK_PACKS", {}); packsToCheck.isNotEmpty())
         {
             std::cout << "Checking the packs in " << packsToCheck << "\n";
             auto& sounds = engine.getSounds();
@@ -8888,7 +8891,7 @@ int main (int argc, char* argv[])
 
             const juce::String packId ("ikaros-studio.store-test");
             const juce::String storeSound ("sampler:ikaros-studio.store-test/Store Keys");
-            const juce::String storeIndex = juce::String (IKAROS_TEST_STORE) + "/index.json";
+            const juce::String storeIndex = juce::String (LITHIUM_TEST_STORE) + "/index.json";
 
             auto waitForStore = [&store]
             {
@@ -8921,7 +8924,7 @@ int main (int argc, char* argv[])
                      && offered->downloadSize > 0 && offered->category == "Keyboards" && offered->name == "Store Pack",
                    "the index lists a pack to download, with its size");
 
-            useIndex (juce::String (IKAROS_TEST_STORE) + "/index-damaged.json");
+            useIndex (juce::String (LITHIUM_TEST_STORE) + "/index-damaged.json");
             store.install (packId);
             waitForStore();
             check (! sounds.findPack (packId).has_value() && store.findPack (packId)->error.isNotEmpty() && leftovers() == 0,
@@ -9001,7 +9004,7 @@ int main (int argc, char* argv[])
                    "installing a collection installs the packs it's missing");
 
             // A Nota sample registry's index: the author's SFZ library, wrapped in a pack when it's installed.
-            useIndex (juce::String (IKAROS_TEST_STORE) + "/nota-index.json");
+            useIndex (juce::String (LITHIUM_TEST_STORE) + "/nota-index.json");
             const juce::String notaId ("nota.nota-test");
             auto nota = store.findPack (notaId);
             check (nota && nota->category == "Brass" && nota->name == "Nota Test" && nota->state == State::notInstalled
@@ -9059,7 +9062,7 @@ int main (int argc, char* argv[])
     {
         // A fresh engine: Tracktion expects only one at a time.
         AudioEngine reopened { testSettings };
-        check (reopened.openSession (dir.getChildFile ("Elsewhere").getChildFile ("Other.iksession")), "reopen");
+        check (reopened.openSession (dir.getChildFile ("Elsewhere").getChildFile ("Other.lisession")), "reopen");
         pumpMessages();
         int withWaveforms = 0;
 
@@ -9534,7 +9537,7 @@ int main (int argc, char* argv[])
     {
         std::cout << "Third-party plug-ins\n";
         auto pluginSession = AudioEngine::getSessionFileFor (dir.getChildFile ("Plugins"));
-        juce::String gainName ("Ikaros Test Gain");
+        juce::String gainName ("Lithium Studio Test Gain");
         juce::String gainTarget;   // the gain parameter's automation target
         const std::vector<AutomationPoint> gainPoints { { 2.0, 0.25f }, { 6.0, 0.75f } };
 
@@ -9572,10 +9575,10 @@ int main (int argc, char* argv[])
                 return std::optional<PluginInfo>();
             };
 
-            auto synth = findNamed (plugins.getInstruments(), "Ikaros Test Synth", "VST3");
+            auto synth = findNamed (plugins.getInstruments(), "Lithium Studio Test Synth", "VST3");
             auto gain = findNamed (plugins.getEffects(), gainName, "VST3");
             check (synth.has_value() && gain.has_value(), "VST3 instruments and effects are found");
-            check (findNamed (plugins.getInstruments(), "Ikaros Test Synth", "LV2").has_value()
+            check (findNamed (plugins.getInstruments(), "Lithium Studio Test Synth", "LV2").has_value()
                      && findNamed (plugins.getEffects(), gainName, "LV2").has_value(), "LV2 ones too");
             if (synth)
             {
@@ -9583,16 +9586,16 @@ int main (int argc, char* argv[])
                 auto installed = plugins.getInstalledPlugins();
                 auto off = std::find_if (installed.begin(), installed.end(), [&] (const PluginInfo& p) { return p.id == synth->id; });
                 check (off != installed.end() && off->disabled, "a turned-off plug-in stays in the installed list");
-                check (! findNamed (plugins.getInstruments(), "Ikaros Test Synth", "VST3").has_value()
+                check (! findNamed (plugins.getInstruments(), "Lithium Studio Test Synth", "VST3").has_value()
                          && ! plugins.findPlugin (synth->id).has_value(),
                        "but is left out of the lists and can't be picked");
                 plugins.setPluginEnabled (synth->id, true);
-                check (findNamed (plugins.getInstruments(), "Ikaros Test Synth", "VST3").has_value()
+                check (findNamed (plugins.getInstruments(), "Lithium Studio Test Synth", "VST3").has_value()
                          && plugins.findPlugin (synth->id).has_value(),
                        "and comes back when turned on");
             }
 
-            check (status.failed.contains ("Ikaros Crash Test") && status.failed.contains ("Ikaros Hang Test"),
+            check (status.failed.contains ("Lithium Studio Crash Test") && status.failed.contains ("Lithium Studio Hang Test"),
                    "a plug-in that crashes or hangs fails without taking the app down");
             check (plugins.getSkippedPlugins().size() == 2, "and is skipped from then on");
 
@@ -9632,8 +9635,8 @@ int main (int argc, char* argv[])
                 check (effects.setSound (t1, "plugin:" + synth->id), "a plug-in instrument can be picked");
                 pumpMessages();
                 auto instrument = effects.getInstrument (t1);
-                check (instrument && instrument->isThirdParty && instrument->name == "Ikaros Test Synth", "and becomes the instrument");
-                check (tracks.getTrack (t1)->name == "Ikaros Test Synth", "(the track takes its name)");
+                check (instrument && instrument->isThirdParty && instrument->name == "Lithium Studio Test Synth", "and becomes the instrument");
+                check (tracks.getTrack (t1)->name == "Lithium Studio Test Synth", "(the track takes its name)");
                 check (engine.saveSessionAs (pluginSession), "save with plug-ins");
             }
         }
@@ -9664,7 +9667,7 @@ int main (int argc, char* argv[])
             for (auto& p : plugins.getInstalledPlugins())
             {
                 if (p.format != "VST3") continue;
-                if (p.name == "Ikaros Test Synth") synthId = p.id;
+                if (p.name == "Lithium Studio Test Synth") synthId = p.id;
                 if (p.name == gainName) gainId = p.id;
             }
 
@@ -9722,8 +9725,8 @@ int main (int argc, char* argv[])
             {
                 if (plugin->hasTagName ("PLUGIN") && plugin->getStringAttribute ("name") == gainName)
                 {
-                    plugin->setAttribute ("name", "Ikaros Gone Gain");
-                    plugin->setAttribute ("filename", "/nowhere/Ikaros Gone Gain.vst3");
+                    plugin->setAttribute ("name", "Lithium Studio Gone Gain");
+                    plugin->setAttribute ("filename", "/nowhere/Lithium Studio Gone Gain.vst3");
                     plugin->setAttribute ("uniqueId", "0");
                     plugin->setAttribute ("uid", "0");
                 }
@@ -9739,11 +9742,11 @@ int main (int argc, char* argv[])
             pumpMessages();
             auto t1 = engine.getTracks().getTracks().front().id;
             auto chain = engine.getTracks().effects().getEffectChain (t1);
-            check (chain.size() == 1 && chain[0].missing && chain[0].name == "Ikaros Gone Gain",
+            check (chain.size() == 1 && chain[0].missing && chain[0].name == "Lithium Studio Gone Gain",
                    "the missing plug-in shows as a placeholder with its name");
             check (engine.getTracks().effects().getInstrument (t1).has_value(), "the rest of the track is fine");
             check (engine.saveSession(), "it can be saved");
-            check (SessionBundle::readEntry (pluginSession, SessionBundle::sessionEntry).toString().contains ("Ikaros Gone Gain"),
+            check (SessionBundle::readEntry (pluginSession, SessionBundle::sessionEntry).toString().contains ("Lithium Studio Gone Gain"),
                    "and keeps the missing plug-in's settings");
 
             auto& automation = engine.getTracks().automation();
@@ -9768,7 +9771,7 @@ int main (int argc, char* argv[])
     }
     else if (runs ("main"))
     {
-        std::cout << "(Third-party plug-in checks skipped: build with -DIKAROS_BUILD_TEST_PLUGINS=ON)\n";
+        std::cout << "(Third-party plug-in checks skipped: build with -DLITHIUM_BUILD_TEST_PLUGINS=ON)\n";
     }
 
     if (runs ("undo"))

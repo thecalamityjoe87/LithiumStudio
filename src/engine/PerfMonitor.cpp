@@ -12,19 +12,19 @@
  #include <unistd.h>
 #endif
 
-// Clang's RealtimeSanitizer (CMake IKAROS_SANITIZE=realtime): between
+// Clang's RealtimeSanitizer (CMake LITHIUM_SANITIZE=realtime): between
 // __rtsan_realtime_enter and _exit, any allocation, lock or blocking call on
 // this thread is reported. GCC doesn't have it, so this is usually off.
 #if defined (__has_feature)
  #if __has_feature (realtime_sanitizer)
   #include <sanitizer/rtsan_interface.h>
-  #define IKAROS_RTSAN 1
+  #define LITHIUM_RTSAN 1
  #endif
 #endif
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 // tools/perf/rtcheck.so, when preloaded (LD_PRELOAD), offers these two
@@ -37,17 +37,17 @@ namespace
     RtCheckHook rtCheckEnter = nullptr, rtCheckLeave = nullptr;
 }
 
-// On unless CMake's IKAROS_PERF_TOOLS option turns it off (see CMakeLists.txt).
-#ifndef IKAROS_PERF_TOOLS
- #define IKAROS_PERF_TOOLS 1
+// On unless CMake's LITHIUM_PERF_TOOLS option turns it off (see CMakeLists.txt).
+#ifndef LITHIUM_PERF_TOOLS
+ #define LITHIUM_PERF_TOOLS 1
 #endif
 
 bool PerfMonitor::isEnabled()
 {
-   #if IKAROS_PERF_TOOLS
+   #if LITHIUM_PERF_TOOLS
     // A function-local static is initialised once, the first time it's used
     // (and C++ makes that thread-safe), so the environment is read only once.
-    static const bool enabled = juce::SystemStats::getEnvironmentVariable ("IKAROS_PERF", {}) == "1";
+    static const bool enabled = juce::SystemStats::getEnvironmentVariable ("LITHIUM_PERF", {}) == "1";
     return enabled;
    #else
     return false;
@@ -61,29 +61,29 @@ PerfMonitor::PerfMonitor (te::Engine& e, std::function<te::Edit*()> editGetter)
    #if JUCE_LINUX
     // dlsym finds a function by name in the libraries loaded so far (here:
     // rtcheck.so, if it was preloaded); nullptr if there isn't one.
-    rtCheckEnter = reinterpret_cast<RtCheckHook> (dlsym (RTLD_DEFAULT, "ikaros_rtcheck_enter"));
-    rtCheckLeave = reinterpret_cast<RtCheckHook> (dlsym (RTLD_DEFAULT, "ikaros_rtcheck_leave"));
+    rtCheckEnter = reinterpret_cast<RtCheckHook> (dlsym (RTLD_DEFAULT, "lithium_rtcheck_enter"));
+    rtCheckLeave = reinterpret_cast<RtCheckHook> (dlsym (RTLD_DEFAULT, "lithium_rtcheck_leave"));
    #endif
 
     // Must come before Tracktion's own callback (see StartCallback in the
     // header). One side effect: Tracktion is then no longer JUCE's first
     // callback, so JUCE renders it into a spare buffer and adds that to the
     // output, a copy of 2 x buffer-size samples per callback. Negligible, but
-    // it's only like that while IKAROS_PERF is on.
+    // it's only like that while LITHIUM_PERF is on.
     auto& adm = engine.getDeviceManager().deviceManager;
     adm.addAudioCallback (&startCallback);
     adm.addAudioCallback (&endCallback);
 
-    setBurnPercent (juce::SystemStats::getEnvironmentVariable ("IKAROS_PERF_BURN", "0").getDoubleValue());
+    setBurnPercent (juce::SystemStats::getEnvironmentVariable ("LITHIUM_PERF_BURN", "0").getDoubleValue());
 
-    if (auto burnPath = juce::SystemStats::getEnvironmentVariable ("IKAROS_PERF_BURN_FILE", {}); burnPath.isNotEmpty())
+    if (auto burnPath = juce::SystemStats::getEnvironmentVariable ("LITHIUM_PERF_BURN_FILE", {}); burnPath.isNotEmpty())
         burnFile = juce::File (burnPath);
 
-    auto csvPath = juce::SystemStats::getEnvironmentVariable ("IKAROS_PERF_CSV", {});
+    auto csvPath = juce::SystemStats::getEnvironmentVariable ("LITHIUM_PERF_CSV", {});
 
     csvFile = csvPath.isNotEmpty() ? juce::File (csvPath)
                                    : juce::File::getSpecialLocation (juce::File::userHomeDirectory)
-                                         .getChildFile ("ikaros-perf")
+                                         .getChildFile ("lithium-perf")
                                          .getChildFile ("perf-" + juce::Time::getCurrentTime().formatted ("%Y%m%d-%H%M%S") + ".csv");
 
    #if JUCE_LINUX
@@ -126,7 +126,7 @@ PerfMonitor::PerfMonitor (te::Engine& e, std::function<te::Edit*()> editGetter)
     pluginCsv = open (pluginCsvFile, "time_s,label,track,plugin,avg_pct,max_pct");
     threadCsv = open (threadCsvFile, "time_s,label,tid,name,cpu_pct");
 
-    DBG ("IKAROS_PERF: writing " << csvFile.getFullPathName());
+    DBG ("LITHIUM_PERF: writing " << csvFile.getFullPathName());
     startTimerHz (4);
 }
 
@@ -205,7 +205,7 @@ void PerfMonitor::StartCallback::audioDeviceIOCallbackWithContext (const float* 
     if (rtCheckEnter != nullptr)
         rtCheckEnter();
 
-   #if IKAROS_RTSAN
+   #if LITHIUM_RTSAN
     __rtsan_realtime_enter();
    #endif
 }
@@ -214,7 +214,7 @@ void PerfMonitor::EndCallback::audioDeviceIOCallbackWithContext (const float* co
                                                                 float* const* outputs, int numOutputs, int numSamples,
                                                                 const juce::AudioIODeviceCallbackContext&)
 {
-   #if IKAROS_RTSAN
+   #if LITHIUM_RTSAN
     __rtsan_realtime_exit();
    #endif
 
@@ -517,7 +517,7 @@ void PerfMonitor::readProcessStats()
 
     // /proc/self/task has a folder per thread; its "stat" file holds the CPU
     // time used so far (utime + stime, in clock ticks) after the name, which
-    // is in brackets and may contain spaces ("Ikaros Studio").
+    // is in brackets and may contain spaces ("Lithium Studio").
     if (auto* dir = opendir ("/proc/self/task"))
     {
         while (auto* entry = readdir (dir))
@@ -657,4 +657,4 @@ void PerfMonitor::writeCsvLine()
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

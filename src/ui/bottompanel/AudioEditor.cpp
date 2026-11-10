@@ -6,7 +6,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -821,7 +821,7 @@ void AudioEditor::showMenu()
 // Painting
 void AudioEditor::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("AudioEditor");
+    LITHIUM_PERF_PAINT ("AudioEditor");
     // The waveform is part of the arrangement: dark in both themes.
     g.fillAll (theme().arrangement.laneBg);
 
@@ -1155,4 +1155,4 @@ void AudioEditor::resized()
     clampView();
 }
 
-} // namespace ikaros
+} // namespace lithium

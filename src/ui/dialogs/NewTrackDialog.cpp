@@ -2,10 +2,10 @@
 #include "ui/dialogs/AlertDialog.h"
 #include "ui/dialogs/MonitoringWarning.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -65,7 +65,7 @@ public:
         g.drawFittedText (description, content, juce::Justification::centredTop, 3, 1.0f);
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, r, size::radiusCard);
+            LithiumLookAndFeel::drawFocusRing (g, r, size::radiusCard);
     }
 
 private:
@@ -390,4 +390,4 @@ void NewTrackDialog::resized()
     cancelButton.setBounds (buttons.removeFromRight (100));
 }
 
-} // namespace ikaros
+} // namespace lithium

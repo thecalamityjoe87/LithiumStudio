@@ -1,9 +1,9 @@
 #include "ui/preferences/ThemePicker.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -121,7 +121,7 @@ public:
         g.drawText (getName(), label, juce::Justification::centredBottom, false);
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, r, size::radius);
+            LithiumLookAndFeel::drawFocusRing (g, r, size::radius);
     }
 };
 
@@ -170,4 +170,4 @@ void ThemePicker::resized()
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

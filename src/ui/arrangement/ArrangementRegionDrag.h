@@ -4,7 +4,7 @@
 
 #include "ui/arrangement/ArrangementView.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -55,4 +55,4 @@ private:
     void updateFadeDrag (int dx);
 };
 
-} // namespace ikaros
+} // namespace lithium

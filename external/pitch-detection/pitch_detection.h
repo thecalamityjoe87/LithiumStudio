@@ -2,11 +2,11 @@
 // (https://github.com/sevagh/pitch-detection), MIT License,
 // Copyright (c) 2018 Sevag Hanssian. See LICENSE.
 //
-// Ikaros: changed for Ikaros Studio (see README.ikaros). Only YIN and its
+// Lithium: changed for Ikaros Studio (see README.lithium). Only YIN and its
 // probabilistic version are kept, for one frame size at a time. FFTS is
 // replaced by juce::dsp::FFT, and mlpack's HMM by picking the most probable
 // candidate (the pitch analysis smooths across frames itself). Every change
-// is marked "Ikaros:".
+// is marked "Lithium:".
 
 #ifndef PITCH_DETECTION_H
 #define PITCH_DETECTION_H
@@ -24,12 +24,12 @@ namespace pitch_alloc
  *
  * Usage: pitch_alloc::Yin ya(2048)
  *
- * Ikaros: not a template (float only), and not thread-safe: use one per thread.
+ * Lithium: not a template (float only), and not thread-safe: use one per thread.
  */
 class Yin
 {
   public:
-	// Ikaros: what probabilistic_pitch() finds in one frame.
+	// Lithium: what probabilistic_pitch() finds in one frame.
 	struct Result {
 		float pitch = -1.0f;        // Hz, or -1 if there's no candidate at all
 		float probability = 0.0f;   // how likely the frame is pitched (0..1): the
@@ -38,7 +38,7 @@ class Yin
 		                            // period: 0 = perfectly periodic, ~1 = noise
 	};
 
-	// Ikaros: the pitch range to look in (Hz) is fixed per instance, so
+	// Lithium: the pitch range to look in (Hz) is fixed per instance, so
 	// every frame looks only at periods that matter.
 	Yin(int audio_buffer_size, int sample_rate, float min_pitch, float max_pitch);
 
@@ -59,11 +59,11 @@ class Yin
   private:
 	int nfft;                       // the frame length
 	int sample_rate;
-	int tau_min, tau_max;           // Ikaros: the periods looked at, in samples
+	int tau_min, tau_max;           // Lithium: the periods looked at, in samples
 	int yin_buffer_size;
 	std::vector<float> yin_buffer;
 
-	// Ikaros: the difference function, through juce::dsp::FFT (see difference()).
+	// Lithium: the difference function, through juce::dsp::FFT (see difference()).
 	std::unique_ptr<juce::dsp::FFT> fft;
 	std::vector<float> frame_spectrum, half_spectrum;
 	std::vector<double> energy;     // running sum of the squared samples

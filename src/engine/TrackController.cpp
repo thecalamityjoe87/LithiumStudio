@@ -7,7 +7,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace detail;
@@ -351,7 +351,7 @@ TrackId TrackController::duplicateTrack (TrackId id, bool withRegions)
 
     owner.beginUndoStep (withRegions ? "Duplicate Track" : "New Track with Duplicate Settings");
 
-    // copyTrack deep-copies the track's state (plugins, volume, our ikaros*
+    // copyTrack deep-copies the track's state (plugins, volume, our lithium*
     // properties, clips) with fresh IDs, and inserts it after the source.
     auto copy = asAudioTrack (edit->copyTrack (source, te::TrackInsertPoint (nullptr, source)).get());
 
@@ -587,4 +587,4 @@ TrackDetails TrackController::getDetails (TrackId id) const
     return d;
 }
 
-} // namespace ikaros
+} // namespace lithium

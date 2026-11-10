@@ -12,7 +12,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
-namespace ikaros::platform
+namespace lithium::platform
 {
 
 namespace
@@ -131,11 +131,11 @@ bool startWindowManagerDrag (juce::DocumentWindow& window)
     return true;
 }
 
-} // namespace ikaros::platform
+} // namespace lithium::platform
 
 #else
 
-namespace ikaros::platform
+namespace lithium::platform
 {
     bool isMaximised (juce::DocumentWindow& window)                     { return window.isFullScreen(); }
     void setMaximised (juce::DocumentWindow& window, bool maximise)     { window.setFullScreen (maximise); }

@@ -3,7 +3,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -159,7 +159,7 @@ void FreesoundSetupDialog::paint (juce::Graphics& g)
 
     drawStep (1, step1Area, "Create a free Freesound account", "Already have one? Skip to step 2.");
     drawStep (2, step2Area, "Apply for an API key",
-              "Log in, then fill in the form: any app name works, for example \"Ikaros Studio\".");
+              "Log in, then fill in the form: any app name works, for example \"Lithium Studio\".");
     drawStep (3, step3Area, "Paste your key",
               "On your API keys page, copy the value under \"Client secret/Api key\" (not the Client id).");
 
@@ -231,4 +231,4 @@ void FreesoundSetupDialog::resized()
     footerArea = r.removeFromBottom (48);
 }
 
-} // namespace ikaros
+} // namespace lithium

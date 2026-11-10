@@ -1,12 +1,12 @@
 #include "ui/bottompanel/PedalView.h"
 #include "engine/TrackController.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Theme.h"
 #include "ui/theme/Tokens.h"
 #include "ui/widgets/CachedShadow.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -85,7 +85,7 @@ public:
         g.drawEllipse (cap, 1.0f);
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat(), getWidth() * 0.5f);
+            LithiumLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat(), getWidth() * 0.5f);
     }
 
 private:
@@ -103,8 +103,8 @@ PedalView::PedalView (AudioEngine& e, const PedalStyle& s) : engine (e), style (
     for (int i = 0; i < (int) style.knobs.size(); ++i)
     {
         auto* knob = knobs.add (new juce::Slider (juce::Slider::RotaryHorizontalVerticalDrag, juce::Slider::NoTextBox));
-        knob->getProperties().set ("pedal", true);   // drawn by IkarosLookAndFeel's drawPedalKnob
-        knob->setColour (IkarosLookAndFeel::knobArcColourId, lettering());
+        knob->getProperties().set ("pedal", true);   // drawn by LithiumLookAndFeel's drawPedalKnob
+        knob->setColour (LithiumLookAndFeel::knobArcColourId, lettering());
         knob->setRotaryParameters (juce::MathConstants<float>::pi * 1.25f, juce::MathConstants<float>::pi * 2.75f, true);
         knob->setRange (0.0, 1.0);
         knob->setMouseDragSensitivity (180);
@@ -328,7 +328,7 @@ void PedalView::paintOverChildren (juce::Graphics& g)
     }
 
     if (hasKeyboardFocus (false))
-        IkarosLookAndFeel::drawFocusRing (g, bounds, size::radiusCard);
+        LithiumLookAndFeel::drawFocusRing (g, bounds, size::radiusCard);
 }
 
 juce::Rectangle<int> PedalView::knobArea (int index) const
@@ -408,4 +408,4 @@ bool PedalView::keyPressed (const juce::KeyPress& key)
     return false;
 }
 
-} // namespace ikaros
+} // namespace lithium

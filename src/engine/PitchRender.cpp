@@ -2,7 +2,7 @@
 #include "engine/PitchCurve.h"
 #include <rubberband/rubberband/RubberBandStretcher.h>   // built into the app through Tracktion (see CMakeLists.txt)
 
-namespace ikaros::pitchrender
+namespace lithium::pitchrender
 {
 
 namespace
@@ -294,4 +294,4 @@ bool render (const PitchRenderRequest& request, std::atomic<float>* progress, co
     return temp.overwriteTargetFileWithTemporary();
 }
 
-} // namespace ikaros::pitchrender
+} // namespace lithium::pitchrender

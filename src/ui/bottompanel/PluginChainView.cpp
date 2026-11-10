@@ -1,11 +1,11 @@
 #include "ui/bottompanel/PluginChainView.h"
 #include "ui/widgets/PaintProbe.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 #include "ui/theme/TrackColours.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -93,7 +93,7 @@ public:
         g.drawText (slot.name, area, juce::Justification::centredLeft, true);
 
         if (showFocusRing && hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, r, size::radius);
+            LithiumLookAndFeel::drawFocusRing (g, r, size::radius);
     }
 
     void resized() override
@@ -203,7 +203,7 @@ public:
         g.drawText ("Add effect", content, juce::Justification::centredLeft);
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, r, size::radius);
+            LithiumLookAndFeel::drawFocusRing (g, r, size::radius);
     }
 };
 
@@ -331,7 +331,7 @@ int PluginChainView::getIdealHeight() const
 
 void PluginChainView::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("PluginChainView");
+    LITHIUM_PERF_PAINT ("PluginChainView");
     if (trackId == 0)
     {
         g.setColour (theme().textSecondary);
@@ -350,7 +350,7 @@ void PluginChainView::paint (juce::Graphics& g)
     auto drawLabel = [&] (juce::Rectangle<int> area, const juce::String& text)
     {
         g.setColour (theme().textSecondary);
-        g.setFont (fonts::uiBold (textSize::tiny).withExtraKerningFactor (0.1f));
+        g.setFont (fonts::caption (textSize::xs).withExtraKerningFactor (0.1f));
         g.drawText (text, area, juce::Justification::centredLeft);
     };
 
@@ -589,4 +589,4 @@ void PluginChainView::endDrag()
             row->repaint();
 }
 
-} // namespace ikaros
+} // namespace lithium

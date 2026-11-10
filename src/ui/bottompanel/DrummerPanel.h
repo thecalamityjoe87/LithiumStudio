@@ -6,7 +6,7 @@
 #include "ui/widgets/IconButton.h"
 #include "ui/widgets/Knob.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -99,4 +99,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DrummerPanel)
 };
 
-} // namespace ikaros
+} // namespace lithium

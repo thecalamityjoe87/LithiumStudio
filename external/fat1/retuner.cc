@@ -18,8 +18,8 @@
 //
 // -----------------------------------------------------------------------
 //
-//  Ikaros: changed for Ikaros Studio (see README.ikaros and retuner.h).
-//  Every change is marked "Ikaros:".
+//  Lithium: changed for Ikaros Studio (see README.lithium and retuner.h).
+//  Every change is marked "Lithium:".
 
 #include "retuner.h"
 #include <math.h>
@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Ikaros: M_PI isn't defined by MSVC's <math.h> unless asked for.
+// Lithium: M_PI isn't defined by MSVC's <math.h> unless asked for.
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -56,7 +56,7 @@ Retuner::Retuner (int fsamp)
 		_ipsize = 4096;
 		_fftlen = 2048;
 		_frsize = 128;
-		// Ikaros: a linear-phase half-band FIR from juce::dsp::Oversampling
+		// Lithium: a linear-phase half-band FIR from juce::dsp::Oversampling
 		// instead of zita-resampler. Its delay is measured below and
 		// reported with the latency (see get_upsampler_delay()).
 	} else if (_fsamp < 128000) {
@@ -77,21 +77,21 @@ Retuner::Retuner (int fsamp)
 	_ifmin = _fsamp / 1200;
 	_ifmax = _fsamp / 60;
 
-	// Various buffers (Ikaros: std::vectors, zeroed as they're made)
+	// Various buffers (Lithium: std::vectors, zeroed as they're made)
 	_ipbuff.assign (_ipsize + 3, 0.0f);       // Resampled or filtered input
 	_xffunc.assign (_frsize, 0.0f);           // Crossfade function
 	_fftTwind.assign (_fftlen, 0.0f);         // Window function
 	_fftWcorr.assign (_fftlen, 0.0f);         // Autocorrelation of window
 	_fftTdata.assign (2 * _fftlen, 0.0f);     // Time domain data for FFT, and its spectrum
 
-	// Ikaros: one juce::dsp::FFT replaces the two FFTW plans. Its order is
+	// Lithium: one juce::dsp::FFT replaces the two FFTW plans. Its order is
 	// log2 of the length (2048 -> 11).
 	int order = 0;
 	while ((1 << order) < _fftlen)
 		++order;
 	_fft = std::make_unique<juce::dsp::FFT> (order);
 
-	// Ikaros: the upsampler, for blocks up to one fragment long. Its delay
+	// Lithium: the upsampler, for blocks up to one fragment long. Its delay
 	// is found by sending a click through it (the filter is linear phase,
 	// so it's the same for every frequency).
 	if (_upsamp) {
@@ -126,7 +126,7 @@ Retuner::Retuner (int fsamp)
 	}
 
 	// Compute window autocorrelation and normalise it.
-	// Ikaros: in _fftTdata, which holds the spectrum as (re, im) pairs.
+	// Lithium: in _fftTdata, which holds the spectrum as (re, im) pairs.
 	std::copy (_fftTwind.begin (), _fftTwind.end (), _fftTdata.begin ());
 	forward (_fftTdata.data ());
 	h = _fftlen / 2;
@@ -166,10 +166,10 @@ Retuner::Retuner (int fsamp)
 
 Retuner::~Retuner (void)
 {
-	// Ikaros: the vectors, the FFT and the upsampler free themselves.
+	// Lithium: the vectors, the FFT and the upsampler free themselves.
 }
 
-// Ikaros: FFTW's r2c transform. JUCE leaves (re, im) pairs for bins 0 to
+// Lithium: FFTW's r2c transform. JUCE leaves (re, im) pairs for bins 0 to
 // _fftlen / 2 in the same array.
 void
 Retuner::forward (float* data)
@@ -177,7 +177,7 @@ Retuner::forward (float* data)
 	_fft->performRealOnlyForwardTransform (data, true);
 }
 
-// Ikaros: FFTW's c2r transform. It reads bins 0 to _fftlen / 2. JUCE divides
+// Lithium: FFTW's c2r transform. It reads bins 0 to _fftlen / 2. JUCE divides
 // by the length on the way back and FFTW doesn't; the code below expects
 // FFTW's scale (it adds a fixed 0.1 to the energy in findcycle()).
 void
@@ -221,7 +221,7 @@ Retuner::process (int nfram, float const* inp, float* out)
 
 		// At 44.1 and 48 kHz upsample by 2.
 		if (_upsamp) {
-			// Ikaros: juce::dsp::Oversampling instead of zita-resampler.
+			// Lithium: juce::dsp::Oversampling instead of zita-resampler.
 			// It returns a view of its own buffer, 2 * k samples long.
 			const float* ch[] = { inp };
 			auto         up   = _upsampler.processSamplesUp (juce::dsp::AudioBlock<const float> (ch, 1, (size_t)k));
@@ -436,7 +436,7 @@ Retuner::findcycle (void)
 		return 0;
 	}
 #endif
-	// Ikaros: in place in _fftTdata, as (re, im) pairs.
+	// Lithium: in place in _fftTdata, as (re, im) pairs.
 	forward (_fftTdata.data ());
 	f = _fsamp / (_fftlen * 3e3f);
 	for (i = 0; i < h; i++) {

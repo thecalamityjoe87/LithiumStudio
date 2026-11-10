@@ -4,14 +4,14 @@
 #include <set>
 #include <thread>
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
 {
-    // The worker process is this app, started with "--IkarosPluginScan:<pipe>".
+    // The worker process is this app, started with "--LithiumPluginScan:<pipe>".
     // JUCE's ChildProcessCoordinator/Worker add and parse that argument.
-    const juce::String workerCommandLineID ("IkarosPluginScan");
+    const juce::String workerCommandLineID ("LithiumPluginScan");
 
     juce::MemoryBlock toMessage (const juce::XmlElement& xml)
     {
@@ -195,7 +195,7 @@ private:
 
 //==============================================================================
 PluginScanner::PluginScanner (juce::AudioPluginFormatManager& f, juce::KnownPluginList& l)
-    : juce::Thread ("Ikaros plug-in scan"), formats (f), list (l)
+    : juce::Thread ("Lithium Studio plug-in scan"), formats (f), list (l)
 {
 }
 
@@ -418,4 +418,4 @@ void PluginScanner::finish()
         onFinished();
 }
 
-} // namespace ikaros
+} // namespace lithium

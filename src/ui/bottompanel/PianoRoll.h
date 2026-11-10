@@ -7,7 +7,7 @@
 #include <bitset>
 #include <optional>
 
-namespace ikaros
+namespace lithium
 {
 
 class AudioEngine;
@@ -178,4 +178,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PianoRoll)
 };
 
-} // namespace ikaros
+} // namespace lithium

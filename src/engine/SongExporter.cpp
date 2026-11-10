@@ -7,7 +7,7 @@
 #include <tracktion_engine/tracktion_engine.h>
 #include <thread>
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace detail;   // the shared engine helpers (TrackHelpers.h)
@@ -539,4 +539,4 @@ void SongExporter::cancelAndWait()
         edit->getTransport().ensureContextAllocated();
 }
 
-} // namespace ikaros
+} // namespace lithium

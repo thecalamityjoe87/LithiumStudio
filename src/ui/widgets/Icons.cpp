@@ -22,7 +22,7 @@
     OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-namespace ikaros::icons
+namespace lithium::icons
 {
 
 namespace
@@ -220,4 +220,4 @@ std::unique_ptr<juce::Drawable> createDrawable (Icon icon, juce::Colour colour)
     return drawable;
 }
 
-} // namespace ikaros::icons
+} // namespace lithium::icons

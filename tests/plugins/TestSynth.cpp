@@ -1,6 +1,6 @@
 // A tiny sine-wave synth, built as a VST3/LV2 plug-in for testing plug-in
 // hosting (scanning, instruments, plug-in windows, saving plug-in state).
-// Not part of the app. Build with -DIKAROS_BUILD_TEST_PLUGINS=ON.
+// Not part of the app. Build with -DLITHIUM_BUILD_TEST_PLUGINS=ON.
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_audio_utils/juce_audio_utils.h>
@@ -81,7 +81,7 @@ public:
         synth.addSound (new SineSound());
     }
 
-    const juce::String getName() const override             { return "Ikaros Test Synth"; }
+    const juce::String getName() const override             { return "Lithium Studio Test Synth"; }
     bool acceptsMidi() const override                        { return true; }
     bool producesMidi() const override                       { return false; }
     double getTailLengthSeconds() const override             { return 0.5; }

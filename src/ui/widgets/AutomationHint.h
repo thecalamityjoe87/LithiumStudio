@@ -3,7 +3,7 @@
 #include "engine/AudioEngine.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -67,4 +67,4 @@ void setAutomatedLook (juce::Slider&, bool automated);
     and a button that opens the track's automation lane on that setting. */
 void showAutomationHint (AudioEngine&, juce::Component& control, TrackId, const juce::String& targetId);
 
-} // namespace ikaros
+} // namespace lithium

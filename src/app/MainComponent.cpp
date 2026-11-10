@@ -19,7 +19,7 @@
 #include "ui/widgets/PaintProbe.h"
 #include "ui/widgets/PerfOverlay.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -165,7 +165,7 @@ MainComponent::~MainComponent()
 //==============================================================================
 void MainComponent::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("MainComponent");
+    LITHIUM_PERF_PAINT ("MainComponent");
     g.fillAll (theme().windowBg);
 }
 
@@ -176,17 +176,17 @@ void MainComponent::paintOverChildren (juce::Graphics&)
 }
 
 //==============================================================================
-// Debug only (IKAROS_PERF=1, see engine/PerfMonitor.h).
+// Debug only (LITHIUM_PERF=1, see engine/PerfMonitor.h).
 void MainComponent::setUpPerfMonitor (PerfMonitor& perf)
 {
     perf.setUiSampler ([] { return paintprobe::takeSample(); });
 
     // Always on top of the other children, dialogs included; showing unless
-    // IKAROS_PERF_OVERLAY=0.
+    // LITHIUM_PERF_OVERLAY=0.
     perfOverlay = std::make_unique<PerfOverlay> (perf);
     perfOverlay->setAlwaysOnTop (true);
     addChildComponent (*perfOverlay);
-    perfOverlay->setVisible (juce::SystemStats::getEnvironmentVariable ("IKAROS_PERF_OVERLAY", "1") != "0");
+    perfOverlay->setVisible (juce::SystemStats::getEnvironmentVariable ("LITHIUM_PERF_OVERLAY", "1") != "0");
 
     // A KeyListener sees key presses that reach this component (from it or
     // any child that doesn't use them) before the command shortcuts do.
@@ -990,11 +990,11 @@ void MainComponent::getCommandInfo (juce::CommandID id, juce::ApplicationCommand
             break;
 
         case CommandIDs::about:
-            info.setInfo ("About Ikaros Studio", "About this app", "Help", 0);
+            info.setInfo ("About Lithium Studio", "About this app", "Help", 0);
             break;
 
         case juce::StandardApplicationCommandIDs::quit:
-            info.setInfo ("Quit", "Quit Ikaros Studio", "File", 0);
+            info.setInfo ("Quit", "Quit Lithium Studio", "File", 0);
             info.addDefaultKeypress ('q', cmd);
             break;
 
@@ -1348,6 +1348,7 @@ void MainComponent::openOtherSession()
         // Bundles, and session folders from earlier versions.
         fileChooser = std::make_unique<juce::FileChooser> ("Open Session", engine.getSessionFolder(),
                                                            juce::String ("*") + AudioEngine::sessionFileExtension
+                                                             + ";*" + AudioEngine::previousSessionFileExtension
                                                              + ";*" + AudioEngine::legacySessionFileExtension);
 
         fileChooser->launchAsync (juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles,
@@ -1362,7 +1363,7 @@ void MainComponent::openOtherSession()
 void MainComponent::openSessionFile (const juce::File& file)
 {
     if (! engine.openSession (file))
-        showError ("Couldn't open session", "\"" + file.getFileName() + "\" isn't a session Ikaros Studio can read, "
+        showError ("Couldn't open session", "\"" + file.getFileName() + "\" isn't a session Lithium Studio can read, "
                                             "or it's damaged.");
 }
 
@@ -1385,7 +1386,7 @@ void MainComponent::save (const juce::File& bundle, std::function<void (bool)> a
 
     if (job == nullptr)
     {
-        showError ("Couldn't save session", "Ikaros Studio couldn't write \"" + bundle.getFullPathName()
+        showError ("Couldn't save session", "Lithium Studio couldn't write \"" + bundle.getFullPathName()
                                             + "\". Check that the folder exists and that you can write to it.");
         if (afterSave)
             afterSave (false);
@@ -1401,7 +1402,7 @@ void MainComponent::save (const juce::File& bundle, std::function<void (bool)> a
         saving = false;
 
         if (! ok)
-            showError ("Couldn't save session", "Ikaros Studio couldn't write \"" + bundle.getFullPathName()
+            showError ("Couldn't save session", "Lithium Studio couldn't write \"" + bundle.getFullPathName()
                                                 + "\". Check that there's enough space on the disk.");
         if (afterSave)
             afterSave (ok);
@@ -1421,7 +1422,7 @@ void MainComponent::saveSession (std::function<void (bool)> afterSave)
 
 void MainComponent::saveSessionAs (std::function<void (bool)> afterSave)
 {
-    // A session is one file ("My Song.iksession").
+    // A session is one file ("My Song.lisession").
     auto initial = engine.isUntitled() ? engine.getSessionFolder().getChildFile (engine.getSessionName() == "Untitled Session"
                                                                                     ? juce::String ("My Session")
                                                                                     : engine.getSessionName())
@@ -1652,4 +1653,4 @@ void MainComponent::showError (const juce::String& title, const juce::String& me
                        .withAssociatedComponent (this));
 }
 
-} // namespace ikaros
+} // namespace lithium

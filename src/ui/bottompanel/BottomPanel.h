@@ -12,7 +12,7 @@
 #include "ui/bottompanel/TrackInspector.h"
 #include "ui/state/Selection.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -222,4 +222,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BottomPanel)
 };
 
-} // namespace ikaros
+} // namespace lithium

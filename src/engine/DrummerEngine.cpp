@@ -4,7 +4,7 @@
 #include <cmath>
 #include <cstdint>
 
-namespace ikaros::drummer
+namespace lithium::drummer
 {
 
 namespace
@@ -630,4 +630,4 @@ DrumPart generate (const GrooveLibrary& library, const DrummerSettings& settings
     return part;
 }
 
-} // namespace ikaros::drummer
+} // namespace lithium::drummer

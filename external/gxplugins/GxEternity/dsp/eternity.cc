@@ -1,10 +1,10 @@
 // generated from file '../dkbuild/eternity//eternity.dsp' by dsp2cc:
 // Code generated with Faust 0.9.90 (http://faust.grame.fr)
-// Modified for Ikaros Studio (see ../../README.ikaros): the zita-resampler
+// Modified for Ikaros Studio (see ../../README.lithium): the zita-resampler
 // oversampling and its variable-length array (which MSVC doesn't accept) are
-// taken out. Ikaros oversamples this pedal itself, with juce::dsp::Oversampling,
+// taken out. Lithium Studio oversamples this pedal itself, with juce::dsp::Oversampling,
 // so compute() is now given audio at the oversampled rate and works in place.
-// Each change is marked "Ikaros:".
+// Each change is marked "Lithium:".
 
 #include "lovepedal_neg_table.h"
 #include "lovepedal_table.h"
@@ -14,7 +14,7 @@ namespace eternity {
 
 class Dsp: public PluginLV2 {
 private:
-	// Ikaros: gx_resample::FixedRateResampler smp;
+	// Lithium: gx_resample::FixedRateResampler smp;
 	uint32_t samplingFreq;
 	uint32_t fSamplingFreq;
 	FAUSTFLOAT 	fslider0;
@@ -117,7 +117,7 @@ void Dsp::clear_state_f_static(PluginLV2 *p)
 inline void Dsp::init(uint32_t RsamplingFreq)
 {
 	samplingFreq = 2 * RsamplingFreq;
-	// Ikaros: smp.setup(RsamplingFreq, samplingFreq); (init still sets the filters up for twice the rate)
+	// Lithium: smp.setup(RsamplingFreq, samplingFreq); (init still sets the filters up for twice the rate)
 	fSamplingFreq = samplingFreq;
 	fConst0 = double(min(1.92e+05, max(1.0, (double)fSamplingFreq)));
 	fConst1 = (1.33353532692336e-09 * fConst0);
@@ -169,7 +169,7 @@ void always_inline Dsp::compute(int count, FAUSTFLOAT *input0, FAUSTFLOAT *outpu
 #define fslider0 (*fslider0_)
 #define fslider1 (*fslider1_)
 #define fslider2 (*fslider2_)
-	// Ikaros: was 2x oversampling into a variable-length array
+	// Lithium: was 2x oversampling into a variable-length array
 	int ReCount = count;
 	FAUSTFLOAT* buf = output0;
 	if (input0 != output0) memcpy(output0, input0, count * sizeof(float));
@@ -194,7 +194,7 @@ void always_inline Dsp::compute(int count, FAUSTFLOAT *input0, FAUSTFLOAT *outpu
 		fRec2[1] = fRec2[0];
 		fRec0[1] = fRec0[0];
 	}
-	// Ikaros: smp.down(buf, output0);
+	// Lithium: smp.down(buf, output0);
 #undef fslider0
 #undef fslider1
 #undef fslider2

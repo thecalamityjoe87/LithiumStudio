@@ -4,7 +4,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 const char* SfzPlugin::xmlTypeName = "ikarosSfz";
@@ -447,4 +447,4 @@ void SfzPlugin::applyToBuffer (const te::PluginRenderContext& fc)
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

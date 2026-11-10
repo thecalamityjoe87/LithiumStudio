@@ -8,7 +8,7 @@
 #include "engine/PitchAnalysis.h"
 #include <functional>
 
-namespace ikaros
+namespace lithium
 {
 
 struct PitchRenderRequest
@@ -45,4 +45,4 @@ namespace pitchrender
     bool render (const PitchRenderRequest&, std::atomic<float>* progress = nullptr, const std::atomic<bool>* cancel = nullptr);
 }
 
-} // namespace ikaros
+} // namespace lithium

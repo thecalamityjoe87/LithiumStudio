@@ -5,7 +5,7 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <bitset>
 
-namespace ikaros
+namespace lithium
 {
 
 class AudioEngine;
@@ -67,4 +67,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PianoKeyboard)
 };
 
-} // namespace ikaros
+} // namespace lithium

@@ -3,7 +3,7 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <atomic>
 
-namespace ikaros
+namespace lithium
 {
 
 /*  What the toolbar warns about (see Toolbar::update): the busiest audio
@@ -87,4 +87,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE (AudioLoadMeter)
 };
 
-} // namespace ikaros
+} // namespace lithium

@@ -3,7 +3,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -99,7 +99,7 @@ void TrackInspector::layoutSections()
 
 void TrackInspector::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("TrackInspector");
+    LITHIUM_PERF_PAINT ("TrackInspector");
     g.fillAll (theme().inspectorBg);
     g.setColour (theme().divider);
     g.fillRect (getLocalBounds().removeFromRight (1));
@@ -111,4 +111,4 @@ void TrackInspector::resized()
     layoutSections();
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -4,7 +4,7 @@
 
 namespace tracktion { inline namespace engine { class Edit; } }
 
-namespace ikaros
+namespace lithium
 {
 
 class AudioEngine;
@@ -75,4 +75,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE (TestAudioDevice)
 };
 
-} // namespace ikaros
+} // namespace lithium

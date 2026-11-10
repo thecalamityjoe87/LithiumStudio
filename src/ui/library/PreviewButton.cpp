@@ -1,7 +1,7 @@
 #include "ui/library/PreviewButton.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -56,4 +56,4 @@ juce::Rectangle<int> PreviewButton::getBoundsIn (juce::Rectangle<int> row)
               .withSizeKeepingCentre (size::roundButton, size::roundButton);
 }
 
-} // namespace ikaros
+} // namespace lithium

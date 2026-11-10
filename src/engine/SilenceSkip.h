@@ -2,7 +2,7 @@
 
 #include <juce_audio_basics/juce_audio_basics.h>
 
-namespace ikaros
+namespace lithium
 {
 
 /*  Lets an effect skip its DSP while its input is silent and whatever it was
@@ -60,4 +60,4 @@ private:
     juce::int64 tailSamples = 0, silentSamples = 0;
 };
 
-} // namespace ikaros
+} // namespace lithium

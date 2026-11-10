@@ -5,7 +5,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -269,7 +269,7 @@ void PianoKeyboard::handleNoteOff (juce::MidiKeyboardState*, int, int note, floa
 
 void PianoKeyboard::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("PianoKeyboard");
+    LITHIUM_PERF_PAINT ("PianoKeyboard");
     const auto tray = getLocalBounds().toFloat();
     g.setColour (theme().keyboardTray);
     g.fillRoundedRectangle (tray, size::radiusLarge);
@@ -289,4 +289,4 @@ void PianoKeyboard::resized()
         keys->setKeyWidth ((float) r.getWidth() / (float) numWhiteKeys);
 }
 
-} // namespace ikaros
+} // namespace lithium

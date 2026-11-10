@@ -3,7 +3,7 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <optional>
 
-namespace ikaros::platform
+namespace lithium::platform
 {
 
 /*  Makes the device manager's lists notice sound cards that were plugged in
@@ -69,4 +69,4 @@ std::optional<bool> isThreadRealtime (std::int64_t threadId);
 */
 bool keepOnFastestCores (std::int64_t threadId);
 
-} // namespace ikaros::platform
+} // namespace lithium::platform

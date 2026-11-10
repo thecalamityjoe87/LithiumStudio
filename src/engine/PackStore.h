@@ -2,7 +2,7 @@
 
 #include "engine/EngineTypes.h"
 
-namespace ikaros
+namespace lithium
 {
 
 class SoundLibrary;
@@ -12,8 +12,10 @@ class SoundLibrary;
     Downloadable sound packs, like GarageBand's Sound Library: the app comes
     with one small pack, and the user downloads the ones they want.
 
-    The packs on offer are listed in a pack index, a JSON file on the web
-    (see getDefaultIndexUrl, set at build time with IKAROS_PACK_INDEX_URL):
+    The packs on offer are listed in pack indexes, JSON files on the web
+    (see getDefaultIndexUrl, set at build time with LITHIUM_PACK_INDEX_URL:
+    one address or several, separated by spaces; their packs are merged,
+    the first index winning when two list the same pack id):
 
         { "format": 1,
           "packs": [ { "id": "ikaros-studio.drums", "name": "Drums", "version": "1.0.0",
@@ -58,8 +60,9 @@ public:
     //==============================================================================
     // The index
 
-    /** The index URL the app was built with. The IKAROS_PACK_INDEX
-        environment variable overrides it (for testing a new index). */
+    /** The index address(es) the app was built with, separated by spaces.
+        The LITHIUM_PACK_INDEX environment variable overrides them (for
+        testing a new index). */
     static juce::String getDefaultIndexUrl();
 
     /** Uses another index (the smoke test's). Call refreshIndex() after. */
@@ -158,4 +161,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE (PackStore)
 };
 
-} // namespace ikaros
+} // namespace lithium

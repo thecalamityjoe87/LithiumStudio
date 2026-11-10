@@ -7,7 +7,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace detail;
@@ -575,4 +575,4 @@ void AutomationEditor::keepValuesWhenAutomationGoes (const std::function<void()>
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

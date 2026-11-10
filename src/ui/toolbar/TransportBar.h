@@ -4,7 +4,7 @@
 #include "ui/toolbar/LcdDisplay.h"
 #include "ui/toolbar/MetronomeButton.h"
 
-namespace ikaros
+namespace lithium
 {
 
 class AudioEngine;
@@ -52,4 +52,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TransportBar)
 };
 
-} // namespace ikaros
+} // namespace lithium

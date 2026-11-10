@@ -2,7 +2,7 @@
 
 #include <juce_audio_formats/juce_audio_formats.h>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -39,4 +39,4 @@ private:
     class Writer;
 };
 
-} // namespace ikaros
+} // namespace lithium

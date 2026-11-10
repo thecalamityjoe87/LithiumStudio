@@ -1,7 +1,7 @@
 #include "engine/ControlSurface.h"
 #include "engine/MidiPorts.h"
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -253,4 +253,4 @@ void ControlSurface::show (const State& state)
     setFader (mackie::masterStrip, state.masterVolume);
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -11,7 +11,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace detail;
@@ -1026,4 +1026,4 @@ std::vector<RegionId> RegionEditor::importAudioFiles (TrackId trackId, const juc
     return idsOf (added);
 }
 
-} // namespace ikaros
+} // namespace lithium

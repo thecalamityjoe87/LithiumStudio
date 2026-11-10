@@ -1,7 +1,7 @@
 #include "ui/widgets/PerfOverlay.h"
 #include "ui/widgets/PaintProbe.h"
 
-namespace ikaros
+namespace lithium
 {
 
 PerfOverlay::PerfOverlay (const PerfMonitor& m) : monitor (m)
@@ -56,7 +56,7 @@ void PerfOverlay::timerCallback()
 
 void PerfOverlay::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("PerfOverlay");
+    LITHIUM_PERF_PAINT ("PerfOverlay");
 
     // Fixed colours: a debugging aid, so it doesn't follow the theme.
     g.setColour (juce::Colours::black.withAlpha (0.78f));
@@ -71,4 +71,4 @@ void PerfOverlay::paint (juce::Graphics& g)
         g.drawText (line, area.removeFromTop (16), juce::Justification::centredLeft, false);
 }
 
-} // namespace ikaros
+} // namespace lithium

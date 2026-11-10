@@ -4,7 +4,7 @@
 #include "engine/TrackHelpers.h"
 #include "platform/AudioHardware.h"
 
-namespace ikaros
+namespace lithium
 {
 
 // ALSA names are "Card, Port; Description" and other systems' are the card's
@@ -290,4 +290,4 @@ void AudioDeviceWatcher::check()
     pending = std::move (change);
 }
 
-} // namespace ikaros
+} // namespace lithium

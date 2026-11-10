@@ -2,7 +2,7 @@
 
 #include "engine/AudioEngine.h"
 
-namespace ikaros
+namespace lithium
 {
 
 /** Turns monitoring on or off for a track. The first time monitoring is
@@ -14,4 +14,4 @@ void setMonitoringWithWarning (AudioEngine&, TrackId, bool shouldMonitor, juce::
     away, without asking, once it has been shown). */
 void confirmMonitoring (AudioEngine&, juce::Component* associatedComponent, std::function<void (bool goAhead)>);
 
-} // namespace ikaros
+} // namespace lithium

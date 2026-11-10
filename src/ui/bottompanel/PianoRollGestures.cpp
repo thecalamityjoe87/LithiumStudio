@@ -8,7 +8,7 @@
 #include "engine/AudioEngine.h"
 #include "engine/TrackController.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace pianoroll;
@@ -418,4 +418,4 @@ bool PianoRoll::keyPressed (const juce::KeyPress& key)
     return false;   // e.g. Space, Ctrl+Z: on to the app's shortcuts
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -2,7 +2,7 @@
 #include "BinaryData.h"
 #include "ui/theme/Fonts.h"
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -10,9 +10,9 @@ namespace
     constexpr int width = 440, height = 300, iconSize = 112;
     constexpr float cornerRadius = 14.0f;
 
-    // The icon's background (resources/icons/*.svg) with light text, whatever the theme.
-    const juce::Colour background (0xff1a1d23);
-    const juce::Colour title (0xfff4f5f7), subtitle (0xff9aa0ab), accent (0xffffb547);
+    // The middle of the icon's tile gradient (resources/icons/*.svg), with light text, whatever the theme.
+    const juce::Colour background (0xff161e26);
+    const juce::Colour title (0xffe6edf2), subtitle (0xff93a3b1), accent (0xff3cc4d6);
 
     // Long enough to read the name, short enough not to hold anyone up.
     constexpr juce::uint32 minimumVisibleMs = 1200;
@@ -25,9 +25,9 @@ namespace
 StartupSplash::StartupSplash (std::function<void()> shown)
     : onShown (std::move (shown))
 {
-    setTitle ("Ikaros Studio");
-    icon = juce::ImageFileFormat::loadFrom (BinaryData::io_github_thecalamityjoe87_IkarosStudio_png,
-                                            (size_t) BinaryData::io_github_thecalamityjoe87_IkarosStudio_pngSize);
+    setTitle ("Lithium Studio");
+    icon = juce::ImageFileFormat::loadFrom (BinaryData::io_github_thecalamityjoe87_LithiumStudio_png,
+                                            (size_t) BinaryData::io_github_thecalamityjoe87_LithiumStudio_pngSize);
 
     // Not opaque, so the rounded corners show the desktop behind them
     // (where the desktop supports see-through windows).
@@ -101,20 +101,33 @@ void StartupSplash::paint (juce::Graphics& g)
                  juce::RectanglePlacement::centred);
 
     area.removeFromTop (14);
-    g.setColour (title);
-    g.setFont (fonts::uiBold (28.0f));
-    g.drawText ("Ikaros Studio", area.removeFromTop (36), juce::Justification::centred);
+    // The wordmark: LITHIUM bold, STUDIO muted, condensed and widely spaced.
+    {
+        const auto bold = fonts::captionBold (30.0f).withExtraKerningFactor (0.14f);
+        const auto light = fonts::caption (30.0f).withExtraKerningFactor (0.14f);
+        const juce::String family ("LITHIUM"), product (" STUDIO");
+        const auto familyWidth = juce::GlyphArrangement::getStringWidth (bold, family);
+        const auto productWidth = juce::GlyphArrangement::getStringWidth (light, product);
+        auto row = area.removeFromTop (36).toFloat().withSizeKeepingCentre (familyWidth + productWidth, 36.0f);
+
+        g.setColour (title);
+        g.setFont (bold);
+        g.drawText (family, row.removeFromLeft (familyWidth), juce::Justification::centredLeft, false);
+        g.setColour (subtitle);
+        g.setFont (light);
+        g.drawText (product, row, juce::Justification::centredLeft, false);
+    }
 
     g.setColour (subtitle);
     g.setFont (fonts::ui (13.0f));
-    g.drawText ("Version " + juce::JUCEApplication::getInstance()->getApplicationVersion() + " (" IKAROS_STAGE ")",
+    g.drawText ("Version " + juce::JUCEApplication::getInstance()->getApplicationVersion() + " (" LITHIUM_STAGE ")",
                 area.removeFromTop (20), juce::Justification::centred);
 
     g.setColour (subtitle);
     g.setFont (fonts::ui (12.0f));
     g.drawText (stage, area.removeFromBottom (16), juce::Justification::centred);
 
-    // A thin bar above the text: a track, and the amber part for what's done.
+    // A thin bar above the text: a track, and the cyan part for what's done.
     area.removeFromBottom (8);
     const auto track = area.removeFromBottom (3).reduced (40, 0).toFloat();
     g.setColour (juce::Colours::white.withAlpha (0.1f));
@@ -123,4 +136,4 @@ void StartupSplash::paint (juce::Graphics& g)
     g.fillRoundedRectangle (track.withWidth (track.getWidth() * progress), 1.5f);
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -3,7 +3,7 @@
 #include "engine/SoundLibrary.h"
 #include "platform/AppFolders.h"
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -792,4 +792,4 @@ void FreesoundStore::recordInPack (const FreesoundSound& sound, const juce::Stri
     writeJson (packFile, juce::var (info.release()));
 }
 
-} // namespace ikaros
+} // namespace lithium

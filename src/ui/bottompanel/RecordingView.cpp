@@ -3,7 +3,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -172,4 +172,4 @@ void RecordingView::resized()
     hintArea = r.removeFromTop (36);
 }
 
-} // namespace ikaros
+} // namespace lithium

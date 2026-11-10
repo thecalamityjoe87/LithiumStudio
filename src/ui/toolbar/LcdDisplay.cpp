@@ -1,10 +1,10 @@
 #include "ui/toolbar/LcdDisplay.h"
 #include "ui/widgets/PaintProbe.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -330,7 +330,7 @@ juce::Rectangle<int> LcdDisplay::Field::getValueArea() const
 
 void LcdDisplay::Field::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("LcdDisplay::Field");
+    LITHIUM_PERF_PAINT ("LcdDisplay::Field");
     const auto r = getLocalBounds().toFloat();
 
     // A shade lighter than the readout; lighter still under the mouse.
@@ -358,7 +358,7 @@ void LcdDisplay::Field::paint (juce::Graphics& g)
                 juce::Justification::centredLeft);
 
     if (hasKeyboardFocus (false))
-        IkarosLookAndFeel::drawFocusRing (g, r, size::radiusSmall);
+        LithiumLookAndFeel::drawFocusRing (g, r, size::radiusSmall);
 }
 
 void LcdDisplay::Field::mouseUp (const juce::MouseEvent& e)
@@ -437,7 +437,7 @@ LcdDisplay::TempoField::Part LcdDisplay::TempoField::getPartAt (juce::Point<int>
 
 void LcdDisplay::TempoField::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("LcdDisplay::TempoField");
+    LITHIUM_PERF_PAINT ("LcdDisplay::TempoField");
     Field::paint (g);   // the field and caption; the label draws the number
 
     for (auto part : { Part::stepUp, Part::stepDown })
@@ -697,7 +697,7 @@ void LcdDisplay::paintBlank (juce::Graphics& g, juce::Rectangle<int> row, float 
 void LcdDisplay::paintCaption (juce::Graphics& g, juce::Rectangle<int> area, const juce::String& text, juce::Justification j)
 {
     g.setColour (theme().lcdLabel);
-    g.setFont (fonts::mono (textSize::caption).withExtraKerningFactor (0.1f));
+    g.setFont (fonts::caption (textSize::caption).withExtraKerningFactor (0.12f));
     g.drawText (text, area, j);
 }
 
@@ -708,7 +708,7 @@ int LcdDisplay::getValueRowHeight() noexcept
 
 void LcdDisplay::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("LcdDisplay");
+    LITHIUM_PERF_PAINT ("LcdDisplay");
     paintPanel (g, getLocalBounds().toFloat());
 
     if (tunerShown)
@@ -779,7 +779,12 @@ void LcdDisplay::resized()
     r.removeFromLeft (smallGap);
     timeSigField.setBounds (r.removeFromLeft (timeWidth));
     r.removeFromLeft (smallGap);
-    keyField.setBounds (r.removeFromLeft (keyWidth));
+
+    // The key field takes the rest of the row, so its chevron sits at the
+    // right edge with the same 12px inset the position has on the left (its
+    // own padding reaches into that inset), and any width beyond the
+    // preferred one doesn't leave a gap after it.
+    keyField.setBounds (r.withTrimmedRight (-fieldPaddingX));
 
     // The tuner: note | scale | cents, and the mute button in the top-right
     // corner. The scale takes the room that's left.
@@ -796,7 +801,7 @@ void LcdDisplay::paintTuner (juce::Graphics& g)
     const auto& r = tunerReading;
     const bool inTune = r.isInTune();
     const auto valueColour = inTune ? theme().lcdInTune : theme().lcdValue;
-    const auto captionFont = fonts::mono (textSize::caption).withExtraKerningFactor (0.1f);
+    const auto captionFont = fonts::caption (textSize::caption).withExtraKerningFactor (0.12f);
 
     auto captionRow = [] (juce::Rectangle<int> area) { return area.withTrimmedTop (valueRowHeight).withTrimmedBottom (1); };
     auto valueRow = [] (juce::Rectangle<int> area) { return area.withHeight (valueRowHeight); };
@@ -940,4 +945,4 @@ void LcdDisplay::showKeyPicker()
     showPopover (std::move (picker), keyField);
 }
 
-} // namespace ikaros
+} // namespace lithium

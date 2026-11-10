@@ -12,7 +12,7 @@
 #include "engine/EngineTypes.h"
 #include "ui/theme/Theme.h"
 
-namespace ikaros::tokens::colour
+namespace lithium::tokens::colour
 {
 
 /** The family of a library category ("Keyboards", "Drums"...). Sounds from
@@ -74,4 +74,4 @@ inline juce::Colour textOn (juce::Colour fill)
     return fill.getPerceivedBrightness() > lightFill ? arrangement.regionTextDark : arrangement.regionTextLight;
 }
 
-} // namespace ikaros::tokens::colour
+} // namespace lithium::tokens::colour

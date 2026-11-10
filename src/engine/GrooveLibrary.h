@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -12,7 +12,7 @@ namespace ikaros
     The Drummer's grooves: human drumming from Google's Groove MIDI Dataset
     (CC BY 4.0), cut into bars and fills and scored by tools/build_grooves.py,
     which writes resources/drummer/grooves.json. The app has that file
-    compiled in (the IkarosDrummerData target in CMakeLists.txt).
+    compiled in (the LithiumDrummerData target in CMakeLists.txt).
 
     Each drummer has:
       - beat performances: bars a real drummer played one after another, so
@@ -101,4 +101,4 @@ private:
     std::map<int, juce::String> td11;
 };
 
-} // namespace ikaros
+} // namespace lithium

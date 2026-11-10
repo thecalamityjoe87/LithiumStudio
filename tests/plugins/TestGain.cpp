@@ -1,6 +1,6 @@
 // A tiny gain effect, built as a VST3/LV2 plug-in for testing plug-in
 // hosting (scanning, effects, plug-in windows, saving plug-in state).
-// Not part of the app. Build with -DIKAROS_BUILD_TEST_PLUGINS=ON.
+// Not part of the app. Build with -DLITHIUM_BUILD_TEST_PLUGINS=ON.
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -14,7 +14,7 @@ public:
         addParameter (gain = new juce::AudioParameterFloat ({ "gain", 1 }, "Gain", 0.0f, 1.0f, 0.5f));
     }
 
-    const juce::String getName() const override             { return "Ikaros Test Gain"; }
+    const juce::String getName() const override             { return "Lithium Studio Test Gain"; }
     bool acceptsMidi() const override                        { return false; }
     bool producesMidi() const override                       { return false; }
     double getTailLengthSeconds() const override             { return 0.0; }

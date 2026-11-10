@@ -4,7 +4,7 @@
 #include <array>
 #include <atomic>
 
-namespace ikaros
+namespace lithium
 {
 
 /*  Keeps the audio device's thread, and Tracktion's render workers, at
@@ -19,7 +19,7 @@ namespace ikaros
     The render workers share each block's work with the audio thread, which
     waits for them at the end of it: a worker at ordinary priority that the
     desktop keeps waiting holds up the audio thread too (the dropouts that
-    made Ikaros render on one thread in October 2026). Tracktion can't make
+    made Lithium Studio render on one thread in October 2026). Tracktion can't make
     them real-time on Linux, so they're noted as they start (see
     trackRenderThreads) and get the same treatment as the audio thread.
 */
@@ -79,4 +79,4 @@ private:
     void timerCallback() override;
 };
 
-} // namespace ikaros
+} // namespace lithium

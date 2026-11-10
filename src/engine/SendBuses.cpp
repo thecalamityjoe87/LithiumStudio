@@ -4,7 +4,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace detail;
@@ -134,4 +134,4 @@ float SendBuses::getFullLevelPosition()
     return fullLevelPosition();
 }
 
-} // namespace ikaros
+} // namespace lithium

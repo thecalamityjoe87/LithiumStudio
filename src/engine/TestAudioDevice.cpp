@@ -4,7 +4,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 static te::HostedAudioDeviceInterface::Parameters toParameters (const TestAudioDevice::Settings& s)
@@ -45,7 +45,7 @@ void TestAudioDevice::reopen()
     hosted.initialise (toParameters (settings));
 
     // Being made for plug-ins, the hosted device turns every input mono.
-    // Lay them out again the app's way (see IkarosEngineBehaviour).
+    // Lay them out again the app's way (see LithiumEngineBehaviour).
     dm.applyWaveDeviceLayout (juce::XmlElement ("AUDIODEVICE_LAYOUT"));
 
     hosted.prepareToPlay (settings.sampleRate, settings.blockSize);
@@ -136,4 +136,4 @@ tracktion::Edit* TestAudioDevice::getEditOf (AudioEngine& engine)
     return engine.getEdit();   // TestAudioDevice is one of AudioEngine's friends
 }
 
-} // namespace ikaros
+} // namespace lithium

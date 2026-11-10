@@ -1,10 +1,10 @@
 #include "ui/bottompanel/TuneSectionView.h"
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/TrackColours.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -125,7 +125,7 @@ void TuneSectionView::refresh()
         for (auto* slider : { &correction, &speed })
         {
             slider->setEnabled (on);
-            IkarosLookAndFeel::setFamilyColour (*slider, colour::familyOf (*track));
+            LithiumLookAndFeel::setFamilyColour (*slider, colour::familyOf (*track));
         }
     }
 
@@ -190,4 +190,4 @@ void TuneSectionView::resized()
     hintArea = r.removeFromTop (32);
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -9,7 +9,7 @@
 // seeing Tracktion (as in AudioEngine.h).
 namespace tracktion { inline namespace engine { class Clip; class MidiClip; } }
 
-namespace ikaros
+namespace lithium
 {
 
 class AudioEngine;
@@ -41,7 +41,7 @@ class SectionEditor;
 
     A Drummer track is an instrument track (kind "drummer") playing a drum
     kit. It plays the kit its drummer comes with (see DrummerInfo::kit);
-    until that kit's sound pack is installed, it plays the Ikaros Basics
+    until that kit's sound pack is installed, it plays the Lithium Basics
     Electronic Kit instead (getMissingKitPack says which pack to offer), and
     switches over by itself once it's there. Each kit's pack says which key
     plays which drum piece (instrument.json's drumMap), so the notes follow
@@ -179,4 +179,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DrummerEditor)
 };
 
-} // namespace ikaros
+} // namespace lithium

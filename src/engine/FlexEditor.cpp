@@ -6,7 +6,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -105,7 +105,7 @@ bool hasHitEdits (const te::Clip& clip)
 }
 
 // Tracktion only warps a clip (renders a stretched copy of its recording)
-// with its warpTime switch on. Ikaros keeps that switch on only while the
+// with its warpTime switch on. Lithium Studio keeps that switch on only while the
 // markers actually move something: a region nobody has touched, at the
 // tempo it was recorded at, plays its recording directly, with nothing to
 // wait for and nothing stretched.
@@ -1381,4 +1381,4 @@ void FlexEditor::timerCallback()
         stopTimer();
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -1,4 +1,4 @@
-Ikaros Studio is built on the work of these projects. Thank you.
+Lithium Studio is built on the work of these projects. Thank you.
 
 
 Tracktion Engine and JUCE
@@ -33,7 +33,7 @@ sfizz, the SFZ sample player
   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-  sfizz includes these libraries, which are built into Ikaros Studio with it.
+  sfizz includes these libraries, which are built into Lithium Studio with it.
   Each one's full license text is in its folder under external/sfizz.
 
     Abseil                Apache License 2.0           external/abseil-cpp
@@ -72,7 +72,7 @@ LAME, which encodes MP3 exports
   https://lame.sourceforge.io
   GNU Lesser General Public License, version 2 or later
   Copyright the LAME project contributors (version 3.100)
-  The full license text is in external/lame/COPYING. Ikaros Studio uses
+  The full license text is in external/lame/COPYING. Lithium Studio uses
   LAME's encoder library unchanged; its source is in external/lame.
 
 
@@ -94,7 +94,7 @@ fat1 and zita-at1, the pitch correction behind the Tune effect
   The full license text is in external/fat1/COPYING. Only fat1's retuner
   (zita-at1's pitch correction) is used, with JUCE's FFT and oversampling
   in place of FFTW and zita-resampler; fat1's LV2 plug-in and GUI are not.
-  See external/fat1/README.ikaros for the commit and what was changed.
+  See external/fat1/README.lithium for the commit and what was changed.
 
 
 pitch-detection, the pitch analysis behind the audio editor's Pitch mode
@@ -102,7 +102,7 @@ pitch-detection, the pitch analysis behind the audio editor's Pitch mode
   MIT License
   Copyright (c) 2018 Sevag Hanssian
   Its probabilistic YIN is used, with JUCE's FFT in place of FFTS and
-  without the HMM. See external/pitch-detection/README.ikaros for the
+  without the HMM. See external/pitch-detection/README.lithium for the
   commit and what was changed.
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -134,7 +134,7 @@ GxPlugins and Guitarix, the sound of most of the pedalboard's pedals
   The full license texts are in each folder under external/gxplugins.
   Only the effects' DSP (the code Faust generated) is used; the LV2 wrappers
   and GUIs are not. Three files are changed (the oversampling is done by
-  Ikaros instead): see external/gxplugins/README.ikaros, which also lists
+  Lithium Studio instead): see external/gxplugins/README.lithium, which also lists
   the commits used.
 
     Yellow Drive    GxSD1, inspired by the Boss SD-1 Super OverDrive
@@ -161,7 +161,7 @@ Guitarix, the sound of the Amp
   Guitarix's built-in cabinet impulse responses. Only the code Faust
   generated (and the tube and cabinet data) is used, unchanged; the LV2
   plugin, its GUI and its convolver are not. See
-  external/guitarix/README.ikaros for the files and the commit used.
+  external/guitarix/README.lithium for the files and the commit used.
 
 
 KlonCentaur, the sound of the Golden Boost pedal
@@ -172,7 +172,7 @@ KlonCentaur, the sound of the Golden Boost pedal
   circuit model, unchanged, with parts of chowdsp_utils
   (https://github.com/Chowdhury-DSP/chowdsp_utils, GNU General Public
   License, version 3, Copyright Jatin Chowdhury). Both licenses are in
-  external/kloncentaur; see its README.ikaros for what's used.
+  external/kloncentaur; see its README.lithium for what's used.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions are met:
@@ -201,7 +201,8 @@ KlonCentaur, the sound of the Golden Boost pedal
 
 
 Fonts
-  Figtree and JetBrains Mono, SIL Open Font License 1.1 (see resources/fonts).
+  Barlow, Barlow Condensed, IBM Plex Mono and Figtree, SIL Open Font License 1.1
+  (see resources/fonts).
 
 
 Icons
@@ -220,7 +221,7 @@ The Drummer's grooves: the Groove MIDI Dataset
   tools/build_grooves.py: the 4/4 performances of ten styles, their drum
   notes grouped into the Drummer's eleven pieces, cut into bars and fills,
   and scored for complexity and loudness. The notes' timing and velocities
-  are the drummers' own. The dataset itself isn't part of Ikaros Studio.
+  are the drummers' own. The dataset itself isn't part of Lithium Studio.
 
 
 Controller maps: Ardour's MIDI maps
@@ -231,11 +232,11 @@ Controller maps: Ardour's MIDI maps
   tools/controllers/convert_ardour_maps.py (Ardour commit d34a51e): their
   transport and track buttons, and the knob numbers for the knob layouts.
   The port names, the knob layouts and the Arturia MiniLab 3 profile are our
-  own. The maps themselves aren't part of Ikaros Studio.
+  own. The maps themselves aren't part of Lithium Studio.
 
 
 Sounds
-  Ikaros Basics, the sound pack that comes with the app, is made from scratch
+  Lithium Basics, the sound pack that comes with the app, is made from scratch
   by tools/generate_sounds.py. It contains no third-party samples, and it's
   released under CC0 1.0 (public domain): use the sounds however you like.
 

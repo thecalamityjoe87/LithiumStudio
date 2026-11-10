@@ -18,7 +18,7 @@
     are pitch bends (channel 1-8 = strips, 9 = master), knobs and the jog
     wheel are controllers that count clicks. The host lights a button by
     sending its note back. */
-namespace ikaros::mackie
+namespace lithium::mackie
 {
 
 constexpr int numStrips = 8;
@@ -93,4 +93,4 @@ juce::MidiMessage panRing (int strip, float pan);
 /** Turns a knob's ring of lights off (a strip with no track). */
 juce::MidiMessage ringOff (int strip);
 
-} // namespace ikaros::mackie
+} // namespace lithium::mackie

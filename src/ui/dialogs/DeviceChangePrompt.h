@@ -2,7 +2,7 @@
 
 #include "engine/AudioEngine.h"
 
-namespace ikaros
+namespace lithium
 {
 
 /** Asks whether to switch to a device that was just plugged in (or away
@@ -12,4 +12,4 @@ namespace ikaros
 void showDeviceChangePrompt (AudioEngine&, const AudioDevicePrompt&, juce::Component* associatedComponent,
                              std::function<void()> onClosed);
 
-} // namespace ikaros
+} // namespace lithium

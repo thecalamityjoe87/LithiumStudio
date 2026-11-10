@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 class AudioEngine;
@@ -126,4 +126,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SongExporter)
 };
 
-} // namespace ikaros
+} // namespace lithium

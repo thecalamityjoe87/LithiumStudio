@@ -4,7 +4,7 @@
 #include "ui/widgets/IconButton.h"
 #include "ui/theme/Family.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -93,4 +93,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginChainView)
 };
 
-} // namespace ikaros
+} // namespace lithium

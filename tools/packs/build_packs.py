@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Builds the downloadable sound packs from free sample libraries.
 
-    python3 -I tools/packs/build_packs.py --work ~/ikaros-packs [pack ...]
+    python3 -I tools/packs/build_packs.py --work ~/lithium-packs [pack ...]
 
 The source libraries are downloaded by hand (see SOURCES below for where
 each comes from) and unpacked into <work>/extracted/<source>/. This script
@@ -19,9 +19,9 @@ For each pack it:
     per instrument, with its Sound tab knobs (see SoundLibrary.h)
 
 To check that every instrument loads and plays, run the engine smoke test
-with IKAROS_CHECK_PACKS pointing at the build folder:
+with LITHIUM_CHECK_PACKS pointing at the build folder:
 
-    IKAROS_CHECK_PACKS=<work>/build build/IkarosEngineSmokeTest_artefacts/Debug/IkarosEngineSmokeTest
+    LITHIUM_CHECK_PACKS=<work>/build build/LithiumEngineSmokeTest_artefacts/Debug/LithiumEngineSmokeTest
 
 Nothing here is used by the app itself.
 """
@@ -421,7 +421,7 @@ def build_pack(pack, work: Path):
     size = sum(f.stat().st_size for f in out.rglob("*") if f.is_file())
     (out / "pack.json").write_text(json.dumps({
         "format": 2, "id": pack["id"], "name": pack["name"], "version": VERSION,
-        "description": pack["description"], "author": pack["credits"][0]["who"] + ", packaged by Ikaros Studio",
+        "description": pack["description"], "author": pack["credits"][0]["who"] + ", packaged by Lithium Studio",
         "license": pack["license"], "licenseFile": "LICENSE.txt", "installedSize": size,
         "credits": pack["credits"],
     }, indent=4) + "\n", encoding="utf-8")

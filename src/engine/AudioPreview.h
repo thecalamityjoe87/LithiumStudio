@@ -3,7 +3,7 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_formats/juce_audio_formats.h>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -53,4 +53,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPreview)
 };
 
-} // namespace ikaros
+} // namespace lithium

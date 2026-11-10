@@ -4,7 +4,7 @@
 #include <optional>
 #include <utility>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -26,7 +26,7 @@ namespace ikaros
             Loops/loops.json                                 + the loop files
 
     pack.json (format 2; every field but "id" is optional):
-        { "format": 2, "id": "ikaros-studio.basics", "name": "Ikaros Basics",
+        { "format": 2, "id": "ikaros-studio.basics", "name": "Lithium Basics",
           "version": "1.0.0", "description": "...", "author": "...",
           "license": "CC0-1.0", "licenseFile": "LICENSE.txt", "installedSize": 2951094,
           "credits": [ { "what": "...", "who": "...", "license": "CC0-1.0",
@@ -84,7 +84,7 @@ namespace ikaros
       it, loops tagged as drums or percussion count as unpitched too.
 
     Packs are read from the folder installed with the app and from the user's
-    Documents/Ikaros Studio/Sounds folder.
+    Documents/Lithium Studio/Sounds folder.
 
     This class only reads files; it doesn't touch Tracktion.
 */
@@ -141,7 +141,7 @@ public:
     static const juce::String defaultSoundId;
 
     /** The default place for users' own sound packs, and where downloaded
-        ones go: Documents/Ikaros Studio/Sounds (or IKAROS_USER_SOUNDS_DIR, if
+        ones go: Documents/Lithium Studio/Sounds (or LITHIUM_USER_SOUNDS_DIR, if
         set). The Sounds & Plug-ins preference can choose another. */
     static juce::File getUserSoundsFolder();
 
@@ -224,4 +224,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoundLibrary)
 };
 
-} // namespace ikaros
+} // namespace lithium

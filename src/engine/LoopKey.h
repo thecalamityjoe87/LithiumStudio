@@ -21,7 +21,7 @@
 
 #include <tracktion_engine/tracktion_engine.h>
 
-namespace ikaros::detail
+namespace lithium::detail
 {
 
 namespace te = tracktion;
@@ -44,7 +44,7 @@ inline void followSessionKey (te::AudioClipBase& clip)
     const int loopRoot = clip.state[loopKeyRootProp];
     const bool loopMinor = clip.state[loopKeyMinorProp];
 
-    // Ikaros keeps one key for the whole session, at the start of the pitch sequence.
+    // Lithium Studio keeps one key for the whole session, at the start of the pitch sequence.
     const auto& session = clip.edit.pitchSequence.getPitchAt (clip.getPosition().getStart());
     const bool sessionMinor = session.getScale() == te::Scale::minor || session.getScale() == te::Scale::aeolian;
 
@@ -76,4 +76,4 @@ inline void followSessionKey (te::Edit& edit)
                 followSessionKey (*audio);
 }
 
-} // namespace ikaros::detail
+} // namespace lithium::detail

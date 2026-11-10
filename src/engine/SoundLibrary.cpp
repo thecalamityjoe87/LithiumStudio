@@ -1,6 +1,6 @@
 #include "engine/SoundLibrary.h"
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -125,19 +125,19 @@ juce::File SoundLibrary::getUserSoundsFolder()
     // The smoke test points this at a folder of its own, so it never reads
     // (or changes) the user's packs. Handy for trying the app with an empty
     // Sounds folder too.
-    auto overridePath = juce::SystemStats::getEnvironmentVariable ("IKAROS_USER_SOUNDS_DIR", {});
+    auto overridePath = juce::SystemStats::getEnvironmentVariable ("LITHIUM_USER_SOUNDS_DIR", {});
 
     if (overridePath.isNotEmpty())
         return juce::File (overridePath);
 
     return juce::File::getSpecialLocation (juce::File::userDocumentsDirectory)
-               .getChildFile ("Ikaros Studio").getChildFile ("Sounds");
+               .getChildFile ("Lithium Studio").getChildFile ("Sounds");
 }
 
 juce::File SoundLibrary::getBundledSoundsFolder()
 {
     // Tests (or a developer) can point at another folder.
-    auto overridePath = juce::SystemStats::getEnvironmentVariable ("IKAROS_SOUNDS_DIR", {});
+    auto overridePath = juce::SystemStats::getEnvironmentVariable ("LITHIUM_SOUNDS_DIR", {});
 
     if (overridePath.isNotEmpty())
         return juce::File (overridePath);
@@ -145,13 +145,13 @@ juce::File SoundLibrary::getBundledSoundsFolder()
     // Where the build and the installers put the packs, relative to the program:
     //   next to it (build folder, Windows)
     //   ../Resources/Sounds (inside a macOS .app)
-    //   ../share/ikaros-studio/Sounds (Linux install and Flatpak)
+    //   ../share/lithium-studio/Sounds (Linux install and Flatpak)
     auto exe = juce::File::getSpecialLocation (juce::File::currentExecutableFile);
 
    #if JUCE_LINUX
     // In an AppImage the program is started through the AppRun symlink in the
     // mount's root, and that's the path JUCE reports. /proc/self/exe is the
-    // real file (<mount>/usr/bin/ikaros-studio).
+    // real file (<mount>/usr/bin/lithium-studio).
     if (auto real = juce::File ("/proc/self/exe").getLinkedTarget(); real.existsAsFile())
         exe = real;
    #endif
@@ -160,7 +160,7 @@ juce::File SoundLibrary::getBundledSoundsFolder()
 
     for (auto candidate : { dir.getChildFile ("Sounds"),
                             dir.getSiblingFile ("Resources").getChildFile ("Sounds"),
-                            dir.getSiblingFile ("share").getChildFile ("ikaros-studio").getChildFile ("Sounds") })
+                            dir.getSiblingFile ("share").getChildFile ("lithium-studio").getChildFile ("Sounds") })
         if (candidate.isDirectory())
             return candidate;
 
@@ -580,4 +580,4 @@ juce::String SoundLibrary::getPackIdOf (const juce::String& soundId)
     return soundId.fromFirstOccurrenceOf (samplerPrefix, false, false).upToFirstOccurrenceOf ("/", false, false);
 }
 
-} // namespace ikaros
+} // namespace lithium

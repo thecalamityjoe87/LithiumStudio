@@ -2,7 +2,7 @@
 #include "ui/dialogs/AlertDialog.h"
 #include "engine/TrackController.h"
 
-namespace ikaros
+namespace lithium
 {
 
 void confirmMonitoring (AudioEngine& engine, juce::Component* associatedComponent, std::function<void (bool)> then)
@@ -49,4 +49,4 @@ void setMonitoringWithWarning (AudioEngine& engine, TrackId track, bool shouldMo
     });
 }
 
-} // namespace ikaros
+} // namespace lithium

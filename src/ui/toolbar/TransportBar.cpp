@@ -6,7 +6,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -143,7 +143,7 @@ void TransportBar::update()
 
 void TransportBar::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("TransportBar");
+    LITHIUM_PERF_PAINT ("TransportBar");
     auto r = getLocalBounds().toFloat().reduced (0.5f);
     g.setColour (theme().transportWell);
     g.fillRoundedRectangle (r, size::radiusPill);
@@ -180,4 +180,4 @@ void TransportBar::resized()
     place (countInButton, countIn);
 }
 
-} // namespace ikaros
+} // namespace lithium

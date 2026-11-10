@@ -4,7 +4,7 @@
 #include "engine/FreesoundStore.h"
 #include "ui/widgets/IconButton.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -124,4 +124,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LoopBrowser)
 };
 
-} // namespace ikaros
+} // namespace lithium

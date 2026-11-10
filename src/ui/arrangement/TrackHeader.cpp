@@ -1,7 +1,7 @@
 #include "ui/arrangement/TrackHeader.h"
 #include "ui/widgets/PaintProbe.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 #include "ui/theme/TrackColours.h"
 #include "ui/widgets/AutomationHint.h"
@@ -10,7 +10,7 @@
 #include <map>
 #include <tuple>
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -149,7 +149,7 @@ TrackHeader::TrackHeader (AudioEngine& e, Selection& s, const TrackInfo& t)
     // Pan: a small knob, centre at 12 o'clock. Double-click centres it.
     pan.setRange (-1.0, 1.0);
     pan.setDoubleClickReturnValue (true, 0.0);
-    pan.getProperties().set ("bipolar", true);   // read by IkarosLookAndFeel::drawRotarySlider
+    pan.getProperties().set ("bipolar", true);   // read by LithiumLookAndFeel::drawRotarySlider
     pan.getProperties().set ("compact", true);   // the small knob style
     pan.onDragStart = [this] { engine.beginUndoStep ("Pan"); selection.selectTrack (info.id); };
     pan.onValueChange = [this] { engine.getTracks().setPan (info.id, (float) pan.getValue()); };
@@ -252,7 +252,7 @@ void TrackHeader::update (const TrackInfo& t, bool isSelected)
     const int panAmount = juce::roundToInt (std::abs (t.pan) * 100.0f);
     pan.setTooltip ("Pan: " + (panAmount == 0 ? juce::String ("center") : (t.pan < 0.0f ? "left " : "right ") + juce::String (panAmount))
                     + " (double-click to center)");
-    IkarosLookAndFeel::setFamilyColour (pan, colour::familyOf (t), IkarosLookAndFeel::FamilyShade::ink);
+    LithiumLookAndFeel::setFamilyColour (pan, colour::familyOf (t), LithiumLookAndFeel::FamilyShade::ink);
 
     const bool wasAudio = monitorButton.isVisible();
     const bool hadClipLight = clipLight.isVisible();
@@ -460,7 +460,7 @@ void TrackHeader::finishRenaming (bool keepNewName)
 
 void TrackHeader::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("TrackHeader");
+    LITHIUM_PERF_PAINT ("TrackHeader");
     // Unselected headers are see-through: the column's background shows.
     auto r = getLocalBounds();
 
@@ -634,4 +634,4 @@ void TrackHeader::resized()
     pickerArea = bottomRow.withY (bottomRow.getBottom() + 4).withHeight (18);
 }
 
-} // namespace ikaros
+} // namespace lithium

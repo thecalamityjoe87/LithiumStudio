@@ -1,10 +1,10 @@
 #include "ui/widgets/CollapsibleSection.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 #include "ui/widgets/Icons.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -42,7 +42,7 @@ public:
         g.drawText (getName(), content, juce::Justification::centredLeft, true);
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, r, size::radiusXs);
+            LithiumLookAndFeel::drawFocusRing (g, r, size::radiusXs);
     }
 };
 
@@ -91,4 +91,4 @@ void CollapsibleSection::resized()
     content.setBounds (r.withHeight (content.getHeight()));
 }
 
-} // namespace ikaros
+} // namespace lithium

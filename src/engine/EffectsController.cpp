@@ -17,7 +17,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace detail;
@@ -1736,4 +1736,4 @@ EffectsController::TuneReading EffectsController::getTuneReading (TrackId id, Pl
     return r;
 }
 
-} // namespace ikaros
+} // namespace lithium

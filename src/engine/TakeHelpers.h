@@ -5,7 +5,7 @@
 
 #include <tracktion_engine/tracktion_engine.h>
 
-namespace ikaros::detail
+namespace lithium::detail
 {
 
 namespace te = tracktion;
@@ -38,4 +38,4 @@ void assignNoteIdsToEveryTake (te::MidiClip&);
     that wasn't cut short. Not an undo step. */
 void splitIntoPassTakes (te::WaveAudioClip&, te::TimeDuration loopLength);
 
-} // namespace ikaros::detail
+} // namespace lithium::detail

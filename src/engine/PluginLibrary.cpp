@@ -3,7 +3,7 @@
 #include "engine/PluginScanner.h"
 #include "engine/TrackHelpers.h"
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -29,7 +29,7 @@ PluginLibrary::PluginLibrary (AudioEngine& o) : owner (o)
             scan();
     };
     scanner->setRecordFile (owner.getTeEngine().getPropertyStorage().getAppPrefsFolder()
-                                .getChildFile ("IkarosScannedPlugins.xml"));
+                                .getChildFile ("LithiumScannedPlugins.xml"));
     pm.knownPluginList.addChangeListener (this);
 }
 
@@ -272,4 +272,4 @@ void PluginLibrary::changeListenerCallback (juce::ChangeBroadcaster*)
     owner.notifyModelChanged();
 }
 
-} // namespace ikaros
+} // namespace lithium

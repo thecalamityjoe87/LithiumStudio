@@ -12,7 +12,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace detail;
@@ -797,4 +797,4 @@ void DrummerEditor::refreshAll()
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

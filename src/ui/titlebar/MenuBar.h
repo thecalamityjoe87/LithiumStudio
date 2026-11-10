@@ -2,7 +2,7 @@
 
 #include "ui/titlebar/WindowControls.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -10,10 +10,12 @@ namespace ikaros
     The 30px strip at the top. It doubles as the window's title bar, because
     the app draws its own (no OS title bar or window buttons).
 
-      [File Edit Track ...]     [logo] Ikaros Studio · Session name ●     [– □ ×]
+      [logo] LITHIUM STUDIO  [File Edit Track ...]     Session name ●     [– □ ×]
 
-    The centred branding is the app logo and name, then the session name in
-    muted text, followed by a small dot while it has unsaved changes.
+    The branding on the left is the app logo and wordmark. The session name
+    is centred on the strip, in muted text, followed by a small dot while it
+    has unsaved changes; it moves aside (and then ends in an ellipsis)
+    rather than overlap the menus or the window buttons.
 
     Drag the empty parts to move the window; double-click to maximise/restore.
     On macOS the menus move to the system menu bar and the window's own
@@ -56,13 +58,13 @@ private:
 
     juce::String sessionName;
     bool unsavedChanges = false;
+    juce::Rectangle<int> brandArea;  // the logo and wordmark, left of the menus
     juce::Rectangle<int> freeArea;   // between the menus and the window buttons
     int nativeButtonsWidth = 0;      // macOS: the space kept for the traffic lights
-    juce::Image logo;                // the app icon, drawn small beside the name
 
     int getMenusWidth();
     juce::Component* getWindow() const   { return getTopLevelComponent(); }
 
 };
 
-} // namespace ikaros
+} // namespace lithium

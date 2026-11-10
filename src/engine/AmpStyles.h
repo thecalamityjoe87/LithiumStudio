@@ -4,7 +4,7 @@
 #include <array>
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -73,4 +73,4 @@ juce::String getAmpCabName (int cab);
     "bass" gets the Bass voice, anything else Clean). */
 int getDefaultAmpVoiceFor (const juce::String& trackIcon);
 
-} // namespace ikaros
+} // namespace lithium

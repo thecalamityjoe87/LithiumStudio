@@ -3,10 +3,10 @@
 #include "engine/PerfMonitor.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace ikaros
+namespace lithium
 {
 
-/*  The performance monitor's live numbers (IKAROS_PERF=1 only), in a small
+/*  The performance monitor's live numbers (LITHIUM_PERF=1 only), in a small
     box in the window's top-right corner. Ctrl+Shift+P shows and hides it
     (see MainComponent). It ignores the mouse, and only repaints 4 times a
     second while it's showing.
@@ -27,4 +27,4 @@ private:
     void timerCallback() override;
 };
 
-} // namespace ikaros
+} // namespace lithium

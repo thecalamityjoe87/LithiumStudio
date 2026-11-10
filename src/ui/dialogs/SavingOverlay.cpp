@@ -2,7 +2,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -102,4 +102,4 @@ void SavingOverlay::resized()
     progressBar.setBounds (card.reduced (20, 0).withTrimmedTop (56).withHeight (20));
 }
 
-} // namespace ikaros
+} // namespace lithium

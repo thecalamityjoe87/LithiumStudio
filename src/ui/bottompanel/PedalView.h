@@ -4,7 +4,7 @@
 #include "engine/PedalStyles.h"
 #include "ui/widgets/CachedShadow.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -104,4 +104,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PedalView)
 };
 
-} // namespace ikaros
+} // namespace lithium

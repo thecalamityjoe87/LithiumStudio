@@ -4,7 +4,7 @@
 #include <memory>
 #include <string_view>
 
-namespace ikaros
+namespace lithium
 {
 
 // A setting is its key in the file plus the value it has until the user
@@ -23,7 +23,7 @@ namespace settings
     // General
     namespace OnStartup { enum { sessionChooser, reopenLastSession }; }
     inline constexpr IntSetting  onStartup           { "onStartup", OnStartup::sessionChooser };
-    inline constexpr TextSetting sessionFolder       { "sessionFolder", "" };         // empty: Documents/Ikaros Studio
+    inline constexpr TextSetting sessionFolder       { "sessionFolder", "" };         // empty: Documents/Lithium Studio
 
     // Audio & MIDI
     namespace Velocity { enum { soft, normal, hard }; }
@@ -48,7 +48,7 @@ namespace settings
     inline constexpr IntSetting  wheelMode           { "wheelMode", Wheel::zoomWithModifier };
 
     // Sounds & Plug-ins
-    inline constexpr TextSetting userSoundsFolder    { "userSoundsFolder", "" };      // empty: Documents/Ikaros Studio/Sounds
+    inline constexpr TextSetting userSoundsFolder    { "userSoundsFolder", "" };      // empty: Documents/Lithium Studio/Sounds
     inline constexpr TextSetting pluginFolders       { "pluginFolders", "" };         // one folder per line, searched as well as the standard ones
     inline constexpr TextSetting disabledPluginFormats { "disabledPluginFormats", "" };   // one format name per line
     inline constexpr TextSetting disabledPlugins     { "disabledPlugins", "" };       // one plug-in ID (PluginInfo::id) per line
@@ -144,4 +144,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Preferences)
 };
 
-} // namespace ikaros
+} // namespace lithium

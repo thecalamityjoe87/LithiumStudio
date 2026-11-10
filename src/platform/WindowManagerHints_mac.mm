@@ -8,7 +8,7 @@
 #import <Cocoa/Cocoa.h>
 #import <objc/runtime.h>
 
-namespace ikaros::platform
+namespace lithium::platform
 {
 
 namespace
@@ -92,6 +92,6 @@ int getInlineTitleBarButtonsWidth (const juce::DocumentWindow& window)
     return (int) std::ceil (width / (double) window.getDesktopScaleFactor());
 }
 
-} // namespace ikaros::platform
+} // namespace lithium::platform
 
 #endif

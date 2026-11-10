@@ -1,10 +1,10 @@
 #include "ui/dialogs/SessionChooser.h"
-#include "BinaryData.h"
+#include "ui/widgets/Branding.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -13,7 +13,7 @@ namespace
 {
     constexpr int tileWidth = 200, tileGap = 16;
     constexpr int sidebarWidth = 210, headerHeight = 64, footerHeight = 72;
-    constexpr int contentPadding = 24, fieldLabelWidth = 48, sidebarLogoSize = 24;
+    constexpr int contentPadding = 24, fieldLabelWidth = 48;
 
     // Exactly three tile columns, padded evenly; the scrollbar sits inside the right-hand padding.
     constexpr int scrollbarGap = 6;
@@ -185,7 +185,7 @@ public:
         g.drawText (getName(), content, juce::Justification::centredLeft);
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, r, size::radius);
+            LithiumLookAndFeel::drawFocusRing (g, r, size::radius);
     }
 
 private:
@@ -223,9 +223,6 @@ SessionChooser::SessionChooser (AudioEngine& e, Callbacks c)
     setWantsKeyboardFocus (true);
     setAlwaysOnTop (true);
 
-    // ImageCache keeps the decoded PNG, which the title bar has already asked for.
-    logo = juce::ImageCache::getFromMemory (BinaryData::io_github_thecalamityjoe87_IkarosStudio_png,
-                                            BinaryData::io_github_thecalamityjoe87_IkarosStudio_pngSize);
 
     newNav = std::make_unique<NavItem> ("New Session", Icon::plus);
     recentNav = std::make_unique<NavItem> ("Recent", Icon::clock);
@@ -477,27 +474,8 @@ void SessionChooser::paint (juce::Graphics& g)
     g.setColour (theme().border);
     g.drawRoundedRectangle (panel.toFloat().reduced (0.5f), size::radiusPill, 1.0f);
 
-    // Branding: [logo] Ikaros Studio
-    auto brand = sidebar.withHeight (headerHeight).reduced (20, 0);
-
-    if (logo.isValid())
-    {
-        // As in the title bar: draw just the rounded tile (the PNG has a 16px
-        // transparent margin of 256) and outline it so it shows on dark themes.
-        const auto tile = brand.removeFromLeft (sidebarLogoSize).withSizeKeepingCentre (sidebarLogoSize, sidebarLogoSize).toFloat();
-        const auto source = logo.getBounds().reduced (logo.getWidth() / 16);
-        g.setImageResamplingQuality (juce::Graphics::highResamplingQuality);
-        g.drawImage (logo, (int) tile.getX(), (int) tile.getY(), (int) tile.getWidth(), (int) tile.getHeight(),
-                     source.getX(), source.getY(), source.getWidth(), source.getHeight());
-
-        g.setColour (theme().logoOutline);
-        g.drawRoundedRectangle (tile.reduced (0.5f), sidebarLogoSize * 52.0f / 224.0f, 1.0f);
-        brand.removeFromLeft (10);
-    }
-
-    g.setColour (theme().text);
-    g.setFont (fonts::uiBold (textSize::md));
-    g.drawText ("Ikaros Studio", brand, juce::Justification::centredLeft);
+    // Branding: [logo] LITHIUM STUDIO, exactly as in the title bar.
+    branding::paint (g, sidebar.withHeight (headerHeight).reduced (20, 0).toFloat());
 
     auto title = header.reduced (contentPadding, 0);
     g.setFont (fonts::uiBold (textSize::display));
@@ -582,4 +560,4 @@ void SessionChooser::layoutTiles()
     tileHolder.setSize (viewport.getMaximumVisibleWidth(), juce::jmax (0, rows * (tileHeight + tileGap) - tileGap));
 }
 
-} // namespace ikaros
+} // namespace lithium

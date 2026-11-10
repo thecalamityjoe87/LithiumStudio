@@ -3,7 +3,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>   // juce::ModifierKeys: is a mouse button held?
 #include <tracktion_engine/tracktion_engine.h>
 
-namespace ikaros
+namespace lithium
 {
 
 namespace te = tracktion;
@@ -342,4 +342,4 @@ void Autosaver::pollRecording()
         writeInfo();
 }
 
-} // namespace ikaros
+} // namespace lithium

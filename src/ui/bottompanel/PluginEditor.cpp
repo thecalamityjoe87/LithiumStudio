@@ -3,7 +3,7 @@
 #include "ui/theme/Tokens.h"
 #include <algorithm>
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -214,4 +214,4 @@ void PluginEditor::resized()
                              Knob::preferredWidth, Knob::preferredHeight);
 }
 
-} // namespace ikaros
+} // namespace lithium

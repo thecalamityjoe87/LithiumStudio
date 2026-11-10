@@ -5,7 +5,7 @@
 #include <optional>
 #include <set>
 
-namespace ikaros
+namespace lithium
 {
 
 class Preferences;
@@ -173,4 +173,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE (FreesoundStore)
 };
 
-} // namespace ikaros
+} // namespace lithium

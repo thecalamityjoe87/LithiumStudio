@@ -1,10 +1,10 @@
 // generated from file './/sfp_clip.dsp' by dsp2cc:
 // Code generated with Faust 0.9.90 (http://faust.grame.fr)
-// Modified for Ikaros Studio (see ../../README.ikaros): the zita-resampler
+// Modified for Ikaros Studio (see ../../README.lithium): the zita-resampler
 // oversampling and its variable-length array (which MSVC doesn't accept) are
-// taken out. Ikaros oversamples this stage itself, with juce::dsp::Oversampling,
+// taken out. Lithium Studio oversamples this stage itself, with juce::dsp::Oversampling,
 // so compute() is now given audio at the oversampled rate and works in place.
-// Each change is marked "Ikaros:".
+// Each change is marked "Lithium:".
 
 
 namespace sfp_clip {
@@ -43,7 +43,7 @@ static table1d_imp<100> clip __rt_data = {
 	}
 };
 
-#if 0 // Ikaros: the resampler isn't used
+#if 0 // Lithium: the resampler isn't used
 #define MAX_UPSAMPLE 8
 
 class SimpleResampler
@@ -141,12 +141,12 @@ void SimpleResampler::down(int32_t count, float *input, float *output)
   assert(r_down.out_count == 1);
 }
 
-#endif // Ikaros
+#endif // Lithium Studio
 
 class Dsp: public PluginLV2 {
 private:
 	uint32_t fSamplingFreq;
-	// Ikaros: SimpleResampler res;
+	// Lithium: SimpleResampler res;
 	FAUSTFLOAT 	fslider0;
 	FAUSTFLOAT	*fslider0_;
 	double 	fRec0[2];
@@ -199,7 +199,7 @@ void Dsp::clear_state_f_static(PluginLV2 *p)
 inline void Dsp::init(uint32_t samplingFreq)
 {
 	fSamplingFreq = samplingFreq;
-    // Ikaros: res.setup(samplingFreq,4);
+    // Lithium: res.setup(samplingFreq,4);
 	clear_state_f();
 }
 
@@ -227,7 +227,7 @@ void always_inline Dsp::compute(int count, FAUSTFLOAT *input0, FAUSTFLOAT *outpu
 {
 #define fslider0 (*fslider0_)
 	double 	fSlow0 = (0.007000000000000006 * double(fslider0));
-    // Ikaros: was 4x oversampling into a variable-length array
+    // Lithium: was 4x oversampling into a variable-length array
     int rescount = count;
     float* buf = output0;
     if (input0 != output0) memcpy(output0, input0, count * sizeof(float));
@@ -238,7 +238,7 @@ void always_inline Dsp::compute(int count, FAUSTFLOAT *input0, FAUSTFLOAT *outpu
 		// post processing
 		fRec0[1] = fRec0[0];
 	}
-    // Ikaros: res.down(count,buf,output0);
+    // Lithium: res.down(count,buf,output0);
 #undef fslider0
 }
 

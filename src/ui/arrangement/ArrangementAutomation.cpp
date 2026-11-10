@@ -2,12 +2,12 @@
 #include "ui/widgets/PaintProbe.h"
 #include "ui/arrangement/ArrangementLayout.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/widgets/AutomationHint.h"
 #include "ui/widgets/Icons.h"
 #include <numeric>
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -112,7 +112,7 @@ int ArrangementView::AutomationLane::numSelected() const
 //==============================================================================
 void ArrangementView::AutomationLane::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("ArrangementView::AutomationLane");
+    LITHIUM_PERF_PAINT ("ArrangementView::AutomationLane");
     // No background: the track's lane (grid and faded regions) shows through.
     // Each kind of setting has its own colour (volume blue, pan green...).
     const float width = (float) getWidth();
@@ -468,4 +468,4 @@ bool ArrangementView::AutomationLane::keyPressed (const juce::KeyPress& key)
     return false;
 }
 
-} // namespace ikaros
+} // namespace lithium

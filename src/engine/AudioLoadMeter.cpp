@@ -1,6 +1,6 @@
 #include "engine/AudioLoadMeter.h"
 
-namespace ikaros
+namespace lithium
 {
 
 AudioLoadMeter::AudioLoadMeter (juce::AudioDeviceManager& dm, bool shouldTimeBlocks)
@@ -107,4 +107,4 @@ void AudioLoadMeter::EndCallback::audioDeviceIOCallbackWithContext (const float*
     owner.blockDone (juce::Time::highResolutionTicksToSeconds (ticks), numSamples);
 }
 
-} // namespace ikaros
+} // namespace lithium

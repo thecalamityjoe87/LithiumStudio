@@ -1,6 +1,6 @@
 #include "engine/MackieControl.h"
 
-namespace ikaros::mackie
+namespace lithium::mackie
 {
 
 namespace
@@ -132,4 +132,4 @@ juce::MidiMessage ringOff (int strip)
     return juce::MidiMessage::controllerEvent (1, 0x30 + strip, 0);
 }
 
-} // namespace ikaros::mackie
+} // namespace lithium::mackie

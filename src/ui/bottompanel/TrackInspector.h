@@ -7,7 +7,7 @@
 #include "ui/theme/Tokens.h"
 #include "ui/widgets/CollapsibleSection.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -64,4 +64,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackInspector)
 };
 
-} // namespace ikaros
+} // namespace lithium

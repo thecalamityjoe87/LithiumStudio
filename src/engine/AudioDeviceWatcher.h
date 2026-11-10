@@ -5,7 +5,7 @@
 #include <functional>
 #include <optional>
 
-namespace ikaros
+namespace lithium
 {
 
 class AudioEngine;
@@ -83,4 +83,4 @@ private:
     std::optional<Switching> switching;
 };
 
-} // namespace ikaros
+} // namespace lithium

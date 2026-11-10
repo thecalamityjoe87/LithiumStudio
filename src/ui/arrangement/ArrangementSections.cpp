@@ -4,9 +4,9 @@
 #include "engine/AudioEngine.h"
 #include "engine/TrackController.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -45,7 +45,7 @@ ArrangementView::SectionStrip::SectionStrip (ArrangementView& o) : owner (o)
 
     nameField.setFont (fonts::ui (textSize::sm));
     nameField.setTitle ("Section name");
-    IkarosLookAndFeel::styleInlineEditor (nameField);
+    LithiumLookAndFeel::styleInlineEditor (nameField);
     nameField.onReturnKey = [this] { commitNameField(); };
     nameField.onEscapeKey = [this] { hideNameField(); };
     nameField.onFocusLost = [this] { commitNameField(); };
@@ -135,7 +135,7 @@ ArrangementView::SectionStrip::Hit ArrangementView::SectionStrip::findHit (juce:
 //==============================================================================
 void ArrangementView::SectionStrip::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("ArrangementView::SectionStrip");
+    LITHIUM_PERF_PAINT ("ArrangementView::SectionStrip");
     auto r = getLocalBounds();
     g.fillAll (theme().sectionsStripBg);
     g.setColour (theme().divider);
@@ -580,4 +580,4 @@ void ArrangementView::SectionStrip::hideNameField()
         grabKeyboardFocus();
 }
 
-} // namespace ikaros
+} // namespace lithium

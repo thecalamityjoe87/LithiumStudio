@@ -6,7 +6,7 @@
 // Plain structs about recording health and the audio device, for the UI.
 // (Kept out of EngineTypes.h, which nearly every file includes.)
 
-namespace ikaros
+namespace lithium
 {
 
 /** An input level at or above this (dB) counts as clipping: the converter
@@ -83,4 +83,4 @@ struct AudioDeviceStatus
     int dropouts = 0;
 };
 
-} // namespace ikaros
+} // namespace lithium
