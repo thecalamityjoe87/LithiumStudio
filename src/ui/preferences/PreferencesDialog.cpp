@@ -3,7 +3,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -240,4 +240,4 @@ void PreferencesDialog::resized()
         page->setBounds (pageArea);
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -1,6 +1,6 @@
 #include "ui/widgets/CachedShadow.h"
 
-namespace ikaros
+namespace lithium
 {
 
 void CachedShadow::drawForRoundedRectangle (juce::Graphics& g, const juce::DropShadow& shadow,
@@ -53,4 +53,4 @@ void CachedShadow::draw (juce::Graphics& g, const juce::DropShadow& shadow, juce
     g.drawImageAt (image, (int) whole.x + shadow.offset.x - margin, (int) whole.y + shadow.offset.y - margin, true);
 }
 
-} // namespace ikaros
+} // namespace lithium

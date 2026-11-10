@@ -5,7 +5,7 @@
 #include "ui/state/Selection.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace ikaros
+namespace lithium
 {
 
 /** What hardware controllers do in the app:
@@ -55,4 +55,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SurfaceHandler)
 };
 
-} // namespace ikaros
+} // namespace lithium

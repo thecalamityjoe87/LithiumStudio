@@ -4,7 +4,7 @@
 #include "ui/state/Selection.h"
 #include <map>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -45,4 +45,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MixerView)
 };
 
-} // namespace ikaros
+} // namespace lithium

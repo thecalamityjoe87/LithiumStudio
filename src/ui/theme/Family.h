@@ -1,6 +1,6 @@
 #pragma once
 
-namespace ikaros::tokens
+namespace lithium::tokens
 {
 
 /** The instrument families. Tracks, regions, library categories and the
@@ -14,4 +14,4 @@ namespace ikaros::tokens
     including all of Tokens.h. */
 enum class Family { drums, audio, strings, bass, keys, synths, guitar, woodwinds, brass, loops, plugins, master };
 
-} // namespace ikaros::tokens
+} // namespace lithium::tokens

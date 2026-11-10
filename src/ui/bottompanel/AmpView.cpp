@@ -2,12 +2,12 @@
 #include "ui/widgets/PaintProbe.h"
 #include "engine/TrackController.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Theme.h"
 #include "ui/theme/Tokens.h"
 #include "ui/widgets/Icons.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -201,7 +201,7 @@ public:
         icons::draw (g, Icon::power, r.reduced (5.0f), symbol, r.getWidth() - 10.0f, 2.0f);
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat(), getHeight() * 0.5f);
+            LithiumLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat(), getHeight() * 0.5f);
     }
 
 private:
@@ -281,7 +281,7 @@ public:
         g.drawFittedText (value, text, juce::Justification::centredLeft, 1, 0.8f);
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat(), radius);
+            LithiumLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat(), radius);
     }
 
 private:
@@ -300,7 +300,7 @@ AmpView::AmpView (AudioEngine& e) : engine (e)
     for (int i = 0; i < ampKnobCount; ++i)
     {
         auto* knob = knobs.add (new juce::Slider (juce::Slider::RotaryHorizontalVerticalDrag, juce::Slider::NoTextBox));
-        knob->getProperties().set ("pedal", true);          // drawn by IkarosLookAndFeel's drawPedalKnob...
+        knob->getProperties().set ("pedal", true);          // drawn by LithiumLookAndFeel's drawPedalKnob...
         knob->getProperties().set ("capSize", capSize);     // ...with a bigger cap than a pedal's
         knob->setRotaryParameters (juce::MathConstants<float>::pi * 1.25f, juce::MathConstants<float>::pi * 2.75f, true);
         knob->setRange (0.0, 1.0);
@@ -359,7 +359,7 @@ void AmpView::styleKnobs()
     for (auto* knob : knobs)
     {
         knob->getProperties().set ("knobCap", cap);
-        knob->setColour (IkarosLookAndFeel::knobArcColourId, s.lettering);
+        knob->setColour (LithiumLookAndFeel::knobArcColourId, s.lettering);
         knob->repaint();
     }
 }
@@ -582,7 +582,7 @@ void AmpView::drawBackground (juce::Graphics& g) const
 
 void AmpView::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("AmpView");
+    LITHIUM_PERF_PAINT ("AmpView");
     // The covering, faceplate and grille come from the cached image,
     // redrawn when the voice, cab or screen scale has changed.
     const auto scale = g.getInternalContext().getPhysicalPixelScaleFactor();
@@ -635,7 +635,7 @@ void AmpView::paint (juce::Graphics& g)
 
 void AmpView::paintOverChildren (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("AmpView::paintOverChildren");
+    LITHIUM_PERF_PAINT ("AmpView::paintOverChildren");
     const auto bounds = getLocalBounds().toFloat();
 
     // Bypassed: dimmed and greyed out, knobs and all.
@@ -646,7 +646,7 @@ void AmpView::paintOverChildren (juce::Graphics& g)
     }
 
     if (hasKeyboardFocus (false))
-        IkarosLookAndFeel::drawFocusRing (g, bounds, cornerRadius);
+        LithiumLookAndFeel::drawFocusRing (g, bounds, cornerRadius);
 }
 
 void AmpView::resized()
@@ -675,4 +675,4 @@ void AmpView::resized()
     cabButton->setBounds (grille.getRight() - badgeWidth, grille.getBottom() - pillHeight, badgeWidth, pillHeight);
 }
 
-} // namespace ikaros
+} // namespace lithium

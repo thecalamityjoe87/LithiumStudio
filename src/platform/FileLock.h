@@ -2,7 +2,7 @@
 
 #include <juce_core/juce_core.h>
 
-namespace ikaros::platform
+namespace lithium::platform
 {
 
 /*  A lock on a file, held for as long as the FileLock object exists. The
@@ -40,4 +40,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE (FileLock)
 };
 
-} // namespace ikaros::platform
+} // namespace lithium::platform

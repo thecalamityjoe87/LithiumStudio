@@ -2,7 +2,7 @@
 
 #include <map>
 
-namespace ikaros::paintprobe
+namespace lithium::paintprobe
 {
 
 namespace
@@ -84,4 +84,4 @@ PerfMonitor::UiSample takeSample()
     return sample;
 }
 
-} // namespace ikaros::paintprobe
+} // namespace lithium::paintprobe

@@ -11,7 +11,7 @@
 // defines macros with common names.
 #include <X11/Xlibint.h>
 
-namespace ikaros::platform
+namespace lithium::platform
 {
 
 namespace
@@ -59,11 +59,11 @@ void enableDropsFromWaylandApps()
     originalClientMessageProc = XESetWireToEvent (display, ClientMessage, convertClientMessage);
 }
 
-} // namespace ikaros::platform
+} // namespace lithium::platform
 
 #else
 
-namespace ikaros::platform
+namespace lithium::platform
 {
 void enableDropsFromWaylandApps() {}
 }

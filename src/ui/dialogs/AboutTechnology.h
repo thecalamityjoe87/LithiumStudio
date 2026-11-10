@@ -2,12 +2,12 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
 /**
-    The About window's Built With page: the projects Ikaros Studio is made
+    The About window's Built With page: the projects Lithium Studio is made
     from. Tracktion Engine and JUCE get cards with their logos; the rest get a
     row each with a lettered tile. Clicking a card or row opens the project's
     website.
@@ -34,4 +34,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AboutTechnology)
 };
 
-} // namespace ikaros
+} // namespace lithium

@@ -5,7 +5,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace detail;
@@ -150,4 +150,4 @@ void NoteEditor::quantiseNotes (RegionId id, const std::vector<NoteId>& ids, con
     changeNotes (id, changes, "Quantize");
 }
 
-} // namespace ikaros
+} // namespace lithium

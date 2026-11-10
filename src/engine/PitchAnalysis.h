@@ -11,7 +11,7 @@
 #include <optional>
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -93,4 +93,4 @@ namespace pitchanalysis
     std::optional<PitchAnalysis> readCache (const juce::File& cacheFile, juce::uint64 fingerprint);
 }
 
-} // namespace ikaros
+} // namespace lithium

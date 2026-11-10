@@ -4,7 +4,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -314,7 +314,7 @@ public:
             {
                 auto r = juce::Rectangle<int> (0, y, getWidth(), headingHeight).withTrimmedTop (10);
                 g.setColour (theme().textSecondary);
-                g.setFont (fonts::uiSemiBold (textSize::smPlus));
+                g.setFont (fonts::caption (textSize::md).withExtraKerningFactor (0.08f));
                 g.drawText (line.name.toUpperCase(), r, juce::Justification::centredLeft);
                 y += headingHeight;
                 continue;
@@ -375,4 +375,4 @@ AdvancedPage::AdvancedPage (AudioEngine& e, juce::ApplicationCommandManager& com
 
 AdvancedPage::~AdvancedPage() = default;
 
-} // namespace ikaros
+} // namespace lithium

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The macOS Installer's pages, in the style of Lithium Drums' installer.
+     build-pkg.sh replaces @VERSION@. There's one thing to install (the app),
+     so there's no Customize step. -->
+<installer-gui-script minSpecVersion="2">
+    <title>Lithium Studio @VERSION@</title>
+    <organization>io.github.thecalamityjoe87</organization>
+    <domains enable_localSystem="true"/>
+    <options customize="never" require-scripts="false" hostArchitectures="arm64,x86_64"/>
+    <os-version min="11.0"/>
+
+    <welcome file="welcome.html" mime-type="text/html"/>
+    <license file="LICENSE.txt" mime-type="text/plain"/>
+    <conclusion file="conclusion.html" mime-type="text/html"/>
+    <background file="background.png" mime-type="image/png" alignment="bottomleft" scaling="none"/>
+    <background-darkAqua file="background.png" mime-type="image/png" alignment="bottomleft" scaling="none"/>
+
+    <choices-outline>
+        <line choice="app"/>
+    </choices-outline>
+
+    <choice id="app" title="Lithium Studio" description="The app, in Applications.">
+        <pkg-ref id="io.github.thecalamityjoe87.LithiumStudio.app"/>
+    </choice>
+
+    <pkg-ref id="io.github.thecalamityjoe87.LithiumStudio.app">app.pkg</pkg-ref>
+</installer-gui-script>

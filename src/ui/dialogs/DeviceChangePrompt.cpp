@@ -1,7 +1,7 @@
 #include "ui/dialogs/DeviceChangePrompt.h"
 #include "ui/dialogs/AlertDialog.h"
 
-namespace ikaros
+namespace lithium
 {
 
 void showDeviceChangePrompt (AudioEngine& engine, const AudioDevicePrompt& prompt, juce::Component* associatedComponent,
@@ -56,4 +56,4 @@ void showDeviceChangePrompt (AudioEngine& engine, const AudioDevicePrompt& promp
         });
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -5,7 +5,7 @@
 #include "ui/widgets/IconButton.h"
 #include "ui/widgets/LevelMeter.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -49,4 +49,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RecordingView)
 };
 
-} // namespace ikaros
+} // namespace lithium

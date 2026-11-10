@@ -4,8 +4,8 @@
 // files. Every place that turns stretching on goes through here, so the
 // choice is made in one place.
 //
-// Ikaros stretches with Rubber Band (built into Tracktion, see the
-// ikaros_timestretch library in CMakeLists.txt). It has two modes here:
+// Lithium Studio stretches with Rubber Band (built into Tracktion, see the
+// lithium_timestretch library in CMakeLists.txt). It has two modes here:
 //  - melodic, for anything with a pitch (chords, bass, a transposed
 //    recording): keeps notes steady;
 //  - percussive, for drums and other unpitched loops: keeps hits sharp.
@@ -25,12 +25,12 @@
 
 #include <tracktion_engine/tracktion_engine.h>
 
-namespace ikaros::detail
+namespace lithium::detail
 {
 
 namespace te = tracktion;
 
-/** True for Rubber Band's modes, the stretcher Ikaros uses. */
+/** True for Rubber Band's modes, the stretcher Lithium Studio uses. */
 inline bool usesRubberBand (te::TimeStretcher::Mode mode)
 {
     return mode == te::TimeStretcher::rubberbandMelodic || mode == te::TimeStretcher::rubberbandPercussive;
@@ -65,4 +65,4 @@ inline void upgradeLegacyStretcher (te::AudioClipBase& clip, bool percussive)
         useStretcher (clip, percussive);
 }
 
-} // namespace ikaros::detail
+} // namespace lithium::detail

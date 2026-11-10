@@ -1,7 +1,7 @@
 #include "engine/Mp3Format.h"
 #include <lame.h>
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -105,4 +105,4 @@ std::unique_ptr<juce::AudioFormatWriter> Mp3AudioFormat::createWriterFor (std::u
     return std::make_unique<Writer> (out.release(), options.getSampleRate(), channels, lame);
 }
 
-} // namespace ikaros
+} // namespace lithium

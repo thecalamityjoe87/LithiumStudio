@@ -15,7 +15,7 @@
 #include <memory>
 #include <optional>
 
-namespace ikaros
+namespace lithium
 {
 
 class AudioEngine;
@@ -192,4 +192,4 @@ private:
     TrackId createSamplerTrack (const juce::File&, double startSeconds, double lengthSeconds, const juce::String& name);   // likewise
 };
 
-} // namespace ikaros
+} // namespace lithium

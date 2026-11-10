@@ -1,7 +1,7 @@
 #include "engine/SessionRecovery.h"
 #include "platform/FileLock.h"
 
-namespace ikaros
+namespace lithium
 {
 
 // Writes a whole file to a temporary file next to it, then swaps it in, so
@@ -284,4 +284,4 @@ juce::Array<juce::MidiMessage> SessionRecovery::readJournal (const juce::File& f
     return messages;
 }
 
-} // namespace ikaros
+} // namespace lithium

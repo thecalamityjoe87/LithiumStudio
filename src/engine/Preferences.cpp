@@ -1,6 +1,6 @@
 #include "engine/Preferences.h"
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -107,4 +107,4 @@ void Preferences::changed (const juce::String& key)
     listeners.call ([&key] (Listener& l) { l.preferenceChanged (key); });
 }
 
-} // namespace ikaros
+} // namespace lithium

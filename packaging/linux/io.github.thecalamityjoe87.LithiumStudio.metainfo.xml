@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- AppStream metadata: shown by GNOME Software, KDE Discover and Flathub. -->
+<component type="desktop-application">
+  <id>io.github.thecalamityjoe87.LithiumStudio</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <!-- TODO: confirm the project licence. Tracktion Engine and JUCE are GPLv3 for open-source use. -->
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <name>Lithium Studio</name>
+  <summary>Make music with an easy, friendly studio</summary>
+  <developer id="io.github.thecalamityjoe87">
+    <name>ikarosdev</name>
+  </developer>
+
+  <description>
+    <p>
+      Lithium Studio is a beginner-friendly music studio. Pick a sound, play it on the
+      on-screen keyboard or a MIDI keyboard, and arrange regions on a timeline.
+      It stays simple by default, with advanced controls tucked away until you ask for them.
+    </p>
+    <ul>
+      <li>Instrument tracks with a built-in synthesizer</li>
+      <li>MIDI regions, loop playback and a metronome</li>
+      <li>Sound controls, effects and a simple mixer</li>
+      <li>Works the same on Linux, Windows and macOS</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">io.github.thecalamityjoe87.LithiumStudio.desktop</launchable>
+  <provides>
+    <mediatype>application/x-lithium-session</mediatype>
+    <mediatype>application/x-ikaros-session</mediatype>
+  </provides>
+  <icon type="stock">io.github.thecalamityjoe87.LithiumStudio</icon>
+
+  <url type="homepage">https://github.com/thecalamityjoe87/ikaros-studio</url>
+  <url type="bugtracker">https://github.com/thecalamityjoe87/ikaros-studio/issues</url>
+  <url type="vcs-browser">https://github.com/thecalamityjoe87/ikaros-studio</url>
+
+  <categories>
+    <category>AudioVideo</category>
+    <category>Audio</category>
+    <category>Music</category>
+  </categories>
+
+  <keywords>
+    <keyword>DAW</keyword>
+    <keyword>MIDI</keyword>
+    <keyword>synthesizer</keyword>
+    <keyword>music</keyword>
+  </keywords>
+
+  <content_rating type="oars-1.1"/>
+
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+  <requires>
+    <display_length compare="ge">1100</display_length>
+  </requires>
+
+  <!-- TODO(release): add screenshots before submitting to Flathub. -->
+
+  <releases>
+    <release version="0.15.0" date="2026-11-09" type="development">
+      <description>
+        <p>Ikaros Studio is now Lithium Studio, part of the Lithium family with Lithium Drums: a new name, icon and look (dark blue panels, cyan accent, the Lithium fonts, knobs, faders, meters and mixer strips), and richer instrument colors. Settings, sessions and sound packs move over on their own, and .iksession files still open.</p>
+        <p>New installers for Linux, Windows and macOS, and the sound packs now come from Lithium Sounds, with a Starter Sounds set the installer can download for you.</p>
+      </description>
+    </release>
+    <release version="0.14.1" date="2026-10-25" type="development">
+      <description>
+        <p>Fix release: the macOS window buttons stay in the title bar after leaving full screen, and plugging in a MIDI-only device no longer offers to switch audio to it.</p>
+      </description>
+    </release>
+    <release version="0.14.0" date="2026-10-25" type="development">
+      <description>
+        <p>Alpha release for milestone 14: native window buttons on macOS, working title bar on Windows.</p>
+      </description>
+    </release>
+    <release version="0.13.0" date="2026-10-25" type="development">
+      <description>
+        <p>Alpha release for milestone 13: performance fixes.</p>
+      </description>
+    </release>
+    <release version="0.0.1" date="2026-10-13" type="development">
+      <description>
+        <p>First alpha release.</p>
+      </description>
+    </release>
+  </releases>
+</component>

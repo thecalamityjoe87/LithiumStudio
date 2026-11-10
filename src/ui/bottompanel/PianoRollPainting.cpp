@@ -7,7 +7,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -17,7 +17,7 @@ using namespace pianoroll;
 // Painting
 void PianoRoll::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("PianoRoll");
+    LITHIUM_PERF_PAINT ("PianoRoll");
     // The note grid is part of the arrangement: dark in both themes.
     g.fillAll (theme().arrangement.laneBg);
 
@@ -240,4 +240,4 @@ void PianoRoll::paintVelocities (juce::Graphics& g)
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

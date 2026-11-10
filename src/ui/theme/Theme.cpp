@@ -1,6 +1,6 @@
 #include "ui/theme/Theme.h"
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -13,148 +13,154 @@ namespace
     //==========================================================================
     ThemePalette makeDark()
     {
+        // The Lithium family's dark palette (shared with Lithium Drums):
+        // blue-black surfaces, one cyan accent, the kick red for warnings.
+        //   background #0e1318  panel #141b22  raised #18212a  raisedHigh #1d2833
+        //   border #22303b  borderStrong #2a3946  text #e6edf2  muted #93a3b1
+        //   accent #3cc4d6
         ThemePalette p;
 
         // Surfaces
-        p.windowBg            = hex (0xff121418);
-        p.titleBarBg          = hex (0xff0e1013);
-        p.titleBarBorder      = hex (0xff000000);
-        p.toolbarBg           = hex (0xff1a1d23);
-        p.toolbarBorder       = hex (0xff000000);
-        p.transportWell       = hex (0xff0e1013);
-        p.transportWellBorder = hex (0xff262a32);
-        p.librarySidebarBg    = hex (0xff171a1f);
-        p.tracksBarBg         = hex (0xff1b1e24);
-        p.sectionsRowBg       = hex (0xff1b1e24);
-        p.trackColumnBg       = hex (0xff1b1e24);
-        p.trackRowLine        = hex (0xff252a31);
-        p.rulerBg             = hex (0xff171a1f);
-        p.sectionsStripBg     = hex (0xff121418);
-        p.bottomPanelBg       = hex (0xff1a1d23);
-        p.bottomPanelBorder   = hex (0xff000000);
-        p.inspectorBg         = hex (0xff171a1f);
-        p.divider             = hex (0xff000000);
-        p.dialogBg            = hex (0xff1a1d23);
-        p.dialogSidebarBg     = hex (0xff171a1f);
-        p.popupBg             = hex (0xff1a1d23);
+        p.windowBg            = hex (0xff0e1318);
+        p.titleBarBg          = hex (0xff0a0e12);
+        p.titleBarBorder      = hex (0xff22303b);
+        p.toolbarBg           = hex (0xff141b22);
+        p.toolbarBorder       = hex (0xff22303b);
+        p.transportWell       = hex (0xff0a0e12);
+        p.transportWellBorder = hex (0xff22303b);
+        p.librarySidebarBg    = hex (0xff141b22);
+        p.tracksBarBg         = hex (0xff161e26);
+        p.sectionsRowBg       = hex (0xff161e26);
+        p.trackColumnBg       = hex (0xff161e26);
+        p.trackRowLine        = hex (0xff22303b);
+        p.rulerBg             = hex (0xff141b22);
+        p.sectionsStripBg     = hex (0xff0e1318);
+        p.bottomPanelBg       = hex (0xff141b22);
+        p.bottomPanelBorder   = hex (0xff22303b);
+        p.inspectorBg         = hex (0xff11171e);
+        p.divider             = hex (0xff22303b);
+        p.dialogBg            = hex (0xff141b22);
+        p.dialogSidebarBg     = hex (0xff11171e);
+        p.popupBg             = hex (0xff141b22);
 
-        p.wellBg              = hex (0xff0e1013);
-        p.cardBg              = hex (0xff15181d);
-        p.panelBoxBg          = hex (0xff15181d);
-        p.raised              = hex (0xff22262e);
-        p.controlFill         = hex (0xff2a2f38);
-        p.selectedRow         = hex (0xff242831);
-        p.tileBg              = hex (0xff1c1f25);
-        p.tileBorder          = hex (0xff262a32);
-        p.rowHover            = p.raised.withAlpha (0.6f);
-        p.rowPressed          = p.raised;
+        p.wellBg              = hex (0xff0a0e12);
+        p.cardBg              = hex (0xff18212a);
+        p.panelBoxBg          = hex (0xff18212a);
+        p.raised              = hex (0xff18212a);
+        p.controlFill         = hex (0xff1d2833);
+        p.selectedRow         = hex (0xff1d2833);
+        p.tileBg              = hex (0xff18212a);
+        p.tileBorder          = hex (0xff22303b);
+        p.rowHover            = hex (0xff1d2833).withAlpha (0.7f);
+        p.rowPressed          = hex (0xff1d2833);
 
-        p.neutralActive       = hex (0xff323844);
-        p.neutralActiveBorder = hex (0xff2f343e);
-        p.selectedBorder      = hex (0xff6b7280);
+        p.neutralActive       = hex (0xff223040);
+        p.neutralActiveBorder = hex (0xff2a3946);
+        p.selectedBorder      = hex (0xff4a6072);
         p.selectedTileShadow  = none;
-        p.highlight           = hex (0xffe8eaee);
+        p.highlight           = hex (0xffe6edf2);
 
-        p.selectedBg          = hex (0xff2c323d);
-        p.selectedOutline     = hex (0xffe8eaee);
-        p.selectedInset       = hex (0xff4a5260);
+        p.selectedBg          = hex (0xff223040);
+        p.selectedOutline     = hex (0xffe6edf2);
+        p.selectedInset       = hex (0xff3a4c5b);
         p.trackTileAlpha      = 0.16f;
 
-        p.border              = hex (0xff2f343e);
-        p.borderSoft          = hex (0xff262a32);
-        p.borderStrong        = hex (0xff3a404b);
-        p.outline             = hex (0xff424958);
+        p.border              = hex (0xff2a3946);
+        p.borderSoft          = hex (0xff22303b);
+        p.borderStrong        = hex (0xff34475a);
+        p.outline             = hex (0xff3a4c5b);
 
-        p.buttonFill          = hex (0xff262b34);
-        p.buttonBorder        = hex (0xff323844);
-        p.buttonIcon          = hex (0xffa2a9b4);
-        p.raisedBorder        = none;
-        p.armBorder           = hex (0xff323844);
+        p.buttonFill          = hex (0xff1d2833);
+        p.buttonBorder        = hex (0xff2a3946);
+        p.buttonIcon          = hex (0xff93a3b1);
+        p.raisedBorder        = hex (0xff22303b);   // Lithium's buttons have a hairline border
+        p.armBorder           = hex (0xff2a3946);
 
-        p.segmentWell         = hex (0xff15181d);
-        p.segmentWellBorder   = hex (0xff2f343e);
-        p.segmentSelected     = hex (0xff323844);
+        p.segmentWell         = hex (0xff0f151b);
+        p.segmentWellBorder   = hex (0xff2a3946);
+        p.segmentSelected     = hex (0xff223040);
         p.segmentShadow       = none;
 
-        p.inputBg             = hex (0xff0e1013);
-        p.inputBorder         = hex (0xff262a32);
-        p.field               = hex (0xff1c2027);
+        p.inputBg             = hex (0xff0a0e12);
+        p.inputBorder         = hex (0xff22303b);
+        p.field               = hex (0xff18212a);
 
-        p.lcdBg               = hex (0xff050607);
-        p.lcdBorder           = none;
-        p.lcdLabel            = hex (0xff8f98a6);
-        p.lcdValue            = hex (0xffffaa2b);   // the playhead's amber
-        p.lcdInTune           = hex (0xff4fd18b);
+        p.lcdBg               = hex (0xff070a0d);
+        p.lcdBorder           = hex (0xff18212a);
+        p.lcdLabel            = hex (0xff93a3b1);
+        p.lcdValue            = hex (0xff3cc4d6);   // the playhead's cyan
+        p.lcdInTune           = hex (0xff8bd17c);
 
         // Text
-        p.text                = hex (0xffeef1f5);
-        p.textSecondary       = hex (0xffa3abb8);
-        p.textSoft            = hex (0xffc4c9d1);
-        p.textMenu            = hex (0xffc9d0da);
-        p.textOnAccent        = hex (0xff1d1405);
+        p.text                = hex (0xffe6edf2);
+        p.textSecondary       = hex (0xff93a3b1);
+        p.textSoft            = hex (0xffb9c6d1);
+        p.textMenu            = hex (0xffb9c6d1);
+        p.textOnAccent        = hex (0xff0e1318);
         p.textOnColour        = hex (0xffffffff);
-        p.textDisabled        = hex (0xff6b7280);
+        p.textDisabled        = hex (0xff5d6e7c);
 
         // Sliders and knobs
-        p.sliderTrack         = hex (0xff2a2f38);
-        p.sliderFill          = hex (0xffa3abb8);
-        p.sliderThumb         = hex (0xffeef1f5);
+        p.sliderTrack         = hex (0xff1d2833);
+        p.sliderFill          = hex (0xff93a3b1);
+        p.sliderThumb         = hex (0xffe6edf2);
         p.thumbBorder         = none;
         p.thumbShadow         = none;
-        p.volumeSliderTrack   = hex (0xff2a2f38);
-        p.thumb               = hex (0xffffffff);
-        p.meterThumbRing      = hex (0xff1a1d23);
-        p.faderCap            = hex (0xffc9d0da);
+        p.volumeSliderTrack   = hex (0xff1d2833);
+        p.thumb               = hex (0xffe6edf2);
+        p.meterThumbRing      = hex (0xff141b22);
+        p.faderCap            = hex (0xff4a535b);   // raisedHigh, brighter (as Lithium Drums' cap)
+        p.faderCapBorder      = hex (0xff5b6670);
+        p.faderCapLine        = hex (0xffe6edf2);
 
-        p.knobBody            = hex (0xff2a2f38);
-        p.knobRim             = hex (0xff3a404b);
-        p.knobPointer         = hex (0xffeef1f5);
-        p.knobTrack           = hex (0xff2a2f38);
-        p.compactKnobBody     = hex (0xff14171c);
-        p.compactKnobRim      = hex (0xff323844);
-        p.compactKnobPointer  = hex (0xffffffff);
-        p.compactKnobTrack    = hex (0xff3a404b);
+        p.knobBody            = hex (0xff1d2833);
+        p.knobRim             = hex (0xff22303b);
+        p.knobPointer         = hex (0xffe6edf2);
+        p.knobTrack           = hex (0xff223040);
+        p.compactKnobBody     = hex (0xff11171e);
+        p.compactKnobRim      = hex (0xff22303b);
+        p.compactKnobPointer  = hex (0xffe6edf2);
+        p.compactKnobTrack    = hex (0xff2a3946);
 
-        p.smartCardBg         = hex (0xff15181d);
-        p.smartCardBorder     = none;
+        p.smartCardBg         = hex (0xff18212a);
+        p.smartCardBorder     = hex (0xff22303b);
         p.smartCardShadow     = none;
 
         // The on-screen keyboard
-        p.keyboardTray        = hex (0xff050607);
+        p.keyboardTray        = hex (0xff070a0d);
         p.keyboardTrayBorder  = none;
-        p.pianoWhite          = hex (0xffe9edf2);
-        p.pianoWhiteDown      = hex (0xffa2a9b4);
-        p.pianoKeyDivider     = hex (0xffffffff);   // JUCE's white key background, showing between the keys
-        p.pianoBlack          = hex (0xff1a1d23);
-        p.pianoBlackDown      = hex (0xff6b7280);
-        p.pianoBlackLip       = hex (0xff2f343e);
-        p.pianoLabel          = hex (0xff5b6270);
-        p.rollKeyWhite        = hex (0xffc9d0da);
-        p.rollKeyBlack        = hex (0xff0e1013);
+        p.pianoWhite          = hex (0xffdfe7ed);
+        p.pianoWhiteDown      = hex (0xff93a3b1);
+        p.pianoKeyDivider     = hex (0xfff4f7f9);   // JUCE's white key background, showing between the keys
+        p.pianoBlack          = hex (0xff141b22);
+        p.pianoBlackDown      = hex (0xff5d6e7c);
+        p.pianoBlackLip       = hex (0xff2a3946);
+        p.pianoLabel          = hex (0xff4d5d6a);
+        p.rollKeyWhite        = hex (0xffb9c6d1);
+        p.rollKeyBlack        = hex (0xff0a0e12);
 
-        p.previewFill         = hex (0xffe8eaee);
-        p.previewIcon         = hex (0xff15181d);
-        p.logoOutline         = hex (0xff323844);
+        p.previewFill         = hex (0xffe6edf2);
+        p.previewIcon         = hex (0xff0e1318);
 
         // Accent and status
-        p.accent              = hex (0xffffaa2b);
+        p.accent              = hex (0xff3cc4d6);
         p.accentLight         = p.accent.brighter (0.15f);
         p.accentBorder        = none;
-        p.record              = hex (0xffff5a5a);
-        p.warning             = hex (0xffffd25a);
-        p.solo                = hex (0xffffd25a);
-        p.meterGreen          = hex (0xff4fd18b);
-        p.meterYellow         = hex (0xffffd25a);
-        p.meterRed            = hex (0xffff5a5a);
-        p.effectOn            = hex (0xff4fd18b);
-        p.realtimeBadgeText   = hex (0xff4fd18b);
-        p.realtimeBadgeBg     = hex (0xff4fd18b).withAlpha (0.18f);
+        p.record              = hex (0xfff07167);
+        p.warning             = hex (0xffe7d27c);
+        p.solo                = hex (0xffe7d27c);
+        p.meterGreen          = hex (0xff8bd17c);
+        p.meterYellow         = hex (0xffe7d27c);
+        p.meterRed            = hex (0xfff07167);
+        p.effectOn            = hex (0xff3cc4d6);
+        p.realtimeBadgeText   = hex (0xff8bd17c);
+        p.realtimeBadgeBg     = hex (0xff8bd17c).withAlpha (0.18f);
 
         p.tintLight           = hex (0xffffffff);
         p.tintDark            = hex (0xff000000);
 
-        p.pedalboardFloor     = hex (0xff0e1013);
-        p.pedalboardCable     = hex (0xff4a505b);   // lighter than the floor, so it shows
+        p.pedalboardFloor     = hex (0xff0a0e12);
+        p.pedalboardCable     = hex (0xff3a4c5b);   // lighter than the floor, so it shows
 
         p.scrim               = juce::Colours::black.withAlpha (0.55f);
         p.scrimStrong         = juce::Colours::black.withAlpha (0.6f);    // session chooser
@@ -165,61 +171,64 @@ namespace
         p.dialogShadow        = { juce::Colours::black.withAlpha (0.6f), 30, { 0, 8 } };
         p.popoverShadow       = { juce::Colours::black.withAlpha (0.5f), 14, { 0, 4 } };
 
-        // Instrument families, in the order of tokens::Family.
-        p.familyColours = { hex (0xffe8c547),    // drums
-                            hex (0xff4b93e6),    // audio
-                            hex (0xff33b56b),    // strings
-                            hex (0xff9b7bea),    // bass
-                            hex (0xff5bc0d9),    // keys
-                            hex (0xffe070b0),    // synths
-                            hex (0xffe08a4f),    // guitar
-                            hex (0xff7cc4a0),    // woodwinds
-                            hex (0xffd6a35a),    // brass
-                            hex (0xffa2a9b4),    // loops
-                            hex (0xffe5625e),    // plugins
-                            hex (0xffa2a9b4) };  // master: neutral grey
+        // Instrument families, in the order of tokens::Family: the hues of
+        // Lithium Drums' group and FX colours (drums red, keys blue, loops
+        // teal...), made richer so tracks and regions don't look washed out.
+        // None is the accent cyan.
+        p.familyColours = { hex (0xffff4d5e),    // drums
+                            hex (0xffff8a3d),    // audio
+                            hex (0xffff5fae),    // strings
+                            hex (0xff4fdc6a),    // bass
+                            hex (0xff3d8bff),    // keys
+                            hex (0xff9a6bff),    // synths
+                            hex (0xffffcc33),    // guitar
+                            hex (0xffb4e036),    // woodwinds
+                            hex (0xffe8a33a),    // brass
+                            hex (0xff22d6a8),    // loops
+                            hex (0xffe05ce6),    // plugins
+                            hex (0xff93a3b1) };  // master: neutral grey
         p.inkColours = p.familyColours;          // dark mode: ink is the family colour
         p.knobArcColours = p.familyColours;
 
         using F = tokens::Family;
-        p.eqBands = { p.family (F::audio), p.family (F::strings), p.family (F::drums), p.family (F::bass) };
+        p.eqBands = { p.family (F::keys), p.family (F::bass), p.family (F::guitar), p.family (F::synths) };
 
         // Automation curves: a shade lighter than the track colours, to stand
         // out over regions.
-        p.automationVolume    = hex (0xff7cc0ff);   // blue
-        p.automationPan       = hex (0xff6fe3a3);   // green
-        p.automationReverb    = hex (0xffd4a6ff);   // purple
-        p.automationDelay     = hex (0xffffa877);   // orange
-        p.automationSound     = hex (0xffffe07a);   // yellow: the Sound tab's knobs
-        p.automationPlugin    = hex (0xffff8ac6);   // pink: plug-in parameters
-        p.automated           = hex (0xff7cc0ff);
+        p.automationVolume    = hex (0xff9cc0f0);   // blue
+        p.automationPan       = hex (0xffa6e09a);   // green
+        p.automationReverb    = hex (0xffcbbcff);   // purple
+        p.automationDelay     = hex (0xfff5bc89);   // orange
+        p.automationSound     = hex (0xfff0e2a0);   // yellow: the Sound tab's knobs
+        p.automationPlugin    = hex (0xffefaccb);   // pink: plug-in parameters
+        p.automated           = hex (0xff9cc0f0);
 
         // The arrangement
         auto& a = p.arrangement;
-        a.laneBg              = hex (0xff121418);
-        a.laneDivider         = hex (0xff000000);
-        a.gridBar             = juce::Colours::white.withAlpha (0.05f);
-        a.gridBeat            = juce::Colours::white.withAlpha (0.025f);
-        a.selectedLane        = juce::Colours::white.withAlpha (0.045f);
-        a.text                = hex (0xffeef1f5);
-        a.textSecondary       = hex (0xffa3abb8);
-        a.outline             = hex (0xff3a404b);
-        a.highlight           = hex (0xffe8eaee);
-        a.selectionOutline    = hex (0xffe8eaee);
+        a.laneBg              = hex (0xff0e1318);
+        a.laneDivider         = hex (0xff18212a);
+        a.gridBar             = hex (0xffe6edf2).withAlpha (0.05f);
+        a.gridBeat            = hex (0xffe6edf2).withAlpha (0.025f);
+        a.selectedLane        = hex (0xffe6edf2).withAlpha (0.045f);
+        a.text                = hex (0xffe6edf2);
+        a.textSecondary       = hex (0xff93a3b1);
+        a.outline             = hex (0xff2a3946);
+        a.highlight           = hex (0xffe6edf2);
+        a.selectionOutline    = hex (0xffe6edf2);
         a.tintLight           = hex (0xffffffff);
         a.tintDark            = hex (0xff000000);
-        a.bubble              = hex (0xff22262e);
-        a.tempoCurve          = hex (0xffa2a9b4);
-        a.chipFill            = hex (0xff22262e);
-        a.chipLitFill         = hex (0xff2a2f38);
-        a.chipBorder          = hex (0xff3a404b);
-        a.playhead            = hex (0xffffaa2b);
-        a.cycle               = hex (0xffffaa2b);
-        a.record              = hex (0xffff5a5a);
-        a.scrollbar           = hex (0xff3a404b);
-        a.regionTextDark      = hex (0xff15181d);
+        a.bubble              = hex (0xff1d2833);
+        a.tempoCurve          = hex (0xff93a3b1);
+        a.chipFill            = hex (0xff1d2833);
+        a.chipLitFill         = hex (0xff223040);
+        a.chipBorder          = hex (0xff2a3946);
+        a.playhead            = hex (0xff3cc4d6);
+        a.cycle               = hex (0xff3cc4d6);
+        a.record              = hex (0xfff07167);
+        a.scrollbar           = hex (0xff2a3946);
+        a.regionTextDark      = hex (0xff0e1318);
         a.regionTextLight     = hex (0xffffffff);
-        a.strip               = hex (0xff15181d);
+        a.strip               = hex (0xff11171e);
 
         return p;
     }
@@ -305,7 +314,7 @@ namespace
         p.lcdBg               = hex (0xffffffff);
         p.lcdBorder           = hex (0xffd5d9df);
         p.lcdLabel            = hex (0xff5f6672);
-        p.lcdValue            = hex (0xffb86e00);   // the playhead's amber, deeper: #ffaa2b is too pale on white
+        p.lcdValue            = hex (0xff0e7f8f);   // the playhead's cyan, deeper: #3cc4d6 is too pale on white
         p.lcdInTune           = hex (0xff1f8f4e);
 
         // Text
@@ -325,6 +334,8 @@ namespace
         p.thumb               = hex (0xffffffff);
         p.meterThumbRing      = hex (0xffc6cbd3);
         p.faderCap            = hex (0xffffffff);
+        p.faderCapBorder      = hex (0xffc6cbd3);
+        p.faderCapLine        = hex (0xff1a1d22);
 
         p.knobBody            = hex (0xffffffff);
         p.knobRim             = hex (0xffc6cbd3);
@@ -354,11 +365,10 @@ namespace
 
         p.previewFill         = hex (0xff1a1d22);
         p.previewIcon         = hex (0xffffffff);
-        p.logoOutline         = none;   // the logo tile is dark: it shows on a light title bar by itself
 
-        // Accent and status. Accent fills stay amber, with a deeper border.
-        p.accentBorder        = hex (0xfff09a14);
-        p.record              = hex (0xffe0443a);
+        // Accent and status. Accent fills stay cyan, with a deeper border.
+        p.accentBorder        = hex (0xff2aa3b4);
+        p.record              = hex (0xffd9534a);
         p.warning             = hex (0xffb07800);   // the dark yellow is unreadable on light grey
         p.realtimeBadgeText   = hex (0xff1a8a4b);
         p.realtimeBadgeBg     = juce::Colour (31, 154, 85).withAlpha (0.12f);
@@ -375,22 +385,8 @@ namespace
         p.popoverShadow       = { juce::Colours::black.withAlpha (0.15f), 14, { 0, 4 } };
 
         // Ink: deeper family shades for icons and arcs on the light chrome.
-        p.inkColours = { hex (0xff9a7a0c),    // drums
-                         hex (0xff2363b8),    // audio
-                         hex (0xff1d8048),    // strings
-                         hex (0xff6a48c8),    // bass
-                         hex (0xff1d8aa6),    // keys
-                         hex (0xffb83c86),    // synths
-                         hex (0xffb8582a),    // guitar
-                         hex (0xff3e8c66),    // woodwinds
-                         hex (0xff9a6a22),    // brass
-                         hex (0xff5f6672),    // loops
-                         hex (0xffc23d3a),    // plugins
-                         hex (0xff5f6672) };  // master
-
-        // The Smart Controls arcs keep the family colours on their white
-        // cards, except the drums yellow, which needs to be a little deeper.
-        p.knobArcColours[(size_t) tokens::Family::drums] = hex (0xffe2b31f);
+        for (size_t i = 0; i < ThemePalette::numFamilies; ++i)
+            p.inkColours[i] = p.familyColours[i].withMultipliedSaturation (1.15f).withMultipliedBrightness (0.62f);
 
         // The arrangement stays dark, a little lighter than in dark mode.
         auto& a = p.arrangement;
@@ -400,8 +396,8 @@ namespace
         a.gridBeat            = juce::Colours::white.withAlpha (0.03f);
         a.selectedLane        = juce::Colours::white.withAlpha (0.05f);
         a.strip               = hex (0xff33363c);
-        a.playhead            = hex (0xfff09a14);
-        a.cycle               = hex (0xfff09a14);
+        a.playhead            = hex (0xff3cc4d6);
+        a.cycle               = hex (0xff3cc4d6);
         a.scrollbar           = hex (0xff5a5e66);
 
         return p;
@@ -434,4 +430,4 @@ void setActivePalette (const ThemePalette& p)
     active = &p;
 }
 
-} // namespace ikaros
+} // namespace lithium

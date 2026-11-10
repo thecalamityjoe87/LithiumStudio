@@ -26,7 +26,7 @@
 // drops the ones no longer needed). Between any two markers the tempo is
 // then steady, and seconds and beats are in step again.
 //
-// Recordings made in Ikaros follow the tempo the same way, on any track
+// Recordings made in Lithium Studio follow the tempo the same way, on any track
 // (as in GarageBand): Flex only decides whether their hits can be moved.
 // Each one has a "beat map", where its recording sits in beats with no hits
 // moved, noted the first time the tempo changes after it was recorded
@@ -34,13 +34,13 @@
 // through its beat map, and any hits moved while Flex was on are set aside
 // (in beats, so they stay right through tempo changes) until it's back on.
 // Imported files don't follow the tempo unless they're on a Flex track:
-// Ikaros can't know what tempo they were made at.
+// Lithium Studio can't know what tempo they were made at.
 
 #include "engine/FlexMap.h"
 #include <tracktion_engine/tracktion_engine.h>
 #include <optional>
 
-namespace ikaros::detail
+namespace lithium::detail
 {
 
 namespace te = tracktion;
@@ -84,12 +84,12 @@ juce::String whyClipCantFlex (const te::Clip&);
 
 inline bool canFlex (const te::Clip& clip)          { return whyClipCantFlex (clip).isEmpty(); }
 
-/** True for a file Ikaros recorded: Tracktion names takes "..._Take_<n>"
+/** True for a file Lithium Studio recorded: Tracktion names takes "..._Take_<n>"
     (and the passes of a cycle recording "..._Take_<n>_take_<n>"). */
 bool isRecordingFile (const juce::File&);
 
 /** True if the clip follows the tempo through its warp markers: a
-    recording made in Ikaros, or any region on a Flex track, that can be
+    recording made in Lithium Studio, or any region on a Flex track, that can be
     flexed. */
 bool followsTempo (const te::Clip&);
 
@@ -195,4 +195,4 @@ private:
     std::vector<std::pair<te::Clip::Ptr, FlexLayout>> clips;
 };
 
-} // namespace ikaros::detail
+} // namespace lithium::detail

@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <set>
 
-namespace ikaros::drumkit
+namespace lithium::drumkit
 {
 
 namespace
@@ -592,4 +592,4 @@ std::array<int, numDrumPieces> guessKeys (const KeyNames& names)
     return keys;
 }
 
-} // namespace ikaros::drumkit
+} // namespace lithium::drumkit

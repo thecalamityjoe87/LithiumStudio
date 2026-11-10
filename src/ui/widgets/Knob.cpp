@@ -1,10 +1,10 @@
 #include "ui/widgets/Knob.h"
 #include "ui/widgets/PaintProbe.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -61,12 +61,12 @@ void Knob::setValue (float normalised, const juce::String& text)
 
 void Knob::setArcFamily (Family f)
 {
-    IkarosLookAndFeel::setFamilyColour (slider, f, IkarosLookAndFeel::FamilyShade::knobArc);
+    LithiumLookAndFeel::setFamilyColour (slider, f, LithiumLookAndFeel::FamilyShade::knobArc);
 }
 
 void Knob::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("Knob");
+    LITHIUM_PERF_PAINT ("Knob");
     // A card, with a border in light mode (transparent in dark). Its shadow
     // falls outside the knob's bounds, so the parent draws it: see drawShadow.
     const auto card = getLocalBounds().toFloat();
@@ -136,4 +136,4 @@ void Knob::resized()
     textArea = r;
 }
 
-} // namespace ikaros
+} // namespace lithium

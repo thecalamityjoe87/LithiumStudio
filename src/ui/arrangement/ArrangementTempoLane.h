@@ -4,7 +4,7 @@
 
 #include "ui/arrangement/ArrangementView.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -90,4 +90,4 @@ private:
     void hideTempoField();
 };
 
-} // namespace ikaros
+} // namespace lithium

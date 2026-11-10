@@ -1,13 +1,28 @@
 #include "ui/titlebar/MenuBar.h"
+#include "ui/widgets/Branding.h"
 #include "ui/widgets/PaintProbe.h"
-#include "BinaryData.h"
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
+
+namespace
+{
+    juce::Font nameFont()   { return fonts::ui (textSize::sm); }
+
+    constexpr int brandInset = 14;    // from the strip's left edge (or the macOS traffic lights): the panels' edge
+    // None: each menu item has half the bar's height of padding built in
+    // (its hover highlight fills it), which already puts "File" about 14px
+    // after the wordmark.
+    constexpr int brandToMenus = 0;
+    constexpr int minFreeWidth = 40;  // always leave some strip to drag the window by
+    constexpr float sessionMargin = 12.0f;   // between the session name and the menus or window buttons
+
+    float stringWidth (const juce::Font& f, const juce::String& s)   { return juce::GlyphArrangement::getStringWidth (f, s); }
+}
 
 MenuBar::MenuBar (juce::MenuBarModel* m)
     : model (m),
@@ -23,10 +38,6 @@ MenuBar::MenuBar (juce::MenuBarModel* m)
     addAndMakeVisible (windowControls);
    #endif
 
-    // ImageCache decodes the embedded PNG once and keeps it, so asking for it
-    // again (e.g. after the title bar is recreated) costs nothing.
-    logo = juce::ImageCache::getFromMemory (BinaryData::io_github_thecalamityjoe87_IkarosStudio_png,
-                                            BinaryData::io_github_thecalamityjoe87_IkarosStudio_pngSize);
 }
 
 void MenuBar::setSessionStatus (const juce::String& name, bool /*isUntitled*/, bool unsaved)
@@ -59,7 +70,7 @@ void MenuBar::updateWindowState()
     // Keep the OS window title (taskbar, Alt+Tab) in step with ours.
     if (auto* window = findParentComponentOfClass<juce::DocumentWindow>())
     {
-        auto title = sessionName + (unsavedChanges ? " *" : "") + " - Ikaros Studio";
+        auto title = sessionName + (unsavedChanges ? " *" : "") + " - Lithium Studio";
 
         if (window->getName() != title)
             window->setName (title);
@@ -153,67 +164,37 @@ void MenuBar::mouseDoubleClick (const juce::MouseEvent&)
 //==============================================================================
 void MenuBar::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("MenuBar");
+    LITHIUM_PERF_PAINT ("MenuBar");
     g.fillAll (theme().titleBarBg);
 
     g.setColour (theme().titleBarBorder);
     g.fillRect (getLocalBounds().removeFromBottom (1));
 
-    // Centred branding: [logo] Ikaros Studio · Session name [dot]
-    const auto appFont = fonts::uiBold (textSize::sm);
-    const auto nameFont = fonts::ui (textSize::sm);
-    const juce::String appText ("Ikaros Studio");
-    const auto separator = juce::String::fromUTF8 ("  \xc2\xb7  ");   // " · "
+    // The branding, left of the menus (see resized()).
+    if (! brandArea.isEmpty())
+        branding::paint (g, brandArea.toFloat());
 
-    const float logoSize = (float) size::logoSize;
-    const float logoGap = 8.0f;
+    // The session name, centred on the whole strip, but kept clear of the
+    // menus and the window buttons: it moves aside first, then ends in an
+    // ellipsis. Then the unsaved-changes dot.
     const float dotSpace = unsavedChanges ? 12.0f : 0.0f;
-    const float appWidth = juce::GlyphArrangement::getStringWidth (appFont, appText);
-    const float separatorWidth = juce::GlyphArrangement::getStringWidth (nameFont, separator);
-    const float nameWidth = juce::GlyphArrangement::getStringWidth (nameFont, sessionName);
-    const float total = logoSize + logoGap + appWidth + separatorWidth + nameWidth + dotSpace;
+    const auto space = freeArea.toFloat().reduced (sessionMargin, 0.0f);
 
-    // Centre on the whole strip, but stay clear of the menus and buttons.
-    auto bar = getLocalBounds().withTrimmedBottom (1).toFloat();
-    auto space = freeArea.toFloat().reduced (12.0f, 0.0f);
-    auto x = juce::jlimit (space.getX(), juce::jmax (space.getX(), space.getRight() - total), bar.getCentreX() - total * 0.5f);
-    auto title = juce::Rectangle<float> (x, bar.getY(), juce::jmin (total, space.getWidth()), bar.getHeight());
+    if (space.getWidth() <= dotSpace)
+        return;
 
-    // Takes up to `width` from the left of what's left of the title.
-    auto take = [&title] (float width) { return title.removeFromLeft (juce::jmin (width, title.getWidth())); };
+    const float total = juce::jmin (stringWidth (nameFont(), sessionName) + dotSpace, space.getWidth());
+    const auto bar = getLocalBounds().withTrimmedBottom (1).toFloat();
+    const auto x = juce::jlimit (space.getX(), space.getRight() - total, bar.getCentreX() - total * 0.5f);
+    auto title = juce::Rectangle<float> (x, bar.getY(), total, bar.getHeight());
 
-    if (logo.isValid())
-    {
-        // The PNG has a transparent margin around its rounded tile (16px of
-        // 256, as in the SVG). Draw just the tile at logoSize, and outline it:
-        // the tile is about the title bar's own colour, so it would vanish.
-        const auto tile = take (logoSize).withSizeKeepingCentre (logoSize, logoSize);
-        const auto source = logo.getBounds().reduced (logo.getWidth() / 16);
-        g.setImageResamplingQuality (juce::Graphics::highResamplingQuality);
-        g.drawImage (logo, tile.getX(), tile.getY(), tile.getWidth(), tile.getHeight(),
-                     source.getX(), source.getY(), source.getWidth(), source.getHeight());
-
-        const float tileRadius = logoSize * 52.0f / 224.0f;   // the SVG tile's rx, scaled
-        g.setColour (theme().logoOutline);
-        g.drawRoundedRectangle (tile.reduced (0.5f), tileRadius, 1.0f);
-        take (logoGap);
-    }
-    else
-    {
-        take (logoSize + logoGap);
-    }
-
-    g.setColour (theme().text);
-    g.setFont (appFont);
-    g.drawText (appText, take (appWidth), juce::Justification::centredLeft, true);
-
+    auto name = title.removeFromLeft (title.getWidth() - dotSpace);
     g.setColour (theme().textSecondary);
-    g.setFont (nameFont);
-    g.drawText (separator, take (separatorWidth), juce::Justification::centredLeft, true);
-    g.drawText (sessionName, take (nameWidth), juce::Justification::centredLeft, true);
+    g.setFont (nameFont());
+    g.drawText (sessionName, name, juce::Justification::centredLeft, true);   // true: an ellipsis if it doesn't fit
 
     if (unsavedChanges)
-        g.fillEllipse (take (dotSpace).withSizeKeepingCentre (6.0f, 6.0f).translated (3.0f, 0.0f));
+        g.fillEllipse (title.withSizeKeepingCentre (6.0f, 6.0f).translated (3.0f, 0.0f));
 }
 
 void MenuBar::resized()
@@ -229,15 +210,21 @@ void MenuBar::resized()
     windowControls.setBounds (r.removeFromRight (WindowControls::preferredWidth));
    #endif
 
-    // The menus start at the very left: each item has half the bar's height
-    // of padding built in, which puts "File" on the panels' 14px edge.
-
     // Item widths depend on the menu bar's height (JUCE adds padding based on
     // it), so give the menus their height before measuring them.
     menus.setBounds (r.withWidth (0));
-    menus.setBounds (r.removeFromLeft (juce::jmin (getMenusWidth(), r.getWidth())));
+    const int menusWidth = getMenusWidth();
+
+    // The branding first, then the menus. In a very narrow window the
+    // branding gives way before the menus or the draggable strip do.
+    r.removeFromLeft (brandInset);
+    const int brandRoom = r.getWidth() - brandToMenus - menusWidth - minFreeWidth;
+    brandArea = r.removeFromLeft (juce::jlimit (0, juce::jmax (0, brandRoom), branding::getWidth()));
+    r.removeFromLeft (brandToMenus);
+
+    menus.setBounds (r.removeFromLeft (juce::jmin (menusWidth, r.getWidth())));
 
     freeArea = r;
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -3,7 +3,7 @@
 #include "ui/arrangement/ArrangementLayout.h"
 #include "ui/theme/Fonts.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -34,7 +34,7 @@ void ArrangementView::Ruler::setLoop (bool on, double start, double end)
 
 void ArrangementView::Ruler::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("ArrangementView::Ruler");
+    LITHIUM_PERF_PAINT ("ArrangementView::Ruler");
     auto r = getLocalBounds();
     g.fillAll (theme().rulerBg);
     g.setColour (theme().divider);
@@ -146,4 +146,4 @@ double ArrangementView::Ruler::beatAt (int x) const
     return juce::jmax (0.0, owner.geometry.xToBeat ((float) (x - headerWidth)));
 }
 
-} // namespace ikaros
+} // namespace lithium

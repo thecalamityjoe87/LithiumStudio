@@ -2,7 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -26,4 +26,4 @@ private:
     juce::ApplicationCommandManager& commands;
 };
 
-} // namespace ikaros
+} // namespace lithium

@@ -4,12 +4,12 @@
 #include "ui/dialogs/AboutTechnology.h"
 #include "ui/widgets/IconButton.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
 /**
-    Help > About Ikaros Studio. Five pages behind tabs:
+    Help > About Lithium Studio. Five pages behind tabs:
 
         About             the icon, the version and what the app is
         Credits           who made it
@@ -74,4 +74,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AboutDialog)
 };
 
-} // namespace ikaros
+} // namespace lithium

@@ -4,7 +4,7 @@
 
 #include "ui/arrangement/ArrangementView.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -97,4 +97,4 @@ private:
     juce::String dropText;
 };
 
-} // namespace ikaros
+} // namespace lithium

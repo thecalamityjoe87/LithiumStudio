@@ -4,10 +4,10 @@
 #include "platform/SystemAppearance.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace ikaros
+namespace lithium
 {
 
-class IkarosLookAndFeel;
+class LithiumLookAndFeel;
 
 //==============================================================================
 /**
@@ -26,7 +26,7 @@ class ThemeManager  : private Preferences::Listener,
                       private juce::DarkModeSettingListener
 {
 public:
-    ThemeManager (Preferences&, IkarosLookAndFeel&);
+    ThemeManager (Preferences&, LithiumLookAndFeel&);
     ~ThemeManager() override;
 
 private:
@@ -38,7 +38,7 @@ private:
     void update();
 
     Preferences& preferences;
-    IkarosLookAndFeel& lookAndFeel;
+    LithiumLookAndFeel& lookAndFeel;
 
     // Kept whatever the setting, so it's current when Match system is
     // picked; it calls update() when the desktop portal's mode changes.
@@ -47,4 +47,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ThemeManager)
 };
 
-} // namespace ikaros
+} // namespace lithium

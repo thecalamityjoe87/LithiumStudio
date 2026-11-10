@@ -13,10 +13,10 @@
 #include "engine/SoundLibrary.h"
 #include "ui/state/DragTypes.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -68,7 +68,7 @@ ArrangementView::ArrangementView (AudioEngine& e, Selection& s, juce::Applicatio
     timeScrollBar.addListener (this);
 
     // Both scrollbars sit on the dark arrangement, so they use its colour in
-    // either theme (read by IkarosLookAndFeel::drawScrollbar).
+    // either theme (read by LithiumLookAndFeel::drawScrollbar).
     timeScrollBar.getProperties().set ("arrangement", true);
     viewport.getVerticalScrollBar().getProperties().set ("arrangement", true);
     addAndMakeVisible (timeScrollBar);
@@ -571,7 +571,7 @@ void ArrangementView::updateTransport()
 
 void ArrangementView::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("ArrangementView");
+    LITHIUM_PERF_PAINT ("ArrangementView");
     g.fillAll (theme().arrangement.laneBg);   // under the lanes: the scrollbar strip
 
     // The bottom strip: a line along its top, and under the track headers
@@ -598,7 +598,7 @@ void ArrangementView::paint (juce::Graphics& g)
 
 void ArrangementView::paintOverChildren (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("ArrangementView::paintOverChildren");
+    LITHIUM_PERF_PAINT ("ArrangementView::paintOverChildren");
     icons::draw (g, Icon::search, zoomIconArea.toFloat(), theme().textSecondary, 13.0f, 1.6f);
 }
 
@@ -1200,4 +1200,4 @@ void ArrangementView::filesDropped (const juce::StringArray& files, int x, int y
         selection.selectRegions (first->trackId, ids);
 }
 
-} // namespace ikaros
+} // namespace lithium

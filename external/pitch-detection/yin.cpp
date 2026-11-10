@@ -2,9 +2,9 @@
 // (https://github.com/sevagh/pitch-detection), MIT License,
 // Copyright (c) 2018 Sevag Hanssian. See LICENSE.
 //
-// Ikaros: src/yin.cpp, with the parts of src/autocorrelation.cpp and
+// Lithium: src/yin.cpp, with the parts of src/autocorrelation.cpp and
 // src/parabolic_interpolation.cpp it uses, changed for Ikaros Studio (see
-// README.ikaros). Every change is marked "Ikaros:".
+// README.lithium). Every change is marked "Lithium:".
 
 #include "pitch_detection.h"
 #include <algorithm>
@@ -36,7 +36,7 @@ static const float Beta_Distribution_0[100] = {0.000000, 0.029069, 0.048836,
 namespace pitch_alloc
 {
 
-// Ikaros: the allocation that BaseAlloc and Yin's constructors did, with
+// Lithium: the allocation that BaseAlloc and Yin's constructors did, with
 // juce::dsp::FFT in place of FFTS. The FFT is twice the frame (or more), so
 // the correlation below doesn't wrap around.
 Yin::Yin(int audio_buffer_size, int sample_rate_, float min_pitch, float max_pitch)
@@ -58,7 +58,7 @@ Yin::Yin(int audio_buffer_size, int sample_rate_, float min_pitch, float max_pit
 	running_min.assign((size_t)yin_buffer_size, 1.0f);
 }
 
-// Ikaros: the YIN difference function
+// Lithium: the YIN difference function
 //     d(tau) = sum over j < W of (x[j] - x[j + tau])^2,   W = half the frame
 //            = energy of x[0, W) + energy of x[tau, tau + W) - 2 r(tau)
 // with r(tau) = sum over j < W of x[j] x[j + tau], the correlation of the
@@ -109,12 +109,12 @@ Yin::cumulative_mean_normalized_difference()
 
 	for (int tau = 1; tau < signed(yin_buffer.size()); tau++) {
 		running_sum += yin_buffer[tau];
-		// Ikaros: silence gives 0 / 0; call it not periodic at all.
+		// Lithium: silence gives 0 / 0; call it not periodic at all.
 		yin_buffer[tau] = running_sum > 0.0f ? yin_buffer[tau] * tau / running_sum : 1.0f;
 	}
 }
 
-// Ikaros: within tau_min..tau_max (the original looked from tau = 2 to the end).
+// Lithium: within tau_min..tau_max (the original looked from tau = 2 to the end).
 int
 Yin::absolute_threshold() const
 {
@@ -131,7 +131,7 @@ Yin::absolute_threshold() const
 }
 
 // From src/parabolic_interpolation.cpp: the dip's position between samples.
-// Ikaros: returns only the position (the original also returned the value).
+// Lithium: returns only the position (the original also returned the value).
 float
 Yin::parabolic_interpolation(int x_) const
 {
@@ -169,7 +169,7 @@ Yin::pitch(const float *audio_buffer)
 // threshold's probability under a beta distribution. A frame where the
 // candidates' dips were found has a high probability of being pitched.
 //
-// Ikaros: (1) the candidates are found with a running minimum and a binary
+// Lithium: (1) the candidates are found with a running minimum and a binary
 // search instead of scanning from the start for every threshold (the same
 // candidates, a hundred times fewer comparisons); (2) when no dip is below a
 // threshold, the lowest point gets that threshold's weight times PYIN_PA,

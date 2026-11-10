@@ -7,7 +7,7 @@
 #include "engine/Quantize.h"
 #include <juce_core/juce_core.h>
 
-namespace ikaros
+namespace lithium
 {
 
 enum class EditorGrid { bar, quarter, eighth, sixteenth, thirtySecond, off };
@@ -81,4 +81,4 @@ inline juce::String gridName (EditorGrid grid)
     return "Off";
 }
 
-} // namespace ikaros
+} // namespace lithium

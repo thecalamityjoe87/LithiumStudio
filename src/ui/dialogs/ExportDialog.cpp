@@ -2,7 +2,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -410,4 +410,4 @@ void ExportDialog::resized()
     revealButton.setBounds (buttons.removeFromLeft (150));
 }
 
-} // namespace ikaros
+} // namespace lithium

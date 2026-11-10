@@ -1,10 +1,10 @@
 // generated from file './/vstb_clip.dsp' by dsp2cc:
 // Code generated with Faust 0.9.90 (http://faust.grame.fr)
-// Modified for Ikaros Studio (see ../../README.ikaros): the zita-resampler
+// Modified for Ikaros Studio (see ../../README.lithium): the zita-resampler
 // oversampling and its variable-length array (which MSVC doesn't accept) are
-// taken out. Ikaros oversamples this stage itself, with juce::dsp::Oversampling,
+// taken out. Lithium Studio oversamples this stage itself, with juce::dsp::Oversampling,
 // so compute() is now given audio at the oversampled rate and works in place.
-// Each change is marked "Ikaros:".
+// Each change is marked "Lithium:".
 
 
 namespace vstb_clip {
@@ -43,7 +43,7 @@ static table1d_imp<100> clip __rt_data = {
 	}
 };
 
-#if 0 // Ikaros: the resampler isn't used
+#if 0 // Lithium: the resampler isn't used
 #define MAX_UPSAMPLE 8
 
 class SimpleResampler
@@ -141,12 +141,12 @@ void SimpleResampler::down(int32_t count, float *input, float *output)
   assert(r_down.out_count == 1);
 }
 
-#endif // Ikaros
+#endif // Lithium Studio
 
 class Dsp: public PluginLV2 {
 private:
 	uint32_t fSamplingFreq;
-	// Ikaros: SimpleResampler res;
+	// Lithium: SimpleResampler res;
 
 	void connect(uint32_t port,void* data);
 	void init(uint32_t samplingFreq);
@@ -184,7 +184,7 @@ Dsp::~Dsp() {
 inline void Dsp::init(uint32_t samplingFreq)
 {
 	fSamplingFreq = samplingFreq;
-    // Ikaros: res.setup(samplingFreq,4);
+    // Lithium: res.setup(samplingFreq,4);
 }
 
 void Dsp::init_static(uint32_t samplingFreq, PluginLV2 *p)
@@ -209,7 +209,7 @@ double always_inline Dsp::symclip(double x) {
 
 void always_inline Dsp::compute(int count, FAUSTFLOAT *input0, FAUSTFLOAT *output0)
 {
-    // Ikaros: was 4x oversampling into a variable-length array
+    // Lithium: was 4x oversampling into a variable-length array
     int rescount = count;
     float* buf = output0;
     if (input0 != output0) memcpy(output0, input0, count * sizeof(float));
@@ -217,7 +217,7 @@ void always_inline Dsp::compute(int count, FAUSTFLOAT *input0, FAUSTFLOAT *outpu
         double fTemp0 = buf[i];
 		buf[i] = symclip(fTemp0);
 	}
-    // Ikaros: res.down(count,buf,output0);
+    // Lithium: res.down(count,buf,output0);
 }
 
 void __rt_func Dsp::compute_static(int count, FAUSTFLOAT *input0, FAUSTFLOAT *output0, PluginLV2 *p)

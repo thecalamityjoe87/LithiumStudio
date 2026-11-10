@@ -2,7 +2,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -107,4 +107,4 @@ void FolderField::resized()
     pathArea = r;
 }
 
-} // namespace ikaros
+} // namespace lithium

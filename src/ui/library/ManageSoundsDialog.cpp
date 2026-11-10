@@ -4,7 +4,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -229,7 +229,7 @@ public:
         {
             // "INSTALLED   1.2 GB on this computer", sitting on the cards below.
             auto r = getLocalBounds().withTrimmedTop (10).withTrimmedLeft (2);
-            const auto headingFont = fonts::uiBold (textSize::xs).withExtraKerningFactor (0.1f);
+            const auto headingFont = fonts::caption (textSize::sm).withExtraKerningFactor (0.1f);
             const auto title = view.title.toUpperCase();
             g.setColour (theme().textSecondary);
             g.setFont (headingFont);
@@ -796,7 +796,7 @@ void ManageSoundsDialog::paint (juce::Graphics& g)
     auto r = panel.reduced (28, 24);
     g.setColour (theme().text);
     g.setFont (fonts::uiBold (textSize::title));
-    g.drawText (welcome ? juce::String ("Welcome to Ikaros Studio") : juce::String ("Manage Sounds"),
+    g.drawText (welcome ? juce::String ("Welcome to Lithium Studio") : juce::String ("Manage Sounds"),
                 r.removeFromTop (26), juce::Justification::centredLeft);
 
     const juce::String subtitle = ! welcome ? juce::String ("Download, update and remove sound packs. New sounds appear in the library as soon as they're installed.")
@@ -881,4 +881,4 @@ void ManageSoundsDialog::resized()
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

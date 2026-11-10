@@ -1,4 +1,4 @@
-# Ikaros Studio — top-level CMake project
+# Lithium Studio — top-level CMake project
 #
 # Build (any platform):
 #   cmake -B build -DCMAKE_BUILD_TYPE=Release
@@ -9,12 +9,12 @@
 
 cmake_minimum_required(VERSION 3.22)
 
-# The version is 0.<milestone>.<patch>: bump IKAROS_MILESTONE when a new
-# milestone starts, IKAROS_PATCH for fix builds within one. IKAROS_STAGE is the
+# The version is 0.<milestone>.<patch>: bump LITHIUM_MILESTONE when a new
+# milestone starts, LITHIUM_PATCH for fix builds within one. LITHIUM_STAGE is the
 # label shown beside the version (About, splash) until 1.0.
-set(IKAROS_MILESTONE 14)
-set(IKAROS_PATCH 1)
-set(IKAROS_STAGE "alpha")
+set(LITHIUM_MILESTONE 15)
+set(LITHIUM_PATCH 0)
+set(LITHIUM_STAGE "alpha")
 
 # The oldest macOS the app runs on. It has to be set before project(), which
 # otherwise creates it empty, and the compiler then builds for the macOS of
@@ -22,19 +22,19 @@ set(IKAROS_STAGE "alpha")
 # anything older than 12.
 set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum macOS version")
 
-project(IkarosStudio VERSION 0.${IKAROS_MILESTONE}.${IKAROS_PATCH} LANGUAGES C CXX)
+project(LithiumStudio VERSION 0.${LITHIUM_MILESTONE}.${LITHIUM_PATCH} LANGUAGES C CXX)
 
 # The packaging scripts (packaging/*) name their files with this.
 file(CONFIGURE OUTPUT "${CMAKE_BINARY_DIR}/version.txt" CONTENT "${PROJECT_VERSION}\n")
 
 # Sanitizer builds for the stress tests (docs/perf-report.md), each in its own
-# build folder: -DIKAROS_SANITIZE=address, thread, or realtime (Clang 20+
+# build folder: -DLITHIUM_SANITIZE=address, thread, or realtime (Clang 20+
 # only; PerfMonitor then marks the audio callback as real-time). Set before
 # any target, so JUCE, Tracktion and the libraries are checked too.
-set(IKAROS_SANITIZE "" CACHE STRING "Sanitizer to build with: address, thread or realtime")
-if(IKAROS_SANITIZE)
-    add_compile_options(-fsanitize=${IKAROS_SANITIZE} -fno-omit-frame-pointer)
-    add_link_options(-fsanitize=${IKAROS_SANITIZE})
+set(LITHIUM_SANITIZE "" CACHE STRING "Sanitizer to build with: address, thread or realtime")
+if(LITHIUM_SANITIZE)
+    add_compile_options(-fsanitize=${LITHIUM_SANITIZE} -fno-omit-frame-pointer)
+    add_link_options(-fsanitize=${LITHIUM_SANITIZE})
 endif()
 
 set(CMAKE_CXX_STANDARD 20)
@@ -42,20 +42,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Tracktion/JUCE translation units are huge (~3 GB each with -g), so cap Ninja's
-# parallelism by RAM instead of core count. Override with -DIKAROS_COMPILE_JOBS=N.
-cmake_host_system_information(RESULT IKAROS_TOTAL_MB QUERY TOTAL_PHYSICAL_MEMORY)
-cmake_host_system_information(RESULT IKAROS_CORES QUERY NUMBER_OF_LOGICAL_CORES)
-math(EXPR IKAROS_DEFAULT_JOBS "${IKAROS_TOTAL_MB} / 3072")
-if(IKAROS_DEFAULT_JOBS GREATER IKAROS_CORES)
-    set(IKAROS_DEFAULT_JOBS ${IKAROS_CORES})
+# parallelism by RAM instead of core count. Override with -DLITHIUM_COMPILE_JOBS=N.
+cmake_host_system_information(RESULT LITHIUM_TOTAL_MB QUERY TOTAL_PHYSICAL_MEMORY)
+cmake_host_system_information(RESULT LITHIUM_CORES QUERY NUMBER_OF_LOGICAL_CORES)
+math(EXPR LITHIUM_DEFAULT_JOBS "${LITHIUM_TOTAL_MB} / 3072")
+if(LITHIUM_DEFAULT_JOBS GREATER LITHIUM_CORES)
+    set(LITHIUM_DEFAULT_JOBS ${LITHIUM_CORES})
 endif()
-if(IKAROS_DEFAULT_JOBS LESS 1)
-    set(IKAROS_DEFAULT_JOBS 1)
+if(LITHIUM_DEFAULT_JOBS LESS 1)
+    set(LITHIUM_DEFAULT_JOBS 1)
 endif()
-set(IKAROS_COMPILE_JOBS ${IKAROS_DEFAULT_JOBS} CACHE STRING "Max concurrent compile jobs (Ninja)")
-set_property(GLOBAL PROPERTY JOB_POOLS ikaros_compile=${IKAROS_COMPILE_JOBS} ikaros_link=1)
-set(CMAKE_JOB_POOL_COMPILE ikaros_compile)
-set(CMAKE_JOB_POOL_LINK ikaros_link)
+set(LITHIUM_COMPILE_JOBS ${LITHIUM_DEFAULT_JOBS} CACHE STRING "Max concurrent compile jobs (Ninja)")
+set_property(GLOBAL PROPERTY JOB_POOLS lithium_compile=${LITHIUM_COMPILE_JOBS} lithium_link=1)
+set(CMAKE_JOB_POOL_COMPILE lithium_compile)
+set(CMAKE_JOB_POOL_LINK lithium_link)
 
 # Platform settings that must be decided *before* JUCE is added.
 if(MSVC)
@@ -82,9 +82,9 @@ endif()
 # when it's already in).
 find_package(Git REQUIRED)
 set(JUCE_DIR "${TE_DIR}/modules/juce")
-file(GLOB IKAROS_JUCE_PATCHES "${CMAKE_CURRENT_SOURCE_DIR}/external/patches/juce-*.patch")
+file(GLOB LITHIUM_JUCE_PATCHES "${CMAKE_CURRENT_SOURCE_DIR}/external/patches/juce-*.patch")
 
-foreach(patch IN LISTS IKAROS_JUCE_PATCHES)
+foreach(patch IN LISTS LITHIUM_JUCE_PATCHES)
     execute_process(COMMAND "${GIT_EXECUTABLE}" apply --reverse --check "${patch}"
                     WORKING_DIRECTORY "${JUCE_DIR}"
                     RESULT_VARIABLE already_applied OUTPUT_QUIET ERROR_QUIET)
@@ -101,9 +101,9 @@ foreach(patch IN LISTS IKAROS_JUCE_PATCHES)
 endforeach()
 
 # The same for Tracktion Engine's own fixes.
-file(GLOB IKAROS_TRACKTION_PATCHES "${CMAKE_CURRENT_SOURCE_DIR}/external/patches/tracktion-*.patch")
+file(GLOB LITHIUM_TRACKTION_PATCHES "${CMAKE_CURRENT_SOURCE_DIR}/external/patches/tracktion-*.patch")
 
-foreach(patch IN LISTS IKAROS_TRACKTION_PATCHES)
+foreach(patch IN LISTS LITHIUM_TRACKTION_PATCHES)
     execute_process(COMMAND "${GIT_EXECUTABLE}" apply --reverse --check "${patch}"
                     WORKING_DIRECTORY "${TE_DIR}"
                     RESULT_VARIABLE already_applied OUTPUT_QUIET ERROR_QUIET)
@@ -120,9 +120,9 @@ foreach(patch IN LISTS IKAROS_TRACKTION_PATCHES)
 endforeach()
 
 # And sfizz's.
-file(GLOB IKAROS_SFIZZ_PATCHES "${CMAKE_CURRENT_SOURCE_DIR}/external/patches/sfizz-*.patch")
+file(GLOB LITHIUM_SFIZZ_PATCHES "${CMAKE_CURRENT_SOURCE_DIR}/external/patches/sfizz-*.patch")
 
-foreach(patch IN LISTS IKAROS_SFIZZ_PATCHES)
+foreach(patch IN LISTS LITHIUM_SFIZZ_PATCHES)
     execute_process(COMMAND "${GIT_EXECUTABLE}" apply --reverse --check "${patch}"
                     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/external/sfizz"
                     RESULT_VARIABLE already_applied OUTPUT_QUIET ERROR_QUIET)
@@ -170,23 +170,23 @@ set(ENABLE_LTO OFF CACHE BOOL "" FORCE)   # sfizz's own option; keeps its build 
 # -mavx on some files, so it can't build both architectures in one go:
 # packaging/macos/build-dmg.sh builds each on its own and joins them.
 if(APPLE)
-    set(IKAROS_MAC_ARCH "${CMAKE_OSX_ARCHITECTURES}")
+    set(LITHIUM_MAC_ARCH "${CMAKE_OSX_ARCHITECTURES}")
 
-    if(NOT IKAROS_MAC_ARCH)
-        set(IKAROS_MAC_ARCH "${CMAKE_SYSTEM_PROCESSOR}")
+    if(NOT LITHIUM_MAC_ARCH)
+        set(LITHIUM_MAC_ARCH "${CMAKE_SYSTEM_PROCESSOR}")
     endif()
 
-    if(IKAROS_MAC_ARCH MATCHES ";")
+    if(LITHIUM_MAC_ARCH MATCHES ";")
         message(FATAL_ERROR
             "Build one architecture at a time (CMAKE_OSX_ARCHITECTURES=arm64 or x86_64); "
             "packaging/macos/build-dmg.sh makes a universal app from the two.")
     endif()
 
-    if(IKAROS_MAC_ARCH STREQUAL "arm64")
-        set(IKAROS_MAC_ARCH "aarch64")
+    if(LITHIUM_MAC_ARCH STREQUAL "arm64")
+        set(LITHIUM_MAC_ARCH "aarch64")
     endif()
 
-    set(PROJECT_SYSTEM_PROCESSOR "${IKAROS_MAC_ARCH}" CACHE STRING "" FORCE)
+    set(PROJECT_SYSTEM_PROCESSOR "${LITHIUM_MAC_ARCH}" CACHE STRING "" FORCE)
 
     # WavPack's assembly doesn't build for Apple Silicon (or for Intel from
     # an Apple Silicon Mac); it only speeds up reading .wv samples.
@@ -200,7 +200,7 @@ endif()
 #  - <cstdint>: sfizz's copy of abseil uses uintptr_t in its debug-build
 #    asserts without including it, which newer GCC versions reject (and
 #    Clang with a newer libc++, which includes less by itself).
-set(IKAROS_SAVED_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+set(LITHIUM_SAVED_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_STANDARD 17)
 
 if(NOT MSVC)
@@ -208,10 +208,10 @@ if(NOT MSVC)
 endif()
 
 add_subdirectory("${SFIZZ_DIR}" "${CMAKE_BINARY_DIR}/sfizz" EXCLUDE_FROM_ALL)
-set(CMAKE_CXX_FLAGS "${IKAROS_SAVED_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${LITHIUM_SAVED_CXX_FLAGS}")
 set(CMAKE_CXX_STANDARD 20)
 
-# miniz writes and reads .iksession files (ZIP archives, ZIP64 when they're
+# miniz writes and reads .lisession files (ZIP archives, ZIP64 when they're
 # over 4 GB); see src/engine/SessionBundle.h. Pinned to a release tag (3.1.2).
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/miniz/miniz_zip.c")
     message(FATAL_ERROR
@@ -222,19 +222,19 @@ endif()
 add_subdirectory(external/miniz "${CMAKE_BINARY_DIR}/miniz" EXCLUDE_FROM_ALL)
 
 # LAME's MP3 encoder (libmp3lame 3.100, LGPL), kept in the repo since LAME
-# has no official git repository; see external/lame/README.ikaros.
-add_subdirectory(external/lame/ikaros "${CMAKE_BINARY_DIR}/lame" EXCLUDE_FROM_ALL)
+# has no official git repository; see external/lame/README.lithium.
+add_subdirectory(external/lame/lithium "${CMAKE_BINARY_DIR}/lame" EXCLUDE_FROM_ALL)
 
 # The DSP of the GxPlugins pedals (GPL 3) and two Guitarix effects (GPL 2+)
 # behind most of the pedalboard's pedals, kept in the repo (one GitHub
 # repository per pedal, and only their DSP is used); see
-# external/gxplugins/README.ikaros.
-add_subdirectory(external/gxplugins/ikaros "${CMAKE_BINARY_DIR}/gxplugins" EXCLUDE_FROM_ALL)
+# external/gxplugins/README.lithium.
+add_subdirectory(external/gxplugins/lithium "${CMAKE_BINARY_DIR}/gxplugins" EXCLUDE_FROM_ALL)
 
 # Guitarix's amp models, tone stacks and cabinet IRs (GPL 2+), the sound of
 # the Amp after the pedals, kept in the repo (only the Faust-generated DSP is
-# used); see external/guitarix/README.ikaros.
-add_subdirectory(external/guitarix/ikaros "${CMAKE_BINARY_DIR}/guitarix" EXCLUDE_FROM_ALL)
+# used); see external/guitarix/README.lithium.
+add_subdirectory(external/guitarix/lithium "${CMAKE_BINARY_DIR}/guitarix" EXCLUDE_FROM_ALL)
 
 # Rubber Band stretches audio regions in time and pitch (loops following the
 # song's tempo and key, Flex Time). Tracktion builds it into its own
@@ -255,55 +255,58 @@ endif()
 #    folder above the submodule goes on the include path.
 #  - SoundTouch stays compiled in so sessions saved with it still open (they're
 #    switched to Rubber Band on load; see engine/TimeStretch.h).
-add_library(ikaros_timestretch INTERFACE)
-target_include_directories(ikaros_timestretch INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/external")
-target_compile_definitions(ikaros_timestretch INTERFACE
+add_library(lithium_timestretch INTERFACE)
+target_include_directories(lithium_timestretch INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/external")
+target_compile_definitions(lithium_timestretch INTERFACE
     TRACKTION_ENABLE_TIMESTRETCH_RUBBERBAND=1
     TRACKTION_BUILD_RUBBERBAND=1
     TRACKTION_ENABLE_TIMESTRETCH_SOUNDTOUCH=1)
 
 if(APPLE)
     # Rubber Band uses Apple's vDSP for its FFT on macOS.
-    target_link_libraries(ikaros_timestretch INTERFACE "-framework Accelerate")
+    target_link_libraries(lithium_timestretch INTERFACE "-framework Accelerate")
 endif()
 
 # Third-party plug-in formats: VST3 everywhere, LV2 on Linux and Windows, Audio
 # Units on macOS. JUCE ships everything needed to host them.
 if(APPLE)
-    set(IKAROS_PLUGIN_HOST_DEFINITIONS JUCE_PLUGINHOST_VST3=1 JUCE_PLUGINHOST_AU=1 JUCE_PLUGINHOST_LV2=0)
+    set(LITHIUM_PLUGIN_HOST_DEFINITIONS JUCE_PLUGINHOST_VST3=1 JUCE_PLUGINHOST_AU=1 JUCE_PLUGINHOST_LV2=0)
 else()
-    set(IKAROS_PLUGIN_HOST_DEFINITIONS JUCE_PLUGINHOST_VST3=1 JUCE_PLUGINHOST_AU=0 JUCE_PLUGINHOST_LV2=1)
+    set(LITHIUM_PLUGIN_HOST_DEFINITIONS JUCE_PLUGINHOST_VST3=1 JUCE_PLUGINHOST_AU=0 JUCE_PLUGINHOST_LV2=1)
 endif()
 
 # ------------------------------------------------------------------------------
 # App target
 # ------------------------------------------------------------------------------
-juce_add_gui_app(IkarosStudio
-    PRODUCT_NAME "Ikaros Studio"
+juce_add_gui_app(LithiumStudio
+    PRODUCT_NAME "Lithium Studio"
     COMPANY_NAME "ikarosdev"
-    BUNDLE_ID "io.github.thecalamityjoe87.IkarosStudio"
+    BUNDLE_ID "io.github.thecalamityjoe87.LithiumStudio"
     VERSION ${PROJECT_VERSION}
-    ICON_BIG "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/io.github.thecalamityjoe87.IkarosStudio.png"
+    ICON_BIG "${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/io.github.thecalamityjoe87.LithiumStudio.png"
     MICROPHONE_PERMISSION_ENABLED TRUE
-    MICROPHONE_PERMISSION_TEXT "Ikaros Studio uses audio inputs for recording."
-    DOCUMENT_EXTENSIONS iksession   # macOS: Finder opens .iksession files with the app
+    MICROPHONE_PERMISSION_TEXT "Lithium Studio uses audio inputs for recording."
+    DOCUMENT_EXTENSIONS lisession iksession   # macOS: Finder opens session files with the app
     NEEDS_CURL TRUE                 # downloading sound packs over https (see PackStore)
     NEEDS_WEB_BROWSER FALSE)
 
 # Fonts are compiled into the binary so the app looks identical everywhere.
 # This generates a static library with a `BinaryData` namespace
-# (e.g. BinaryData::FigtreeRegular_ttf / BinaryData::FigtreeRegular_ttfSize).
-juce_add_binary_data(IkarosStudioBinaryData
+# (e.g. BinaryData::BarlowRegular_ttf / BinaryData::BarlowRegular_ttfSize).
+juce_add_binary_data(LithiumStudioBinaryData
     HEADER_NAME "BinaryData.h"
     NAMESPACE BinaryData
     SOURCES
-        resources/fonts/Figtree-Regular.ttf
-        resources/fonts/Figtree-SemiBold.ttf
-        resources/fonts/Figtree-Bold.ttf
-        resources/fonts/Figtree-ExtraBold.ttf
-        resources/fonts/JetBrainsMono-Medium.ttf
-        resources/fonts/JetBrainsMono-Bold.ttf
-        resources/icons/io.github.thecalamityjoe87.IkarosStudio.png    # the About window
+        resources/fonts/Barlow-Regular.ttf
+        resources/fonts/Barlow-Medium.ttf
+        resources/fonts/Barlow-SemiBold.ttf
+        resources/fonts/BarlowCondensed-Medium.ttf
+        resources/fonts/BarlowCondensed-SemiBold.ttf
+        resources/fonts/BarlowCondensed-Bold.ttf
+        resources/fonts/IBMPlexMono-Regular.ttf
+        resources/fonts/IBMPlexMono-Medium.ttf
+        resources/fonts/Figtree-ExtraBold.ttf       # pedal and amp names only
+        resources/icons/io.github.thecalamityjoe87.LithiumStudio.png    # the About window
         resources/about/tracktion_engine_powered.png                   # its Built With page
         resources/about/juce_icon.png
         LICENSE)                                                       # the About page's View License
@@ -311,7 +314,7 @@ juce_add_binary_data(IkarosStudioBinaryData
 # The Drummer's grooves (made from the Groove MIDI Dataset by
 # tools/build_grooves.py), compiled in like the fonts. A target of its own,
 # so the engine smoke test can link it too.
-juce_add_binary_data(IkarosDrummerData
+juce_add_binary_data(LithiumDrummerData
     HEADER_NAME "DrummerData.h"
     NAMESPACE DrummerData
     SOURCES
@@ -319,27 +322,28 @@ juce_add_binary_data(IkarosDrummerData
 
 # The controllers the app knows (see src/engine/ControllerMap.h), one JSON
 # file each.
-file(GLOB IKAROS_CONTROLLER_PROFILES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/resources/controllers/*.json")
-juce_add_binary_data(IkarosControllerData
+file(GLOB LITHIUM_CONTROLLER_PROFILES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/resources/controllers/*.json")
+juce_add_binary_data(LithiumControllerData
     HEADER_NAME "ControllerData.h"
     NAMESPACE ControllerData
-    SOURCES ${IKAROS_CONTROLLER_PROFILES})
+    SOURCES ${LITHIUM_CONTROLLER_PROFILES})
 
 # ------------------------------------------------------------------------------
 # Sources, grouped like the folders under src/. Headers are listed too so they
 # show up in IDE project trees (Visual Studio, Xcode).
 # ------------------------------------------------------------------------------
-set(IKAROS_APP_SOURCES
+set(LITHIUM_APP_SOURCES
     src/app/Main.cpp
     src/app/MainWindow.h            src/app/MainWindow.cpp
     src/app/MainComponent.h         src/app/MainComponent.cpp
     src/app/AppMenuModel.h          src/app/AppMenuModel.cpp
     src/app/SurfaceHandler.h        src/app/SurfaceHandler.cpp
+    src/app/RenameMigration.h       src/app/RenameMigration.cpp
     src/app/CommandIDs.h
     src/app/PerfHarness.h           src/app/PerfHarness.cpp)
 
 # The only code that talks to Tracktion. Also built into the smoke test.
-set(IKAROS_ENGINE_SOURCES
+set(LITHIUM_ENGINE_SOURCES
     src/engine/EngineTypes.h
     src/engine/AudioEngine.h        src/engine/AudioEngine.cpp
     src/engine/TrackController.h    src/engine/TrackController.cpp
@@ -409,11 +413,11 @@ set(IKAROS_ENGINE_SOURCES
     src/engine/SilenceSkip.h)
 
 # Tune's pitch correction is fat1's retuner (GPL 2+, see
-# external/fat1/README.ikaros), and Pitch mode's analysis is probabilistic
-# YIN from sevagh/pitch-detection (MIT, see external/pitch-detection/README.ikaros).
+# external/fat1/README.lithium), and Pitch mode's analysis is probabilistic
+# YIN from sevagh/pitch-detection (MIT, see external/pitch-detection/README.lithium).
 # Both are compiled here, with JUCE's FFT in place of FFTW and FFTS, into the
 # app and the smoke test like the engine.
-set(IKAROS_PITCH_SOURCES
+set(LITHIUM_PITCH_SOURCES
     external/fat1/retuner.h         external/fat1/retuner.cc
     external/pitch-detection/pitch_detection.h external/pitch-detection/yin.cpp)
 set_source_files_properties(external/fat1/retuner.cc src/engine/TunePlugin.cpp PROPERTIES
@@ -425,13 +429,13 @@ set_source_files_properties(external/fat1/retuner.cc external/pitch-detection/yi
 
 # The Golden Boost's circuit model (KlonCentaur, BSD 3-clause, with parts of
 # chowdsp_utils, GPL 3) is compiled in KlonCentaurDsp.cpp. Its files include
-# <pch.h>, our stand-in for ChowCentaur's own; see external/kloncentaur/README.ikaros.
+# <pch.h>, our stand-in for ChowCentaur's own; see external/kloncentaur/README.lithium.
 set_source_files_properties(src/engine/KlonCentaurDsp.cpp PROPERTIES
-    INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/external/kloncentaur/ikaros"
+    INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/external/kloncentaur/lithium"
     COMPILE_OPTIONS "$<IF:$<CXX_COMPILER_ID:MSVC>,/w,-w>")   # third-party code's warnings
 
 # The only OS-specific code.
-set(IKAROS_PLATFORM_SOURCES
+set(LITHIUM_PLATFORM_SOURCES
     src/platform/WindowManagerHints.h  src/platform/WindowManagerHints.cpp
     src/platform/ExternalDrops.h       src/platform/ExternalDrops.cpp
     src/platform/AppFolders.h          src/platform/AppFolders.cpp
@@ -440,16 +444,16 @@ set(IKAROS_PLATFORM_SOURCES
     src/platform/SystemAppearance.h    src/platform/SystemAppearance.cpp)
 
 if(APPLE)
-    list(APPEND IKAROS_PLATFORM_SOURCES src/platform/WindowManagerHints_mac.mm)
+    list(APPEND LITHIUM_PLATFORM_SOURCES src/platform/WindowManagerHints_mac.mm)
 endif()
 
-set(IKAROS_UI_SOURCES
+set(LITHIUM_UI_SOURCES
     # theme: colours/sizes, fonts, and the LookAndFeel that styles JUCE widgets
     src/ui/theme/Tokens.h                   src/ui/theme/Family.h
     src/ui/theme/Theme.h                    src/ui/theme/Theme.cpp
     src/ui/theme/ThemeManager.h             src/ui/theme/ThemeManager.cpp
     src/ui/theme/Fonts.h                    src/ui/theme/Fonts.cpp
-    src/ui/theme/IkarosLookAndFeel.h        src/ui/theme/IkarosLookAndFeel.cpp
+    src/ui/theme/LithiumLookAndFeel.h        src/ui/theme/LithiumLookAndFeel.cpp
 
     # widgets: small reusable controls
     src/ui/widgets/Icons.h                  src/ui/widgets/Icons.cpp
@@ -459,6 +463,7 @@ set(IKAROS_UI_SOURCES
     src/ui/widgets/Knob.h                   src/ui/widgets/Knob.cpp
     src/ui/widgets/AutomationHint.h         src/ui/widgets/AutomationHint.cpp
     src/ui/widgets/LevelMeter.h             src/ui/widgets/LevelMeter.cpp
+    src/ui/widgets/Branding.h               src/ui/widgets/Branding.cpp
     src/ui/widgets/PaintProbe.h             src/ui/widgets/PaintProbe.cpp
     src/ui/widgets/PerfOverlay.h            src/ui/widgets/PerfOverlay.cpp
     src/ui/widgets/ClipLight.h              src/ui/widgets/ClipLight.cpp
@@ -543,66 +548,71 @@ set(IKAROS_UI_SOURCES
     src/ui/bottompanel/TuneSectionView.h    src/ui/bottompanel/TuneSectionView.cpp
     src/ui/bottompanel/RecordingView.h      src/ui/bottompanel/RecordingView.cpp)
 
-target_sources(IkarosStudio PRIVATE
-    ${IKAROS_APP_SOURCES}
-    ${IKAROS_ENGINE_SOURCES}
-    ${IKAROS_PITCH_SOURCES}
-    ${IKAROS_PLATFORM_SOURCES}
-    ${IKAROS_UI_SOURCES})
+target_sources(LithiumStudio PRIVATE
+    ${LITHIUM_APP_SOURCES}
+    ${LITHIUM_ENGINE_SOURCES}
+    ${LITHIUM_PITCH_SOURCES}
+    ${LITHIUM_PLATFORM_SOURCES}
+    ${LITHIUM_UI_SOURCES})
 
 # Mirror the src/ folders in IDE project trees.
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "src"
-             FILES ${IKAROS_APP_SOURCES} ${IKAROS_ENGINE_SOURCES} ${IKAROS_PLATFORM_SOURCES} ${IKAROS_UI_SOURCES})
+             FILES ${LITHIUM_APP_SOURCES} ${LITHIUM_ENGINE_SOURCES} ${LITHIUM_PLATFORM_SOURCES} ${LITHIUM_UI_SOURCES})
 
-target_include_directories(IkarosStudio PRIVATE src)
+target_include_directories(LithiumStudio PRIVATE src)
 
-target_compile_definitions(IkarosStudio PRIVATE
-    JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:IkarosStudio,JUCE_PRODUCT_NAME>"
+target_compile_definitions(LithiumStudio PRIVATE
+    JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:LithiumStudio,JUCE_PRODUCT_NAME>"
     JUCE_APPLICATION_VERSION_STRING="${PROJECT_VERSION}"
-    IKAROS_STAGE="${IKAROS_STAGE}"
+    LITHIUM_STAGE="${LITHIUM_STAGE}"
     JUCE_USE_CURL=1                 # for PackStore's downloads
     JUCE_WEB_BROWSER=0
     JUCE_DISPLAY_SPLASH_SCREEN=0
     JUCE_STRICT_REFCOUNTEDPOINTER=1
     JUCE_MODAL_LOOPS_PERMITTED=0
-    ${IKAROS_PLUGIN_HOST_DEFINITIONS})
+    ${LITHIUM_PLUGIN_HOST_DEFINITIONS})
 
 # The version, as the engine records it in saved sessions.
-target_compile_definitions(IkarosStudio PRIVATE IKAROS_VERSION="${PROJECT_VERSION}")
+target_compile_definitions(LithiumStudio PRIVATE LITHIUM_VERSION="${PROJECT_VERSION}")
 
 # Performance tools (docs/perf-report.md): the monitor, overlay and stress
-# harness are built in but do nothing unless the app runs with IKAROS_PERF=1.
+# harness are built in but do nothing unless the app runs with LITHIUM_PERF=1.
 # OFF compiles them out. (Only set when OFF: changing a definition rebuilds
 # everything, JUCE and Tracktion included.)
-option(IKAROS_PERF_TOOLS "Build the IKAROS_PERF=1 performance monitor and stress harness" ON)
-if(NOT IKAROS_PERF_TOOLS)
-    target_compile_definitions(IkarosStudio PRIVATE IKAROS_PERF_TOOLS=0)
+option(LITHIUM_PERF_TOOLS "Build the LITHIUM_PERF=1 performance monitor and stress harness" ON)
+if(NOT LITHIUM_PERF_TOOLS)
+    target_compile_definitions(LithiumStudio PRIVATE LITHIUM_PERF_TOOLS=0)
 endif()
 
 # JUCE flashes every repainted area in a random colour, to see what redraws
 # too much. A full rebuild: use a separate build folder.
-option(IKAROS_REPAINT_DEBUGGING "Flash repainted areas (JUCE_ENABLE_REPAINT_DEBUGGING)" OFF)
-if(IKAROS_REPAINT_DEBUGGING)
-    target_compile_definitions(IkarosStudio PRIVATE JUCE_ENABLE_REPAINT_DEBUGGING=1)
+option(LITHIUM_REPAINT_DEBUGGING "Flash repainted areas (JUCE_ENABLE_REPAINT_DEBUGGING)" OFF)
+if(LITHIUM_REPAINT_DEBUGGING)
+    target_compile_definitions(LithiumStudio PRIVATE JUCE_ENABLE_REPAINT_DEBUGGING=1)
 endif()
 
-# Where the "More Sounds" window gets its list of downloadable sound packs
-# (see src/engine/PackStore.h): a web address or a file path, in the app's own
-# index format or a Nota sample registry's. The default is the registry fork,
-# which publishes its index.json with GitHub Pages; the smoke test uses its
-# own index in tests/store.
-set(IKAROS_PACK_INDEX_URL "https://thecalamityjoe87.github.io/nota-samples-registry/index.json"
-    CACHE STRING "The sound pack index the app downloads packs from")
-target_compile_definitions(IkarosStudio PRIVATE IKAROS_PACK_INDEX_URL="${IKAROS_PACK_INDEX_URL}")
+# Where Manage Sounds gets its lists of downloadable sound packs (see
+# src/engine/PackStore.h): web addresses or file paths, separated by spaces, in
+# the app's own index format or a Nota sample registry's. The defaults are
+# Lithium Sounds (our own packs and the Starter Sounds set, in the latest
+# release of github.com/thecalamityjoe87/lithium-sounds), then the Nota
+# registry fork (third-party SFZ libraries, published with GitHub Pages). The
+# Linux installer fetches the starter sounds from LITHIUM_SOUNDS_INDEX_URL. The
+# smoke test uses its own index in tests/store.
+set(LITHIUM_SOUNDS_INDEX_URL "https://github.com/thecalamityjoe87/lithium-sounds/releases/latest/download/index.json"
+    CACHE STRING "The Lithium Sounds index: our own packs and the Starter Sounds set")
+set(LITHIUM_PACK_INDEX_URL "${LITHIUM_SOUNDS_INDEX_URL} https://thecalamityjoe87.github.io/nota-samples-registry/index.json"
+    CACHE STRING "The sound pack indexes the app downloads packs from, separated by spaces")
+target_compile_definitions(LithiumStudio PRIVATE LITHIUM_PACK_INDEX_URL="${LITHIUM_PACK_INDEX_URL}")
 
-target_link_libraries(IkarosStudio
+target_link_libraries(LithiumStudio
     PRIVATE
-        IkarosStudioBinaryData
-        IkarosDrummerData
-        IkarosControllerData
-        ikaros_gxplugins
-        ikaros_guitarix
-        ikaros_timestretch
+        LithiumStudioBinaryData
+        LithiumDrummerData
+        LithiumControllerData
+        lithium_gxplugins
+        lithium_guitarix
+        lithium_timestretch
         miniz
         mp3lame
         sfizz::sfizz
@@ -620,36 +630,36 @@ target_link_libraries(IkarosStudio
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     # Tracktion uses some MSVC/Clang-only pragmas; GCC warns about each one.
-    target_compile_options(IkarosStudio PRIVATE -Wno-unknown-pragmas)
+    target_compile_options(LithiumStudio PRIVATE -Wno-unknown-pragmas)
 endif()
 
 if(APPLE)
     # Matches Tracktion's own example settings.
-    target_compile_options(IkarosStudio PRIVATE -fno-aligned-allocation)
+    target_compile_options(LithiumStudio PRIVATE -fno-aligned-allocation)
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_link_libraries(IkarosStudio PRIVATE atomic)
+    target_link_libraries(LithiumStudio PRIVATE atomic)
 
     # Xlib for src/platform (window-manager hints and drag-and-drop fixes JUCE
     # doesn't do itself). JUCE itself loads X11 at runtime, so it's already required.
     find_package(X11 REQUIRED)
-    target_link_libraries(IkarosStudio PRIVATE X11::X11)
+    target_link_libraries(LithiumStudio PRIVATE X11::X11)
 
     # sd-bus (part of libsystemd) for src/platform/AudioHardware, which asks
     # RealtimeKit for a real-time audio thread, and SystemAppearance, which
     # asks the desktop portal whether dark mode is on.
     find_package(PkgConfig REQUIRED)
-    pkg_check_modules(IKAROS_SYSTEMD REQUIRED IMPORTED_TARGET libsystemd)
-    target_link_libraries(IkarosStudio PRIVATE PkgConfig::IKAROS_SYSTEMD)
+    pkg_check_modules(LITHIUM_SYSTEMD REQUIRED IMPORTED_TARGET libsystemd)
+    target_link_libraries(LithiumStudio PRIVATE PkgConfig::LITHIUM_SYSTEMD)
 endif()
 
 # The sound packs that come with the app (made by tools/generate_sounds.py).
 # The sampler plays them from disk, so they're copied next to the program
 # (into Contents/Resources on macOS); SoundLibrary looks for them there.
-set(IKAROS_SOUNDS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/sounds")
+set(LITHIUM_SOUNDS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/sounds")
 
-function(ikaros_copy_sounds target)
+function(lithium_copy_sounds target)
     if(APPLE AND target STREQUAL "IkarosStudio")
         set(dest "$<TARGET_FILE_DIR:${target}>/../Resources/Sounds")
     else()
@@ -657,81 +667,110 @@ function(ikaros_copy_sounds target)
     endif()
 
     add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${IKAROS_SOUNDS_DIR}" "${dest}"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${LITHIUM_SOUNDS_DIR}" "${dest}"
         VERBATIM)
 endfunction()
 
-ikaros_copy_sounds(IkarosStudio)
+lithium_copy_sounds(LithiumStudio)
 
 # ------------------------------------------------------------------------------
 # Linux install layout (used by the Flatpak manifest and `cmake --install`)
 # ------------------------------------------------------------------------------
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     include(GNUInstallDirs)
-    set(APP_ID "io.github.thecalamityjoe87.IkarosStudio")
+    set(APP_ID "io.github.thecalamityjoe87.LithiumStudio")
 
-    # juce_add_gui_app puts the binary at <build>/IkarosStudio_artefacts/<Config>/Ikaros Studio
-    install(PROGRAMS "$<TARGET_FILE:IkarosStudio>"
+    # juce_add_gui_app puts the binary at <build>/LithiumStudio_artefacts/<Config>/Lithium Studio
+    install(PROGRAMS "$<TARGET_FILE:LithiumStudio>"
             DESTINATION ${CMAKE_INSTALL_BINDIR}
-            RENAME ikaros-studio)
+            RENAME lithium-studio)
     install(FILES packaging/linux/${APP_ID}.desktop
             DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
     install(FILES packaging/linux/${APP_ID}.metainfo.xml
             DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
-    install(FILES packaging/linux/${APP_ID}.xml   # the .iksession file type
+    install(FILES packaging/linux/${APP_ID}.xml   # the session file types
             DESTINATION ${CMAKE_INSTALL_DATADIR}/mime/packages)
     install(FILES resources/icons/${APP_ID}.svg
             DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
     install(FILES resources/icons/${APP_ID}.png
             DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps)
     install(DIRECTORY resources/sounds/
-            DESTINATION ${CMAKE_INSTALL_DATADIR}/ikaros-studio/Sounds)
+            DESTINATION ${CMAKE_INSTALL_DATADIR}/lithium-studio/Sounds)
     install(FILES LICENSE CREDITS
             DESTINATION ${CMAKE_INSTALL_DOCDIR})
+
+    # "Install Lithium Studio": the graphical installer in the Linux download
+    # (packaging/linux/build-installer.sh), a port of Lithium Drums' one. It
+    # installs the app into the user's home folder; see tools/installer.
+    juce_add_gui_app(LithiumStudioInstaller
+        PRODUCT_NAME "Install Lithium Studio"
+        COMPANY_NAME "Calamity Audio"
+        BUNDLE_ID    "${APP_ID}.installer"
+        VERSION      "${PROJECT_VERSION}"
+        NEEDS_CURL   TRUE)
+    target_sources(LithiumStudioInstaller PRIVATE
+        tools/installer/InstallerMain.cpp
+        tools/installer/Installation.cpp
+        src/ui/theme/Theme.cpp
+        src/ui/theme/Fonts.cpp
+        src/ui/theme/LithiumLookAndFeel.cpp
+        src/ui/widgets/Branding.cpp)
+    target_include_directories(LithiumStudioInstaller PRIVATE src)
+    target_compile_definitions(LithiumStudioInstaller PRIVATE
+        JUCE_WEB_BROWSER=0
+        JUCE_USE_CURL=1           # downloading the starter sounds over https
+        LITHIUM_VERSION_STRING="${PROJECT_VERSION}"
+        LITHIUM_SOUNDS_INDEX_URL="${LITHIUM_SOUNDS_INDEX_URL}")
+    target_link_libraries(LithiumStudioInstaller PRIVATE
+        LithiumStudioBinaryData   # the fonts and the logo
+        juce::juce_cryptography   # the downloads' SHA-256 check
+        juce::juce_gui_basics
+        juce::juce_recommended_config_flags
+        juce::juce_recommended_warning_flags)
 endif()
 
 # ------------------------------------------------------------------------------
 # Engine smoke test (off by default: it compiles Tracktion a second time)
-#   cmake -B build -DIKAROS_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build
+#   cmake -B build -DLITHIUM_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build
 # ------------------------------------------------------------------------------
-option(IKAROS_BUILD_TESTS "Build the engine smoke test" OFF)
+option(LITHIUM_BUILD_TESTS "Build the engine smoke test" OFF)
 
-if(IKAROS_BUILD_TESTS)
+if(LITHIUM_BUILD_TESTS)
     enable_testing()
-    juce_add_console_app(IkarosEngineSmokeTest PRODUCT_NAME "IkarosEngineSmokeTest")
+    juce_add_console_app(LithiumEngineSmokeTest PRODUCT_NAME "LithiumEngineSmokeTest")
 
-    target_sources(IkarosEngineSmokeTest PRIVATE
+    target_sources(LithiumEngineSmokeTest PRIVATE
         tests/EngineSmokeTest.cpp
         src/platform/AppFolders.cpp      # the engine keeps open sessions there
         src/platform/FileLock.cpp        # and marks them as open with a lock
         src/platform/AudioHardware.cpp   # and the audio device watcher notices new sound cards
         src/engine/TestAudioDevice.cpp   # a pretend audio interface the test drives
-        ${IKAROS_ENGINE_SOURCES}
-        ${IKAROS_PITCH_SOURCES})
+        ${LITHIUM_ENGINE_SOURCES}
+        ${LITHIUM_PITCH_SOURCES})
 
-    target_include_directories(IkarosEngineSmokeTest PRIVATE src)
+    target_include_directories(LithiumEngineSmokeTest PRIVATE src)
 
     # The test sound pack (made by tests/fixtures/generate_test_pack.py).
-    target_compile_definitions(IkarosEngineSmokeTest PRIVATE
-        IKAROS_VERSION="${PROJECT_VERSION}"
-        IKAROS_TEST_FIXTURES="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures"
-        IKAROS_TEST_STORE="${CMAKE_CURRENT_SOURCE_DIR}/tests/store"
-        IKAROS_PACK_INDEX_URL="${CMAKE_CURRENT_SOURCE_DIR}/tests/store/index.json")
+    target_compile_definitions(LithiumEngineSmokeTest PRIVATE
+        LITHIUM_VERSION="${PROJECT_VERSION}"
+        LITHIUM_TEST_FIXTURES="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures"
+        LITHIUM_TEST_STORE="${CMAKE_CURRENT_SOURCE_DIR}/tests/store"
+        LITHIUM_PACK_INDEX_URL="${CMAKE_CURRENT_SOURCE_DIR}/tests/store/index.json")
 
-    target_compile_definitions(IkarosEngineSmokeTest PRIVATE
+    target_compile_definitions(LithiumEngineSmokeTest PRIVATE
         JUCE_MODAL_LOOPS_PERMITTED=1        # for runDispatchLoopUntil() in the test
         JUCE_USE_MP3AUDIOFORMAT=1           # to read exported MP3s back
         JUCE_USE_CURL=0
         JUCE_WEB_BROWSER=0
         JUCE_STRICT_REFCOUNTEDPOINTER=1
-        ${IKAROS_PLUGIN_HOST_DEFINITIONS})
+        ${LITHIUM_PLUGIN_HOST_DEFINITIONS})
 
-    target_link_libraries(IkarosEngineSmokeTest PRIVATE
-        IkarosDrummerData
-        IkarosControllerData
-        ikaros_gxplugins
-        ikaros_guitarix
-        ikaros_timestretch
+    target_link_libraries(LithiumEngineSmokeTest PRIVATE
+        LithiumDrummerData
+        LithiumControllerData
+        lithium_gxplugins
+        lithium_guitarix
+        lithium_timestretch
         miniz
         mp3lame
         sfizz::sfizz
@@ -745,81 +784,81 @@ if(IKAROS_BUILD_TESTS)
         juce::juce_recommended_config_flags)
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        target_compile_options(IkarosEngineSmokeTest PRIVATE -Wno-unknown-pragmas)
+        target_compile_options(LithiumEngineSmokeTest PRIVATE -Wno-unknown-pragmas)
     endif()
 
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-        target_link_libraries(IkarosEngineSmokeTest PRIVATE atomic PkgConfig::IKAROS_SYSTEMD)
+        target_link_libraries(LithiumEngineSmokeTest PRIVATE atomic PkgConfig::LITHIUM_SYSTEMD)
     endif()
 
-    ikaros_copy_sounds(IkarosEngineSmokeTest)
+    lithium_copy_sounds(LithiumEngineSmokeTest)
 
     # The test scans the test plug-ins when they've been built.
     # One test per section (see main() in the test), so `ctest -L export`
     # runs just that section.
-    add_test(NAME EngineSmokeTest COMMAND IkarosEngineSmokeTest "${CMAKE_BINARY_DIR}/TestPlugins" --skip=export,undo,recovery,recording,takes,longrecording,preferences,effects,tempo,sections,stretch,flex,quantize,followtempo,tuner,pedals,amp,drummer,controllers,tune,pitch)
-    add_test(NAME EngineSmokeTest.Export COMMAND IkarosEngineSmokeTest --only=export)
-    add_test(NAME EngineSmokeTest.Undo COMMAND IkarosEngineSmokeTest --only=undo)
-    add_test(NAME EngineSmokeTest.Recovery COMMAND IkarosEngineSmokeTest --only=recovery)
+    add_test(NAME EngineSmokeTest COMMAND LithiumEngineSmokeTest "${CMAKE_BINARY_DIR}/TestPlugins" --skip=export,undo,recovery,recording,takes,longrecording,preferences,effects,tempo,sections,stretch,flex,quantize,followtempo,tuner,pedals,amp,drummer,controllers,tune,pitch)
+    add_test(NAME EngineSmokeTest.Export COMMAND LithiumEngineSmokeTest --only=export)
+    add_test(NAME EngineSmokeTest.Undo COMMAND LithiumEngineSmokeTest --only=undo)
+    add_test(NAME EngineSmokeTest.Recovery COMMAND LithiumEngineSmokeTest --only=recovery)
     set_tests_properties(EngineSmokeTest PROPERTIES LABELS "engine")
     set_tests_properties(EngineSmokeTest.Export PROPERTIES LABELS "export")
     set_tests_properties(EngineSmokeTest.Undo PROPERTIES LABELS "undo")
     set_tests_properties(EngineSmokeTest.Recovery PROPERTIES LABELS "recovery")
 
     # App-wide settings (see src/engine/Preferences.h), and what they change.
-    add_test(NAME EngineSmokeTest.Preferences COMMAND IkarosEngineSmokeTest --only=preferences)
+    add_test(NAME EngineSmokeTest.Preferences COMMAND LithiumEngineSmokeTest --only=preferences)
     set_tests_properties(EngineSmokeTest.Preferences PROPERTIES LABELS "preferences")
 
     # Recording through a pretend audio interface (see src/engine/TestAudioDevice.h):
     # latency, device trouble, full disks. The long take is "slow" (minutes).
-    add_test(NAME EngineSmokeTest.Recording COMMAND IkarosEngineSmokeTest --only=recording)
-    add_test(NAME EngineSmokeTest.Takes COMMAND IkarosEngineSmokeTest --only=takes)
-    add_test(NAME EngineSmokeTest.LongRecording COMMAND IkarosEngineSmokeTest --only=longrecording)
+    add_test(NAME EngineSmokeTest.Recording COMMAND LithiumEngineSmokeTest --only=recording)
+    add_test(NAME EngineSmokeTest.Takes COMMAND LithiumEngineSmokeTest --only=takes)
+    add_test(NAME EngineSmokeTest.LongRecording COMMAND LithiumEngineSmokeTest --only=longrecording)
     set_tests_properties(EngineSmokeTest.Recording PROPERTIES LABELS "recording")
     set_tests_properties(EngineSmokeTest.Takes PROPERTIES LABELS "takes")
     set_tests_properties(EngineSmokeTest.LongRecording PROPERTIES LABELS "slow" TIMEOUT 1800)
 
     # The built-in effects (see src/engine/BuiltInEffects.h), heard through
     # the pretend audio interface.
-    add_test(NAME EngineSmokeTest.Effects COMMAND IkarosEngineSmokeTest --only=effects)
+    add_test(NAME EngineSmokeTest.Effects COMMAND LithiumEngineSmokeTest --only=effects)
     set_tests_properties(EngineSmokeTest.Effects PROPERTIES LABELS "effects")
-    add_test(NAME EngineSmokeTest.Tempo COMMAND IkarosEngineSmokeTest --only=tempo)
+    add_test(NAME EngineSmokeTest.Tempo COMMAND LithiumEngineSmokeTest --only=tempo)
     set_tests_properties(EngineSmokeTest.Tempo PROPERTIES LABELS "tempo")
-    add_test(NAME EngineSmokeTest.Sections COMMAND IkarosEngineSmokeTest --only=sections)
+    add_test(NAME EngineSmokeTest.Sections COMMAND LithiumEngineSmokeTest --only=sections)
     set_tests_properties(EngineSmokeTest.Sections PROPERTIES LABELS "sections")
-    add_test(NAME EngineSmokeTest.Views COMMAND IkarosEngineSmokeTest --only=views)
+    add_test(NAME EngineSmokeTest.Views COMMAND LithiumEngineSmokeTest --only=views)
     set_tests_properties(EngineSmokeTest.Views PROPERTIES LABELS "views")
-    add_test(NAME EngineSmokeTest.Stretch COMMAND IkarosEngineSmokeTest --only=stretch)
+    add_test(NAME EngineSmokeTest.Stretch COMMAND LithiumEngineSmokeTest --only=stretch)
     set_tests_properties(EngineSmokeTest.Stretch PROPERTIES LABELS "stretch")
-    add_test(NAME EngineSmokeTest.Flex COMMAND IkarosEngineSmokeTest --only=flex)
+    add_test(NAME EngineSmokeTest.Flex COMMAND LithiumEngineSmokeTest --only=flex)
     set_tests_properties(EngineSmokeTest.Flex PROPERTIES LABELS "flex")
-    add_test(NAME EngineSmokeTest.Quantize COMMAND IkarosEngineSmokeTest --only=quantize)
+    add_test(NAME EngineSmokeTest.Quantize COMMAND LithiumEngineSmokeTest --only=quantize)
     set_tests_properties(EngineSmokeTest.Quantize PROPERTIES LABELS "quantize")
-    add_test(NAME EngineSmokeTest.FollowTempo COMMAND IkarosEngineSmokeTest --only=followtempo)
+    add_test(NAME EngineSmokeTest.FollowTempo COMMAND LithiumEngineSmokeTest --only=followtempo)
     set_tests_properties(EngineSmokeTest.FollowTempo PROPERTIES LABELS "followtempo")
-    add_test(NAME EngineSmokeTest.Tuner COMMAND IkarosEngineSmokeTest --only=tuner)
+    add_test(NAME EngineSmokeTest.Tuner COMMAND LithiumEngineSmokeTest --only=tuner)
     set_tests_properties(EngineSmokeTest.Tuner PROPERTIES LABELS "tuner")
-    add_test(NAME EngineSmokeTest.Pedals COMMAND IkarosEngineSmokeTest --only=pedals)
+    add_test(NAME EngineSmokeTest.Pedals COMMAND LithiumEngineSmokeTest --only=pedals)
     set_tests_properties(EngineSmokeTest.Pedals PROPERTIES LABELS "pedals")
-    add_test(NAME EngineSmokeTest.Amp COMMAND IkarosEngineSmokeTest --only=amp)
+    add_test(NAME EngineSmokeTest.Amp COMMAND LithiumEngineSmokeTest --only=amp)
     set_tests_properties(EngineSmokeTest.Amp PROPERTIES LABELS "amp")
-    add_test(NAME EngineSmokeTest.Drummer COMMAND IkarosEngineSmokeTest --only=drummer)
+    add_test(NAME EngineSmokeTest.Drummer COMMAND LithiumEngineSmokeTest --only=drummer)
     set_tests_properties(EngineSmokeTest.Drummer PROPERTIES LABELS "drummer")
-    add_test(NAME EngineSmokeTest.Controllers COMMAND IkarosEngineSmokeTest --only=controllers)
+    add_test(NAME EngineSmokeTest.Controllers COMMAND LithiumEngineSmokeTest --only=controllers)
     set_tests_properties(EngineSmokeTest.Controllers PROPERTIES LABELS "controllers")
 
     # Pitch correction: the Tune effect, and the audio editor's Pitch mode
     # (analysis, editing, rendering).
-    add_test(NAME EngineSmokeTest.Tune COMMAND IkarosEngineSmokeTest --only=tune)
+    add_test(NAME EngineSmokeTest.Tune COMMAND LithiumEngineSmokeTest --only=tune)
     set_tests_properties(EngineSmokeTest.Tune PROPERTIES LABELS "tune")
-    add_test(NAME EngineSmokeTest.Pitch COMMAND IkarosEngineSmokeTest --only=pitch)
+    add_test(NAME EngineSmokeTest.Pitch COMMAND LithiumEngineSmokeTest --only=pitch)
     set_tests_properties(EngineSmokeTest.Pitch PROPERTIES LABELS "pitch" TIMEOUT 1800)
 endif()
 
 # Small VST3/LV2 plug-ins (and two deliberately broken ones) for testing
 # plug-in scanning and hosting. See tests/plugins/CMakeLists.txt.
-option(IKAROS_BUILD_TEST_PLUGINS "Build plug-ins for testing plug-in hosting" OFF)
+option(LITHIUM_BUILD_TEST_PLUGINS "Build plug-ins for testing plug-in hosting" OFF)
 
-if(IKAROS_BUILD_TEST_PLUGINS)
+if(LITHIUM_BUILD_TEST_PLUGINS)
     add_subdirectory(tests/plugins)
 endif()

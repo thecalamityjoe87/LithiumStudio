@@ -9,7 +9,7 @@
 #include "engine/TempoMap.h"
 #include <cmath>
 
-namespace ikaros
+namespace lithium
 {
 
 /** How Quantize lines things up. */
@@ -121,4 +121,4 @@ namespace quantize
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

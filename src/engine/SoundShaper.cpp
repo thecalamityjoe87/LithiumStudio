@@ -2,7 +2,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 const char* SoundShaperPlugin::xmlTypeName = "ikarosSoundShaper";
@@ -276,4 +276,4 @@ void TransposePlugin::applyToBuffer (const te::PluginRenderContext& fc)
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -19,7 +19,7 @@
 // tracktion::engine, so tracktion::Edit and tracktion::engine::Edit both work.
 namespace tracktion { inline namespace engine { class Engine; class Edit; } }
 
-namespace ikaros
+namespace lithium
 {
 
 class TrackController;
@@ -45,7 +45,7 @@ struct LiveRecording;
 struct PluginWindowRequest
 {
     std::unique_ptr<juce::Component> content;
-    juce::String title;                                     // e.g. "Ikaros Test Gain - Lead"
+    juce::String title;                                     // e.g. "Lithium Studio Test Gain - Lead"
     juce::Point<int> position;                              // where to put the window's top-left
     std::function<void()> close;                            // call when the user closes the window
     std::function<void (juce::Rectangle<int>)> moved;       // call when the user moves it (remembered for next time)
@@ -92,7 +92,7 @@ public:
         Starting takes a moment. Normally the constructor does all of it. With
         startNow = false it does nothing, and the caller runs the stages one
         at a time (see below), which lets the app show what's loading. */
-    explicit AudioEngine (const juce::String& settingsName = "IkarosStudio", bool openAudioDevice = true,
+    explicit AudioEngine (const juce::String& settingsName = "LithiumStudio", bool openAudioDevice = true,
                           bool startNow = true);
     ~AudioEngine();
 
@@ -113,7 +113,7 @@ public:
 
     //==============================================================================
     // Sessions ("Sessions" in the UI). A saved session is one file, a
-    // .iksession bundle (see SessionBundle), holding the session and every
+    // .lisession bundle (see SessionBundle), holding the session and every
     // audio file it uses (recordings, imported files, loops), so it can be
     // moved, backed up, shared, and opened on Linux, Windows or macOS.
     // Instruments' samples aren't in it: they belong to the sound packs, and
@@ -125,6 +125,9 @@ public:
     // saving packs it back into the bundle.
     static constexpr const char* sessionFileExtension = SessionBundle::extension;
 
+    /** Bundles saved before the app was renamed (".iksession"). */
+    static constexpr const char* previousSessionFileExtension = SessionBundle::previousExtension;
+
     /** Sessions saved by earlier versions: a folder with a .tracktionedit file
         and an Audio folder. They still open; saving one writes a bundle next
         to its folder and leaves the folder as it was. */
@@ -133,7 +136,7 @@ public:
     /** Replaces the session with a new, untitled one built from a template. */
     void newSession (const NewSessionSettings& = {});
 
-    /** Opens a .iksession bundle, or a session folder from an earlier version.
+    /** Opens a .lisession (or .iksession) bundle, or a session folder from an earlier version.
         Returns false (and keeps the current session) if it can't be read. */
     bool openSession (const juce::File&);
 
@@ -166,7 +169,7 @@ public:
     bool saveSession();                         // returns false if the session is untitled
     bool saveSessionAs (const juce::File&);
 
-    /** Where a session saved as "Dir/My Song" goes: "Dir/My Song.iksession". */
+    /** Where a session saved as "Dir/My Song" goes: "Dir/My Song.lisession". */
     static juce::File getSessionFileFor (const juce::File& chosenFile);
 
     /** Where the session chooser's picture of the session goes before saving
@@ -174,7 +177,7 @@ public:
     juce::File getPreviewFile() const;
 
     /** Where the file dialogs for sessions start: the folder chosen in the
-        Preferences, or else Documents/Ikaros Studio. Made if it's missing. */
+        Preferences, or else Documents/Lithium Studio. Made if it's missing. */
     juce::File getSessionFolder() const;
     static juce::File getStandardSessionFolder();
 
@@ -371,7 +374,7 @@ public:
     StereoLevel getMasterLevel();
     SystemStats getSystemStats();   // not const: its peak is "since the last call"
 
-    /** The debug performance monitor, or nullptr unless IKAROS_PERF=1 (see PerfMonitor). */
+    /** The debug performance monitor, or nullptr unless LITHIUM_PERF=1 (see PerfMonitor). */
     PerfMonitor* getPerfMonitor() const noexcept;
 
     /** After a take ends: why it stopped, whether the input clipped, and how
@@ -561,4 +564,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioEngine)
 };
 
-} // namespace ikaros
+} // namespace lithium

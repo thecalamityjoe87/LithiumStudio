@@ -39,7 +39,7 @@
 namespace te = tracktion;   // the conventional short alias used in Tracktion's own examples
 using namespace std::literals;
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -64,7 +64,7 @@ namespace
 //==============================================================================
 // EngineBehaviour lets an app customise Tracktion's defaults by overriding
 // virtual functions.
-struct IkarosEngineBehaviour  : public te::EngineBehaviour
+struct LithiumEngineBehaviour  : public te::EngineBehaviour
 {
     bool shouldOpenAudioInputByDefault() override   { return true; }
 
@@ -81,13 +81,13 @@ struct IkarosEngineBehaviour  : public te::EngineBehaviour
     // battery) for a few percent more. The worker is made real-time and kept on the
     // fast cores like the audio thread (RealtimeAudioThread); at ordinary
     // priority a busy desktop kept it waiting, and the audio thread with it,
-    // which is why Ikaros rendered on one thread from October 2026 until then.
+    // which is why Lithium Studio rendered on one thread from October 2026 until then.
     int getNumberOfCPUsToUseForAudio() override
     {
-        // The performance monitor can try other counts (IKAROS_PERF_AUDIO_THREADS=N)
+        // The performance monitor can try other counts (LITHIUM_PERF_AUDIO_THREADS=N)
         // to compare one thread with several on the same session.
         if (PerfMonitor::isEnabled())
-            if (auto n = juce::SystemStats::getEnvironmentVariable ("IKAROS_PERF_AUDIO_THREADS", {}).getIntValue(); n > 0)
+            if (auto n = juce::SystemStats::getEnvironmentVariable ("LITHIUM_PERF_AUDIO_THREADS", {}).getIntValue(); n > 0)
                 return n;
 
         return 2;
@@ -195,7 +195,7 @@ struct PluginEditorHolder  : public juce::Component
 
 // UIBehaviour is how Tracktion asks the app for UI. We only supply plug-in
 // windows, and pass the framing on to the UI layer's factory.
-struct IkarosUIBehaviour  : public te::UIBehaviour
+struct LithiumUIBehaviour  : public te::UIBehaviour
 {
     PluginWindowFactory factory;
 
@@ -272,12 +272,12 @@ struct AudioEngine::Impl  : private juce::ValueTree::Listener,
 {
     Impl (AudioEngine& o, const juce::String& settingsName, bool openAudioDevice)
         : owner (o),
-          engine (settingsName, std::make_unique<IkarosUIBehaviour>(), std::make_unique<IkarosEngineBehaviour>())
+          engine (settingsName, std::make_unique<LithiumUIBehaviour>(), std::make_unique<LithiumEngineBehaviour>())
     {
         // Before any Edit starts its render workers, so none is missed. The
         // performance monitor can leave them at ordinary priority
-        // (IKAROS_PERF_WORKERS_RT=0) to compare.
-        if (! (PerfMonitor::isEnabled() && juce::SystemStats::getEnvironmentVariable ("IKAROS_PERF_WORKERS_RT", {}) == "0"))
+        // (LITHIUM_PERF_WORKERS_RT=0) to compare.
+        if (! (PerfMonitor::isEnabled() && juce::SystemStats::getEnvironmentVariable ("LITHIUM_PERF_WORKERS_RT", {}) == "0"))
             RealtimeAudioThread::trackRenderThreads();
 
         // 2 inputs, 2 outputs by default. (Tracktion's default of "every
@@ -334,7 +334,7 @@ struct AudioEngine::Impl  : private juce::ValueTree::Listener,
         engine.getPluginManager().createBuiltInType<AmpPlugin>();
 
         // The Engine owns the behaviour we gave it, so this cast always works.
-        auto& behaviour = dynamic_cast<IkarosEngineBehaviour&> (engine.getEngineBehaviour());
+        auto& behaviour = dynamic_cast<LithiumEngineBehaviour&> (engine.getEngineBehaviour());
         behaviour.getRecordingFolder = [this]
         {
             return getAudioFolder();
@@ -427,7 +427,7 @@ struct AudioEngine::Impl  : private juce::ValueTree::Listener,
     // Declared after `engine`, so it's destroyed (and leaves the device) first.
     std::unique_ptr<RealtimeAudioThread> realtimeThread;
 
-    // Only with IKAROS_PERF=1 (see PerfMonitor). Also after `engine`.
+    // Only with LITHIUM_PERF=1 (see PerfMonitor). Also after `engine`.
     std::unique_ptr<PerfMonitor> perfMonitor;
 
     // The toolbar's busiest block and xruns (see AudioLoadMeter). After `engine` too.
@@ -1096,7 +1096,7 @@ AudioEngine::~AudioEngine()
 void AudioEngine::setPluginWindowFactory (PluginWindowFactory factory)
 {
     // The UIBehaviour we gave the Engine is ours, so this cast always works.
-    dynamic_cast<IkarosUIBehaviour&> (impl->engine.getUIBehaviour()).factory = std::move (factory);
+    dynamic_cast<LithiumUIBehaviour&> (impl->engine.getUIBehaviour()).factory = std::move (factory);
 }
 
 bool AudioEngine::runPluginScanWorkerIfRequested (const juce::String& commandLine)
@@ -1308,7 +1308,7 @@ bool AudioEngine::openSession (const juce::File& file)
     else
     {
         // An older session ("My Song/My Song.tracktionedit") is saved as a
-        // bundle next to its folder ("My Song.iksession"), unless one is
+        // bundle next to its folder ("My Song.lisession"), unless one is
         // already there: then Save asks where.
         auto folder = file.getParentDirectory();
         auto bundle = folder.getFileName() == file.getFileNameWithoutExtension()
@@ -1453,10 +1453,10 @@ bool AudioEngine::saveSessionAs (const juce::File& file)
 
 juce::File AudioEngine::getSessionFileFor (const juce::File& chosenFile)
 {
-    if (chosenFile.hasFileExtension (sessionFileExtension))
+    if (chosenFile.hasFileExtension (sessionFileExtension) || chosenFile.hasFileExtension (previousSessionFileExtension))
         return chosenFile;
 
-    // "My Song" or "My Song.tracktionedit" -> "My Song.iksession". (Not
+    // "My Song" or "My Song.tracktionedit" -> "My Song.lisession". (Not
     // withFileExtension on its own: "Take 2.1" would lose its ".1".)
     if (chosenFile.hasFileExtension (legacySessionFileExtension))
         return chosenFile.withFileExtension (sessionFileExtension);
@@ -1484,7 +1484,7 @@ void AudioEngine::setAppSetting (const juce::String& name, const juce::var& valu
 
 juce::File AudioEngine::getStandardSessionFolder()
 {
-    return juce::File::getSpecialLocation (juce::File::userDocumentsDirectory).getChildFile ("Ikaros Studio");
+    return juce::File::getSpecialLocation (juce::File::userDocumentsDirectory).getChildFile ("Lithium Studio");
 }
 
 juce::File AudioEngine::getSessionFolder() const
@@ -1726,8 +1726,8 @@ std::unique_ptr<AudioEngine::SaveJob> AudioEngine::beginSave (const juce::File& 
 
     auto info = new juce::DynamicObject();
     info->setProperty ("format", 1);
-    info->setProperty ("app", "Ikaros Studio");
-    info->setProperty ("appVersion", IKAROS_VERSION);
+    info->setProperty ("app", "Lithium Studio");
+    info->setProperty ("appVersion", LITHIUM_VERSION);
     info->setProperty ("saved", juce::Time::getCurrentTime().toISO8601 (true));
     info->setProperty ("packs", packsUsed);
     job->info = juce::var (info);
@@ -2703,7 +2703,7 @@ TransportState AudioEngine::getTransportState() const
 juce::String AudioEngine::getKeyName() const
 {
     auto state = getTransportState();
-    return ikaros::getKeyName (state.keyRoot, state.keyMinor);
+    return lithium::getKeyName (state.keyRoot, state.keyMinor);
 }
 
 //==============================================================================
@@ -2784,7 +2784,7 @@ SystemStats AudioEngine::getSystemStats()
 
     if (auto* meter = impl->loadMeter.get())
     {
-        // With IKAROS_PERF, PerfMonitor times the blocks (see AudioLoadMeter's constructor).
+        // With LITHIUM_PERF, PerfMonitor times the blocks (see AudioLoadMeter's constructor).
         s.peakPercent = impl->perfMonitor != nullptr ? (float) impl->perfMonitor->getSnapshot().callback.maxPercent
                                                      : meter->takePeak() * 100.0f;
         s.xruns = meter->getXruns();
@@ -2896,4 +2896,4 @@ std::unique_ptr<juce::Component> AudioEngine::createAudioSettingsComponent()
     return comp;
 }
 
-} // namespace ikaros
+} // namespace lithium

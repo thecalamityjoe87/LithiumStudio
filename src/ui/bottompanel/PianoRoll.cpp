@@ -5,7 +5,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -179,10 +179,10 @@ juce::Rectangle<float> PianoRoll::noteBounds (const NoteInfo& n) const
 // Grid
 double PianoRoll::gridBeats() const
 {
-    // ikaros:: picks EditorGrid.h's gridBeats rather than this member function.
+    // lithium:: picks EditorGrid.h's gridBeats rather than this member function.
     // As a step (a new note's length, say), the grid is measured in the bar
     // the region starts in (bars and beats can differ from bar to bar).
-    return ikaros::gridBeats (grid, tempo, region.has_value() ? contentStartBeat() : 0.0);
+    return lithium::gridBeats (grid, tempo, region.has_value() ? contentStartBeat() : 0.0);
 }
 
 void PianoRoll::setGrid (EditorGrid newGrid)
@@ -530,4 +530,4 @@ void PianoRoll::resized()
     clampView();
 }
 
-} // namespace ikaros
+} // namespace lithium

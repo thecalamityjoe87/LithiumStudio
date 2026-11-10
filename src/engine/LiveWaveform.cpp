@@ -1,6 +1,6 @@
 #include "engine/LiveWaveform.h"
 
-namespace ikaros
+namespace lithium
 {
 
 LiveWaveform::LiveWaveform (juce::AudioDeviceManager& dm)
@@ -161,4 +161,4 @@ void LiveWaveform::pushInput (const float* const* inputs, int numInputs, int num
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

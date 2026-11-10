@@ -4,7 +4,7 @@
 #include "ui/theme/Family.h"
 #include "ui/widgets/IconButton.h"
 
-namespace ikaros
+namespace lithium
 {
 
 class AudioEngine;
@@ -83,4 +83,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuneControls)
 };
 
-} // namespace ikaros
+} // namespace lithium

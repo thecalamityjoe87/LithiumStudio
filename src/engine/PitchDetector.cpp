@@ -1,7 +1,7 @@
 #include "engine/PitchDetector.h"
 #include <cmath>
 
-namespace ikaros
+namespace lithium
 {
 
 void PitchDetector::prepare (double newSampleRate)
@@ -145,4 +145,4 @@ juce::String NotePitch::getNoteName() const
     return names[((midiNote % 12) + 12) % 12];
 }
 
-} // namespace ikaros
+} // namespace lithium

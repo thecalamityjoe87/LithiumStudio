@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace ikaros::pitchanalysis
+namespace lithium::pitchanalysis
 {
 
 namespace
@@ -439,7 +439,7 @@ void findNotes (PitchAnalysis& a)
 // The cache
 namespace
 {
-    constexpr juce::uint32 cacheMagic = 0x4b50414b;   // "KAPK" little-endian: Ikaros pitch analysis
+    constexpr juce::uint32 cacheMagic = 0x4b50414b;   // "KAPK" little-endian: Lithium Studio pitch analysis
     constexpr int cacheVersion = 1;
 
     // FNV-1a, 64-bit: a quick, stable hash (the same on every system).
@@ -576,4 +576,4 @@ std::optional<PitchAnalysis> readCache (const juce::File& file, juce::uint64 fin
     return a;
 }
 
-} // namespace ikaros::pitchanalysis
+} // namespace lithium::pitchanalysis

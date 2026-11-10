@@ -7,13 +7,13 @@
 
 namespace tracktion { inline namespace engine { class Engine; class Edit; } }
 
-namespace ikaros
+namespace lithium
 {
 
 /*  Debug-only performance monitoring (see docs/perf-report.md).
 
-    Off unless the app is started with IKAROS_PERF=1 (and compiled out
-    entirely when CMake's IKAROS_PERF_TOOLS is OFF). When it's on:
+    Off unless the app is started with LITHIUM_PERF=1 (and compiled out
+    entirely when CMake's LITHIUM_PERF_TOOLS is OFF). When it's on:
 
       - every audio callback is timed, start to end, including all of JUCE's
         callbacks (Tracktion's render, the tuner, the live waveform...), the
@@ -22,20 +22,20 @@ namespace ikaros
         second, counts callbacks that took longer than the buffer lasts
         ("over budget", an xrun or near enough), and adds Tracktion's own
         figures, each plug-in's share, each thread's CPU and the memory used;
-      - a line per second goes to a CSV file (IKAROS_PERF_CSV, or
-        ~/ikaros-perf/perf-<time>.csv), so runs can be compared.
+      - a line per second goes to a CSV file (LITHIUM_PERF_CSV, or
+        ~/lithium-perf/perf-<time>.csv), so runs can be compared.
 
     The audio thread never logs, allocates or locks here: it writes one small
     record per callback into a lock-free FIFO that the message thread empties.
 
-    IKAROS_PERF_BURN=<percent> (or a number in the file IKAROS_PERF_BURN_FILE,
+    LITHIUM_PERF_BURN=<percent> (or a number in the file LITHIUM_PERF_BURN_FILE,
     re-read every second) adds that much busy work to every callback, to
     overload the audio thread on purpose and check the app survives it.
 */
 class PerfMonitor  : private juce::Timer
 {
 public:
-    /** True if IKAROS_PERF=1 was set (read once). Always false when compiled out. */
+    /** True if LITHIUM_PERF=1 was set (read once). Always false when compiled out. */
     static bool isEnabled();
 
     /** Call before Tracktion's DeviceManager::initialise (see the .cpp for why). */
@@ -243,4 +243,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PerfMonitor)
 };
 
-} // namespace ikaros
+} // namespace lithium

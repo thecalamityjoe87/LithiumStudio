@@ -2,9 +2,9 @@
 #include "ui/widgets/PaintProbe.h"
 #include "ui/arrangement/ArrangementLayout.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -40,7 +40,7 @@ ArrangementView::TempoLane::TempoLane (ArrangementView& o) : owner (o)
     tempoField.setJustification (juce::Justification::centred);
     tempoField.setInputRestrictions (5, "0123456789.");
     tempoField.setTitle ("Tempo in BPM");
-    IkarosLookAndFeel::styleInlineEditor (tempoField);
+    LithiumLookAndFeel::styleInlineEditor (tempoField);
     tempoField.onReturnKey = [this] { commitTempoField(); };
     tempoField.onEscapeKey = [this] { hideTempoField(); };
     tempoField.onFocusLost = [this] { commitTempoField(); };
@@ -131,7 +131,7 @@ ArrangementView::TempoLane::Hit ArrangementView::TempoLane::findHit (juce::Point
 //==============================================================================
 void ArrangementView::TempoLane::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("ArrangementView::TempoLane");
+    LITHIUM_PERF_PAINT ("ArrangementView::TempoLane");
     auto r = getLocalBounds();
     g.fillAll (theme().rulerBg);
     g.setColour (theme().divider);
@@ -141,7 +141,7 @@ void ArrangementView::TempoLane::paint (juce::Graphics& g)
     g.setColour (theme().divider);
     g.fillRect (label.removeFromRight (1));
     g.setColour (theme().textSecondary);
-    g.setFont (fonts::ui (textSize::xs).withExtraKerningFactor (0.1f));
+    g.setFont (fonts::caption (textSize::sm).withExtraKerningFactor (0.1f));
     g.drawText ("TEMPO", label.withTrimmedLeft (12), juce::Justification::centredLeft);
 
     // Everything below scrolls with the timeline; keep it out of the header part.
@@ -502,4 +502,4 @@ void ArrangementView::TempoLane::hideTempoField()
         grabKeyboardFocus();
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -4,9 +4,9 @@
 #include "engine/AmpStyles.h"
 #include <array>
 
-struct PluginLV2;   // a Guitarix DSP (see external/guitarix/ikaros/GuitarixAmp.h)
+struct PluginLV2;   // a Guitarix DSP (see external/guitarix/lithium/GuitarixAmp.h)
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -143,4 +143,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmpPlugin)
 };
 
-} // namespace ikaros
+} // namespace lithium

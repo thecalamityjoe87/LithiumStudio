@@ -4,7 +4,7 @@
 #include <optional>
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 /** What a mapped controller knob, fader or button does in the app. The
@@ -120,7 +120,7 @@ struct ControllerEvent
     reaches the track's instrument) and queued for the app.
 
     No Tracktion: the engine hands it every message from a MIDI input
-    (see IkarosEngineBehaviour::interceptMidiInputMessage), and the app
+    (see LithiumEngineBehaviour::interceptMidiInputMessage), and the app
     collects the events on its timer (see SurfaceHandler). */
 class ControllerMap
 {
@@ -145,4 +145,4 @@ private:
     std::vector<ControllerEvent> events;
 };
 
-} // namespace ikaros
+} // namespace lithium

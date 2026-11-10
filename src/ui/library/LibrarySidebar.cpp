@@ -7,11 +7,11 @@
 #include "ui/library/PreviewButton.h"
 #include "ui/state/DragTypes.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 #include "ui/theme/TrackColours.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -102,7 +102,7 @@ public:
         g.drawFittedText (label, labelArea, juce::Justification::centred, 1, 0.85f);
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, r, size::radius);
+            LithiumLookAndFeel::drawFocusRing (g, r, size::radius);
     }
 
     const juce::String name;
@@ -134,7 +134,7 @@ public:
         g.drawText (getButtonText(), getLocalBounds(), juce::Justification::centredLeft, false);
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat(), size::radiusXs);
+            LithiumLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat(), size::radiusXs);
     }
 };
 
@@ -225,7 +225,7 @@ public:
         if (item.kind == Item::Kind::label)
         {
             g.setColour (theme().textSecondary);
-            g.setFont (fonts::uiBold (textSize::xs).withExtraKerningFactor (0.1f));
+            g.setFont (fonts::caption (textSize::sm).withExtraKerningFactor (0.1f));
             g.drawText (item.name.toUpperCase(), getLocalBounds().withTrimmedLeft (size::libraryRowInset).withTrimmedTop (8),
                         juce::Justification::centredLeft);
             return;
@@ -260,9 +260,9 @@ public:
                 break;
         }
 
-        // On the right: the preview or download button (when there is one),
-        // then the type tag, the "On track" chip or the pack's size.
-        if ((previewButton != nullptr && previewButton->isVisible()) || item.kind == Item::Kind::pack)
+        // On the right: the preview button (when there is one), then the type
+        // tag, the "On track" chip or a pack's download size.
+        if (previewButton != nullptr && previewButton->isVisible())
             content.setRight (getRoundButtonArea().getX() - 8);
 
         if (item.kind == Item::Kind::pack)
@@ -277,7 +277,7 @@ public:
         g.drawText (item.name, content.withTrimmedRight (6), juce::Justification::centredLeft, true);
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, r, size::radius);
+            LithiumLookAndFeel::drawFocusRing (g, r, size::radius);
     }
 
     void mouseDown (const juce::MouseEvent& e) override
@@ -322,7 +322,7 @@ private:
 
     juce::Rectangle<int> getRoundButtonArea() const
     {
-        return PreviewButton::getBoundsIn (getLocalBounds());   // a pack's download button goes in the same place
+        return PreviewButton::getBoundsIn (getLocalBounds());
     }
 
     // Right-aligned small text: "Sampled", "Synth", a plug-in's maker, a file's size.
@@ -351,39 +351,33 @@ private:
         g.drawText (text, chip, juce::Justification::centred, false);
     }
 
-    // A pack that isn't installed: its size and a round download button, or
-    // its progress while it downloads.
+    // A pack that isn't installed, as Lithium Drums lists them: a down arrow
+    // and its download size at the right edge, muted (the whole row is the
+    // button); while it downloads, its progress in the accent colour.
     void paintPackStatus (juce::Graphics& g, juce::Rectangle<int>& content) const
     {
         const auto pack = owner.engine.getPackStore().findPack (item.id);
         const auto state = pack.has_value() ? pack->state : StorePack::State::notInstalled;
         const bool busy = state == StorePack::State::downloading || state == StorePack::State::installing;
 
-        const auto status = state == StorePack::State::downloading ? juce::String (juce::roundToInt (pack->progress * 100.0f)) + "%"
-                          : state == StorePack::State::installing  ? juce::String ("Installing...")
-                                                                   : item.detail;
-        paintTag (g, content, status);
+        const auto text = state == StorePack::State::downloading ? juce::String (juce::roundToInt (pack->progress * 100.0f)) + "%"
+                        : state == StorePack::State::installing  ? juce::String ("Installing...")
+                                                                 : item.detail;
+        const auto sizeFont = fonts::mono (textSize::xs);
+        g.setColour (busy ? theme().accent : theme().textSecondary);
+        g.setFont (sizeFont);
+        g.drawText (text, content.removeFromRight (textWidth (sizeFont, text) + 1), juce::Justification::centredRight, false);
 
-        auto button = getRoundButtonArea().toFloat();
-        g.setColour (theme().buttonFill.brighter (isMouseOver() && ! busy ? 0.1f : 0.0f));
-        g.fillEllipse (button);
-        g.setColour (theme().buttonBorder);
-        g.drawEllipse (button.reduced (0.5f), 1.0f);
+        if (! busy)
+        {
+            const juce::String arrow (juce::CharPointer_UTF8 ("\xe2\x86\x93"));   // a down arrow
+            const auto arrowFont = fonts::mono (textSize::sm);
+            content.removeFromRight (3);
+            g.setFont (arrowFont);
+            g.drawText (arrow, content.removeFromRight (textWidth (arrowFont, arrow) + 1), juce::Justification::centredRight, false);
+        }
 
-        if (busy)
-        {
-            // A progress ring around the button.
-            juce::Path arc;
-            const auto progress = state == StorePack::State::installing ? 1.0f : pack->progress;
-            arc.addCentredArc (button.getCentreX(), button.getCentreY(), button.getWidth() / 2.0f - 1.0f, button.getHeight() / 2.0f - 1.0f,
-                               0.0f, 0.0f, juce::MathConstants<float>::twoPi * juce::jlimit (0.02f, 1.0f, progress), true);
-            g.setColour (theme().text);
-            g.strokePath (arc, juce::PathStrokeType (2.0f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
-        }
-        else
-        {
-            icons::draw (g, Icon::download, button, theme().textSecondary, 13.0f);
-        }
+        content.removeFromRight (8);
     }
 };
 
@@ -1032,7 +1026,7 @@ void LibrarySidebar::chooseFolder()
 //==============================================================================
 void LibrarySidebar::paintOverChildren (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("LibrarySidebar::paintOverChildren");
+    LITHIUM_PERF_PAINT ("LibrarySidebar::paintOverChildren");
     if (loopBrowser.isVisible())
         return;
 
@@ -1045,7 +1039,7 @@ void LibrarySidebar::paintOverChildren (juce::Graphics& g)
 
 void LibrarySidebar::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("LibrarySidebar");
+    LITHIUM_PERF_PAINT ("LibrarySidebar");
     g.fillAll (theme().librarySidebarBg);
     g.setColour (theme().divider);
     g.fillRect (getLocalBounds().removeFromRight (1));
@@ -1174,4 +1168,4 @@ void LibrarySidebar::resized()
     crumbArea.setRight (listViewport.getX() + listViewport.getMaximumVisibleWidth() - size::libraryRowInset);
 }
 
-} // namespace ikaros
+} // namespace lithium

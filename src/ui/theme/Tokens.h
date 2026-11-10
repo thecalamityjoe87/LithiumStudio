@@ -11,11 +11,11 @@
 
 #include "ui/theme/Theme.h"
 
-namespace ikaros::tokens
+namespace lithium::tokens
 {
 
 // ------------------------------------------------------------------ text sizes (px)
-// Pass these to the ikaros::fonts functions, e.g. fonts::ui (textSize::md).
+// Pass these to the lithium::fonts functions, e.g. fonts::ui (textSize::md).
 // 11px is the smallest size for UI text; only the transport readout's caption
 // labels (BAR · BEAT, BPM, TIME, KEY) may go below it.
 namespace textSize
@@ -67,10 +67,10 @@ namespace size
     inline constexpr float radiusXs        = 4.0f;
     inline constexpr float radiusSmall     = 5.0f;
     inline constexpr float radiusMedium    = 6.0f;   // track icon tiles
-    inline constexpr float radius          = 8.0f;
-    inline constexpr float radiusLarge     = 10.0f;
-    inline constexpr float radiusCard      = 12.0f;
-    inline constexpr float radiusPill      = 14.0f;
+    inline constexpr float radius          = 6.0f;   // Lithium's corner (buttons, fields, cards)
+    inline constexpr float radiusLarge     = 8.0f;
+    inline constexpr float radiusCard      = 8.0f;
+    inline constexpr float radiusPill      = 8.0f;
 }
 
-} // namespace ikaros::tokens
+} // namespace lithium::tokens

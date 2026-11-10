@@ -1,6 +1,6 @@
 #pragma once
 
-namespace ikaros::platform
+namespace lithium::platform
 {
 
 /*  Lets files be dragged in from apps running natively under Wayland (e.g.
@@ -19,4 +19,4 @@ namespace ikaros::platform
 */
 void enableDropsFromWaylandApps();
 
-} // namespace ikaros::platform
+} // namespace lithium::platform

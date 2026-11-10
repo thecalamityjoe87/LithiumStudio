@@ -4,7 +4,7 @@
 
 #include "ui/arrangement/ArrangementView.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -55,4 +55,4 @@ private:
     void setTrackInfo (const TrackInfo&, bool isSelected);
 };
 
-} // namespace ikaros
+} // namespace lithium

@@ -2,7 +2,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -261,4 +261,4 @@ void AlertDialog::paint (juce::Graphics& g)
     message.draw (g, messageArea.toFloat());
 }
 
-} // namespace ikaros
+} // namespace lithium

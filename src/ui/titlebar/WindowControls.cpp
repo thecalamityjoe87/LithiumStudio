@@ -1,38 +1,91 @@
 #include "ui/titlebar/WindowControls.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
 
-WindowControls::WindowControls()
+namespace
 {
-    // Functions the buttons call when they paint (see IconButton::ColourScheme).
-    auto normal = []
-    {
-        IconButton::Colours c { juce::Colours::transparentBlack, theme().textMenu,
-                                juce::Colours::transparentBlack, theme().textMenu };
-        c.hoverBackground = theme().raised;
-        c.hoverForeground = theme().text;
-        return c;
-    };
+    // The glyphs, in a unit square, as JUCE's LookAndFeel_V4 makes them.
+    constexpr float strokeThickness = 0.14f;
 
-    auto close = [normal]
+    juce::Path minimiseShape()
     {
-        auto c = normal();
-        c.hoverBackground = theme().record.darker (0.15f);
-        c.hoverForeground = theme().textOnColour;
-        return c;
-    };
-
-    for (auto* b : { &minimiseButton, &maximiseButton, &closeButton })
-    {
-        b->setColours (b == &closeButton ? IconButton::ColourScheme (close) : IconButton::ColourScheme (normal));
-        b->setCornerRadius (0.0f);
-        b->setIconSize (16.0f);
-        addAndMakeVisible (b);
+        juce::Path p;
+        p.addLineSegment ({ 0.0f, 0.5f, 1.0f, 0.5f }, strokeThickness);
+        return p;
     }
+
+    juce::Path maximiseShape()
+    {
+        juce::Path p;
+        p.addLineSegment ({ 0.5f, 0.0f, 0.5f, 1.0f }, strokeThickness);
+        p.addLineSegment ({ 0.0f, 0.5f, 1.0f, 0.5f }, strokeThickness);
+        return p;
+    }
+
+    // Shown while the window is maximised: two overlapping corners.
+    juce::Path restoreShape()
+    {
+        juce::Path outline;
+        outline.startNewSubPath (45.0f, 100.0f);
+        outline.lineTo (0.0f, 100.0f);
+        outline.lineTo (0.0f, 0.0f);
+        outline.lineTo (100.0f, 0.0f);
+        outline.lineTo (100.0f, 45.0f);
+        outline.addRectangle (45.0f, 45.0f, 100.0f, 100.0f);
+
+        juce::Path p;
+        juce::PathStrokeType (30.0f).createStrokedPath (p, outline);
+        return p;
+    }
+
+    juce::Path closeShape()
+    {
+        juce::Path p;
+        p.addLineSegment ({ 0.0f, 0.0f, 1.0f, 1.0f }, strokeThickness);
+        p.addLineSegment ({ 1.0f, 0.0f, 0.0f, 1.0f }, strokeThickness);
+        return p;
+    }
+}
+
+WindowControls::WindowButton::WindowButton (const juce::String& name, juce::Colour c, juce::Path normal, juce::Path toggled)
+    : juce::Button (name), colour (c), normalShape (std::move (normal)), toggledShape (std::move (toggled))
+{
+    setTitle (name);
+    setTooltip (name);
+}
+
+void WindowControls::WindowButton::paintButton (juce::Graphics& g, bool highlighted, bool down)
+{
+    const auto glyphColour = down ? colour.withAlpha (0.6f) : colour;
+
+    if (highlighted || down)
+    {
+        g.fillAll (glyphColour);
+        g.setColour (theme().titleBarBg);
+    }
+    else
+    {
+        g.setColour (glyphColour);
+    }
+
+    // The glyph: a third of the button's height, in the middle.
+    const auto& shape = getToggleState() ? toggledShape : normalShape;
+    const auto h = (float) getHeight();
+    const auto area = getLocalBounds().toFloat().withSizeKeepingCentre (h, h).reduced (h / 3.0f);
+    g.fillPath (shape, shape.getTransformToScaleToFit (area, true));
+}
+
+WindowControls::WindowControls()
+    : minimiseButton ("Minimize", juce::Colour (0xffaa8811), minimiseShape(), minimiseShape()),
+      maximiseButton ("Maximize", juce::Colour (0xff0a830a), maximiseShape(), restoreShape()),
+      closeButton    ("Close",    juce::Colour (0xff9a131d), closeShape(), closeShape())
+{
+    for (auto* b : { &minimiseButton, &maximiseButton, &closeButton })
+        addAndMakeVisible (b);
 
     // The DocumentWindow already knows how to do each of these; we just call
     // the same methods its built-in title-bar buttons would.
@@ -62,7 +115,7 @@ void WindowControls::update()
     if (maximised != showingRestore)
     {
         showingRestore = maximised;
-        maximiseButton.setIcon (maximised ? Icon::windowRestore : Icon::windowMaximise);
+        maximiseButton.setToggleState (maximised, juce::dontSendNotification);
         maximiseButton.setTitle (maximised ? "Restore" : "Maximize");
         maximiseButton.setTooltip (maximised ? "Restore" : "Maximize");
     }
@@ -86,4 +139,4 @@ void WindowControls::resized()
     closeButton.setBounds (r.removeFromLeft (buttonWidth));
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -2,7 +2,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -74,4 +74,4 @@ void AudioSettingsPanel::resized()
     selector->setBounds (r);
 }
 
-} // namespace ikaros
+} // namespace lithium

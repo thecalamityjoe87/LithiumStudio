@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Markdown tables from tools/perf/run_matrix.sh results (for docs/perf-report.md).
 
-    python3 tools/perf/summarize.py ~/ikaros-perf/runs/matrix [more run folders...]
-    python3 tools/perf/summarize.py --plugins ~/ikaros-perf/runs/features/effect-each.plugins.csv
-    python3 tools/perf/summarize.py --threads ~/ikaros-perf/runs/threads [more run folders...]
+    python3 tools/perf/summarize.py ~/lithium-perf/runs/matrix [more run folders...]
+    python3 tools/perf/summarize.py --plugins ~/lithium-perf/runs/features/effect-each.plugins.csv
+    python3 tools/perf/summarize.py --threads ~/lithium-perf/runs/threads [more run folders...]
 
 The first form prints one row per run from each folder's summary.csv; the
 second, each plug-in's average and peak share of the audio thread from a

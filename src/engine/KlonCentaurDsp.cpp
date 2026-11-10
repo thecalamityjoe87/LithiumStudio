@@ -40,7 +40,7 @@ static std::complex<double> wrightomega (std::complex<double> z)
 
 #include "engine/KlonCentaurDsp.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -231,4 +231,4 @@ void KlonCentaurDsp::process (float* const* channels, int numChannels, int numSa
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -2,7 +2,7 @@
 #include "ui/widgets/PaintProbe.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -49,33 +49,47 @@ void LevelMeter::reset()
 
 void LevelMeter::paintBar (juce::Graphics& g, juce::Rectangle<float> r, float value, Orientation orientation, juce::Colour unlit)
 {
-    const float radius = juce::jmin (r.getWidth(), r.getHeight()) * 0.5f;
-    g.setColour (unlit);
-    g.fillRoundedRectangle (r, radius);
-
-    if (value <= 0.001f)
-        return;
-
-    // Green → yellow → red, laid along the bar's length.
+    // As Lithium Drums' meters: the accent up to -6 dB, yellow up to 0 dB,
+    // red above, in solid zones, with a line marking 0 dB.
     const bool horiz = orientation == Orientation::horizontal;
-    juce::ColourGradient grad (theme().meterGreen,
-                               horiz ? r.getX() : r.getCentreX(), horiz ? r.getCentreY() : r.getBottom(),
-                               theme().meterRed,
-                               horiz ? r.getRight() : r.getCentreX(), horiz ? r.getCentreY() : r.getY(),
-                               false);
-    grad.addColour (0.7, theme().meterGreen);
-    grad.addColour (0.88, theme().meterYellow);
+    g.setColour (unlit);
+    g.fillRoundedRectangle (r, 2.0f);
 
-    auto filled = horiz ? r.withWidth (r.getWidth() * value)
-                        : r.withTop (r.getBottom() - r.getHeight() * value);
+    // The part of the bar from proportion a to b (0 = silent end).
+    auto span = [&] (float a, float b)
+    {
+        return horiz ? juce::Rectangle<float> (r.getX() + r.getWidth() * a, r.getY(), r.getWidth() * (b - a), r.getHeight())
+                     : juce::Rectangle<float> (r.getX(), r.getBottom() - r.getHeight() * b, r.getWidth(), r.getHeight() * (b - a));
+    };
 
-    g.setGradientFill (grad);
-    g.fillRoundedRectangle (filled, radius);
+    const auto p6 = dbToProportion (-6.0f), p0 = dbToProportion (0.0f);
+
+    if (value > 0.001f)
+    {
+        g.setColour (theme().accent.withMultipliedAlpha (0.85f));
+        g.fillRect (span (0.0f, juce::jmin (value, p6)));
+
+        if (value > p6)
+        {
+            g.setColour (theme().meterYellow);
+            g.fillRect (span (p6, juce::jmin (value, p0)));
+        }
+
+        if (value > p0)
+        {
+            g.setColour (theme().meterRed);
+            g.fillRect (span (p0, value));
+        }
+    }
+
+    g.setColour (theme().borderSoft.withMultipliedAlpha (0.8f));
+    g.fillRect (horiz ? juce::Rectangle<float> (r.getX() + r.getWidth() * p0, r.getY(), 1.0f, r.getHeight())
+                      : juce::Rectangle<float> (r.getX(), r.getBottom() - r.getHeight() * p0, r.getWidth(), 1.0f));
 }
 
 void LevelMeter::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("LevelMeter");
+    LITHIUM_PERF_PAINT ("LevelMeter");
     auto r = getLocalBounds().toFloat();
 
     if (orientation == Orientation::horizontal)
@@ -87,12 +101,13 @@ void LevelMeter::paint (juce::Graphics& g)
     }
     else
     {
-        auto w = juce::jmin (8.0f, (r.getWidth() - 5.0f) / 2.0f);
-        auto bars = r.withSizeKeepingCentre (w * 2.0f + 5.0f, r.getHeight());
-        paintBar (g, bars.removeFromLeft (w), left, orientation, theme().controlFill);
-        bars.removeFromLeft (5.0f);
-        paintBar (g, bars.removeFromLeft (w), right, orientation, theme().controlFill);
+        // Lithium Drums' channel meter: two 6px bars, 2px apart, on the well colour.
+        constexpr float w = 6.0f, gap = 2.0f;
+        auto bars = r.withSizeKeepingCentre (w * 2.0f + gap, r.getHeight());
+        paintBar (g, bars.removeFromLeft (w), left, orientation, theme().wellBg);
+        bars.removeFromLeft (gap);
+        paintBar (g, bars.removeFromLeft (w), right, orientation, theme().wellBg);
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

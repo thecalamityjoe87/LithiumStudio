@@ -1,8 +1,8 @@
 #include "ui/theme/ThemeManager.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Theme.h"
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -26,7 +26,7 @@ namespace
     }
 }
 
-ThemeManager::ThemeManager (Preferences& p, IkarosLookAndFeel& lf)
+ThemeManager::ThemeManager (Preferences& p, LithiumLookAndFeel& lf)
     : preferences (p), lookAndFeel (lf)
 {
     preferences.addListener (this);
@@ -85,4 +85,4 @@ void ThemeManager::update()
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

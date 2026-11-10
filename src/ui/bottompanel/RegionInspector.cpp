@@ -4,10 +4,10 @@
 #include "engine/TrackController.h"
 #include "ui/widgets/IconButton.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include <array>
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -116,7 +116,7 @@ public:
         if (! dragging)
             gain.setValue (r.gainDb, juce::dontSendNotification);
 
-        IkarosLookAndFeel::setFamilyColour (gain, family);
+        LithiumLookAndFeel::setFamilyColour (gain, family);
         pitchDown.setEnabled (r.transposeSemitones > -RegionEditor::maxTransposeSemitones);
         pitchUp.setEnabled (r.transposeSemitones < RegionEditor::maxTransposeSemitones);
         reverse.setToggleState (r.reversed, juce::dontSendNotification);
@@ -780,7 +780,7 @@ void RegionInspector::layoutSections()
 
 void RegionInspector::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("RegionInspector");
+    LITHIUM_PERF_PAINT ("RegionInspector");
     g.fillAll (theme().inspectorBg);
     g.setColour (theme().divider);
     g.fillRect (getLocalBounds().removeFromRight (1));
@@ -808,4 +808,4 @@ void RegionInspector::resized()
     layoutSections();
 }
 
-} // namespace ikaros
+} // namespace lithium

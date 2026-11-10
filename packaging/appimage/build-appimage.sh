@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds Ikaros_Studio-<version>-x86_64.AppImage from the Release build.
+# Builds Lithium_Studio-<version>-x86_64.AppImage from the Release build.
 #   packaging/appimage/build-appimage.sh
 # Downloads linuxdeploy and appimagetool into build-appimage/tools on first run.
 set -euo pipefail
@@ -8,7 +8,7 @@ root="$(cd "$(dirname "$0")/../.." && pwd)"
 out="$root/build-appimage"
 tools="$out/tools"
 appdir="$out/AppDir"
-app_id="io.github.thecalamityjoe87.IkarosStudio"
+app_id="io.github.thecalamityjoe87.LithiumStudio"
 
 mkdir -p "$tools"
 fetch() {  # fetch <name> <url>
@@ -30,7 +30,7 @@ DESTDIR="$appdir" cmake --install "$root/build-release" --prefix /usr
 "$tools/linuxdeploy" --appdir "$appdir" \
     --desktop-file "$appdir/usr/share/applications/$app_id.desktop" \
     --icon-file "$root/resources/icons/$app_id.svg" \
-    --executable "$appdir/usr/bin/ikaros-studio"
+    --executable "$appdir/usr/bin/lithium-studio"
 
 ARCH=x86_64 VERSION="$version" "$tools/appimagetool" "$appdir" \
-    "$out/Ikaros_Studio-$version-x86_64.AppImage"
+    "$out/Lithium_Studio-$version-x86_64.AppImage"

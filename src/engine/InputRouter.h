@@ -5,7 +5,7 @@
 #include <bitset>
 #include <memory>
 
-namespace ikaros
+namespace lithium
 {
 
 class AudioEngine;
@@ -91,4 +91,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InputRouter)
 };
 
-} // namespace ikaros
+} // namespace lithium

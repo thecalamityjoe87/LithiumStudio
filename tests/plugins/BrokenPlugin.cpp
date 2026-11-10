@@ -3,8 +3,8 @@
 // VST3: the code below runs when the library is loaded, before the host gets
 // as far as asking what's inside.
 //
-// Built twice by tests/plugins/CMakeLists.txt: IKAROS_HANG = 0 crashes,
-// IKAROS_HANG = 1 never returns.
+// Built twice by tests/plugins/CMakeLists.txt: LITHIUM_HANG = 0 crashes,
+// LITHIUM_HANG = 1 never returns.
 
 #include <chrono>
 #include <cstdlib>
@@ -16,7 +16,7 @@ namespace
     {
         LoadTimeTrap()
         {
-           #if IKAROS_HANG
+           #if LITHIUM_HANG
             for (;;)
                 std::this_thread::sleep_for (std::chrono::seconds (1));
            #else

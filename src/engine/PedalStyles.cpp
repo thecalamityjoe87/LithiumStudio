@@ -4,7 +4,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 const std::vector<PedalStyle>& getPedalStyles()
@@ -100,4 +100,4 @@ const PedalStyle* findPedalStyle (const juce::String& pluginType)
     return nullptr;
 }
 
-} // namespace ikaros
+} // namespace lithium

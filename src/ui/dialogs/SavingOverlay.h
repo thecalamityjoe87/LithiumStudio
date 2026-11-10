@@ -3,12 +3,12 @@
 #include "engine/AudioEngine.h"
 #include <thread>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
 /**
-    Packs a session into its .iksession file on a background thread (see
+    Packs a session into its .lisession file on a background thread (see
     AudioEngine::beginSave), so the window keeps drawing while a big session
     saves.
 
@@ -53,4 +53,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SavingOverlay)
 };
 
-} // namespace ikaros
+} // namespace lithium

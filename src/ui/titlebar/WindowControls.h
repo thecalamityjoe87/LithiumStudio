@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ui/widgets/IconButton.h"
+#include <juce_gui_basics/juce_gui_basics.h>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -35,7 +35,9 @@ public:
 /**
     Minimise / maximise-restore / close buttons, drawn by the app so they look
     the same on Windows and every Linux desktop. (macOS uses the system's
-    own traffic lights instead; see MainWindow.)
+    own traffic lights instead; see MainWindow.) They match the Lithium
+    Drums standalone window's buttons (JUCE's LookAndFeel_V4 ones): an ochre
+    line, a green plus and a red cross, filled with their colour on hover.
 
     They act on whatever DocumentWindow this component lives in, so they can be
     placed anywhere in the UI (we put them in the MenuBar strip).
@@ -54,13 +56,24 @@ public:
 
     void resized() override;
 
-    static constexpr int buttonWidth = 46;
+    static constexpr int buttonWidth = 30;   // square, as tall as the title bar (as JUCE's own buttons are)
     static constexpr int preferredWidth = buttonWidth * 3;
 
 private:
-    IconButton minimiseButton { "Minimize", Icon::windowMinimise };
-    IconButton maximiseButton { "Maximize", Icon::windowMaximise };
-    IconButton closeButton    { "Close", Icon::windowClose };
+    /** One button: its glyph in its colour, or the colour filling the button
+        with the glyph cut out of it while the mouse is over it. */
+    class WindowButton  : public juce::Button
+    {
+    public:
+        WindowButton (const juce::String& name, juce::Colour, juce::Path normal, juce::Path toggled);
+        void paintButton (juce::Graphics&, bool highlighted, bool down) override;
+
+    private:
+        juce::Colour colour;
+        juce::Path normalShape, toggledShape;
+    };
+
+    WindowButton minimiseButton, maximiseButton, closeButton;
 
     bool showingRestore = false;
 
@@ -70,4 +83,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WindowControls)
 };
 
-} // namespace ikaros
+} // namespace lithium

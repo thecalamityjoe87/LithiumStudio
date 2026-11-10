@@ -4,7 +4,7 @@
 #include "engine/TrackController.h"
 #include <algorithm>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -193,4 +193,4 @@ private:
     RegionId current = 0;
 };
 
-} // namespace ikaros
+} // namespace lithium

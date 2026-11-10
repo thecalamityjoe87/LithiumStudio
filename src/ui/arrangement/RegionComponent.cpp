@@ -1,12 +1,12 @@
 #include "ui/arrangement/RegionComponent.h"
 #include "ui/widgets/PaintProbe.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 #include "ui/theme/TrackColours.h"
 #include "ui/widgets/Icons.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -209,7 +209,7 @@ void RegionComponent::resized()
 //==============================================================================
 void RegionComponent::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("RegionComponent");
+    LITHIUM_PERF_PAINT ("RegionComponent");
     auto r = getLocalBounds().toFloat();
 
     // While playing, the playhead moving over a region repaints only a thin
@@ -379,7 +379,7 @@ void RegionComponent::paint (juce::Graphics& g)
     }
 
     if (showFocusRing && hasKeyboardFocus (false))
-        IkarosLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat(), corner);
+        LithiumLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat(), corner);
 }
 
 void RegionComponent::paintMidiNotes (juce::Graphics& g, juce::Rectangle<float> area)
@@ -750,4 +750,4 @@ bool RegionComponent::keyPressed (const juce::KeyPress& key)
     return false;
 }
 
-} // namespace ikaros
+} // namespace lithium

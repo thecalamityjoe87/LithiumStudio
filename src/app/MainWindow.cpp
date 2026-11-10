@@ -2,7 +2,7 @@
 #include "platform/WindowManagerHints.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 MainWindow::MainWindow (const juce::String& name, AudioEngine& engine)
@@ -183,4 +183,4 @@ juce::Component::WindowControlKind MainWindow::findControlAtPoint (juce::Point<f
     return content->getWindowControlAt (p - juce::Point<float> ((float) border.getLeft(), (float) border.getTop()));
 }
 
-} // namespace ikaros
+} // namespace lithium

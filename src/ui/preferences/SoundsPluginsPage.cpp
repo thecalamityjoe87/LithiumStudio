@@ -5,7 +5,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -438,4 +438,4 @@ void SoundsPluginsPage::timerCallback()
     updateScanState();
 }
 
-} // namespace ikaros
+} // namespace lithium

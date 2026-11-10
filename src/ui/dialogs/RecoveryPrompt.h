@@ -3,7 +3,7 @@
 #include "engine/AudioEngine.h"
 #include <functional>
 
-namespace ikaros
+namespace lithium
 {
 
 /*  At launch, after a crash: for each session that was open with unsaved
@@ -23,4 +23,4 @@ namespace RecoveryPrompt
     void show (juce::Component& parent, AudioEngine&, std::function<void (bool recovered)> done);
 }
 
-} // namespace ikaros
+} // namespace lithium

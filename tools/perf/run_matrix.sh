@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs Ikaros Studio's stress scenarios headless and collects the numbers
+# Runs Lithium Studio's stress scenarios headless and collects the numbers
 # (see docs/perf-report.md and src/app/PerfHarness.h).
 #
 #   tools/perf/run_matrix.sh [build-dir] [what]
@@ -20,7 +20,7 @@
 # later runs; remove them with tools/perf/run_matrix.sh cleanup).
 # The app runs under Xvfb, so no window appears on the desktop.
 #
-# Results go to $IKAROS_PERF_OUT (default ~/ikaros-perf/runs/<date-time>):
+# Results go to $LITHIUM_PERF_OUT (default ~/lithium-perf/runs/<date-time>):
 #   summary.csv       one line per scenario run
 #   <run>.csv         per second: callback %, xruns, CPU per thread, memory, paint
 #   <run>.plugins.csv per second: each plug-in's share of the audio thread
@@ -33,18 +33,18 @@ BUILD="${1:-build-perf}"
 WHAT="${2:-quick}"
 
 if [ "$BUILD" = "cleanup" ]; then
-    pw-cli destroy ikaros-perf-null >/dev/null 2>&1
-    pw-cli destroy ikaros-perf-src >/dev/null 2>&1
+    pw-cli destroy lithium-perf-null >/dev/null 2>&1
+    pw-cli destroy lithium-perf-src >/dev/null 2>&1
     exit 0
 fi
 
 case "$BUILD" in /*) ;; *) BUILD="$ROOT/$BUILD" ;; esac
-APP="$(find "$BUILD/IkarosStudio_artefacts" -type f -name "Ikaros Studio" | head -1)"
+APP="$(find "$BUILD/LithiumStudio_artefacts" -type f -name "Lithium Studio" | head -1)"
 [ -x "$APP" ] || { echo "No app in $BUILD"; exit 1; }
 
-OUT="${IKAROS_PERF_OUT:-$HOME/ikaros-perf/runs/$(date +%Y%m%d-%H%M%S)}"
-SOUNDS="${IKAROS_PERF_SOUNDS:-$HOME/ikaros-perf/sounds}"
-APPHOME="${IKAROS_PERF_HOME:-$HOME/ikaros-perf/home}"
+OUT="${LITHIUM_PERF_OUT:-$HOME/lithium-perf/runs/$(date +%Y%m%d-%H%M%S)}"
+SOUNDS="${LITHIUM_PERF_SOUNDS:-$HOME/lithium-perf/sounds}"
+APPHOME="${LITHIUM_PERF_HOME:-$HOME/lithium-perf/home}"
 mkdir -p "$OUT" "$APPHOME"
 
 # --- Silent audio -------------------------------------------------------------
@@ -53,16 +53,16 @@ make_node() {   # name media-class
     pw-cli create-node adapter "{ factory.name=support.null-audio-sink node.name=$1 media.class=$2
                                   audio.position=[FL FR] object.linger=true }" >/dev/null
 }
-make_node ikaros-perf-null Audio/Sink
-make_node ikaros-perf-src Audio/Source/Virtual
+make_node lithium-perf-null Audio/Sink
+make_node lithium-perf-src Audio/Source/Virtual
 
 cat > "$APPHOME/.asoundrc" <<'EOF'
 # Stress runs only: play into a null sink, record from a silent source.
 pcm.!default {
     type pipewire
-    playback_node "ikaros-perf-null"
-    capture_node "ikaros-perf-src"
-    hint { show on description "Ikaros perf (silent)" }
+    playback_node "lithium-perf-null"
+    capture_node "lithium-perf-src"
+    hint { show on description "Lithium Studio perf (silent)" }
 }
 ctl.!default { type pipewire }
 EOF
@@ -71,7 +71,7 @@ EOF
 export LV2_PATH="${LV2_PATH:-$HOME/.lv2:/usr/lib/lv2:/usr/local/lib/lv2}"
 
 # The LD_PRELOAD helpers (tools/perf/*.c), built when needed.
-TOOLS="$HOME/ikaros-perf/tools"
+TOOLS="$HOME/lithium-perf/tools"
 build_tools() {
     mkdir -p "$TOOLS"
     gcc -O2 -shared -fPIC -o "$TOOLS/rtcheck.so" "$ROOT/tools/perf/rtcheck.c" -ldl -lpthread || exit 1
@@ -133,8 +133,8 @@ run() {   # run-name scenario [harness options...]
     echo "=== $name"
     env -u WAYLAND_DISPLAY -u DBUS_SESSION_BUS_ADDRESS \
         HOME="$APPHOME" XDG_DATA_HOME="$xdg" XDG_CONFIG_HOME="$APPHOME/.config" \
-        IKAROS_PERF=1 IKAROS_SECOND_INSTANCE=1 IKAROS_PERF_CSV="$OUT/$name.csv" \
-        IKAROS_USER_SOUNDS_DIR="$SOUNDS" \
+        LITHIUM_PERF=1 LITHIUM_SECOND_INSTANCE=1 LITHIUM_PERF_CSV="$OUT/$name.csv" \
+        LITHIUM_USER_SOUNDS_DIR="$SOUNDS" \
         ${RUN_ENV:-} \
         timeout --signal=KILL "${RUN_TIMEOUT:-900}" \
         xvfb-run -a -s "-screen 0 1920x1080x24" ${RUN_PREFIX:-} "$APP" \
@@ -212,8 +212,8 @@ case "$WHAT" in
         done ;;
     threads)
         # Tracktion's render threads: 1, or 2 and 4 with the workers real-time and kept on
-        # the fast cores as in the app (which uses 2; see IkarosEngineBehaviour), or at
-        # ordinary priority (IKAROS_PERF_WORKERS_RT=0, the October 2026 problem).
+        # the fast cores as in the app (which uses 2; see LithiumEngineBehaviour), or at
+        # ordinary priority (LITHIUM_PERF_WORKERS_RT=0, the October 2026 problem).
         # With BUSY=1 the run names end in -busy.
         tag=""
         [ "${BUSY:-0}" = 1 ] && { start_busy; tag="-busy"; }
@@ -222,11 +222,11 @@ case "$WHAT" in
                 [ "$n" = 1 ] && [ "$rt" = 0 ] && continue
                 v="$n"; [ "$n" != 1 ] && { [ "$rt" = 1 ] && v="${n}rt" || v="${n}ord"; }
                 for buffer in 64 256; do
-                    RUN_ENV="IKAROS_PERF_AUDIO_THREADS=$n IKAROS_PERF_WORKERS_RT=$rt" \
+                    RUN_ENV="LITHIUM_PERF_AUDIO_THREADS=$n LITHIUM_PERF_WORKERS_RT=$rt" \
                         run "threads-$v-mix32-$buffer$tag" mix --perf-tracks=32 \
                             --perf-buffer="$buffer" --perf-rate=48000 --perf-seconds=32
                 done
-                RUN_ENV="IKAROS_PERF_AUDIO_THREADS=$n IKAROS_PERF_WORKERS_RT=$rt" \
+                RUN_ENV="LITHIUM_PERF_AUDIO_THREADS=$n LITHIUM_PERF_WORKERS_RT=$rt" \
                     run "threads-$v-realistic-64$tag" realistic --perf-buffer=64 --perf-rate=48000 --perf-seconds=32
             done
         done ;;
@@ -234,19 +234,19 @@ case "$WHAT" in
         # What the audio thread does that it shouldn't (allocations, locks, I/O); read with symbolize.py.
         build_tools
         for a in none addremove plugins-addremove undo record,monitor ui-mixer,ui-scroll; do
-            RUN_ENV="LD_PRELOAD=$TOOLS/rtcheck.so IKAROS_RTCHECK_OUT=$OUT/rtcheck-${a/,/-}.txt" \
+            RUN_ENV="LD_PRELOAD=$TOOLS/rtcheck.so LITHIUM_RTCHECK_OUT=$OUT/rtcheck-${a/,/-}.txt" \
                 run "rtcheck-${a/,/-}" realistic --perf-buffer=256 --perf-rate=48000 --perf-seconds=20 \
                     $([ "$a" != none ] && echo --perf-actions="$a")
         done ;;
     profile)
         # Where every thread spends its CPU time; read with symbolize.py.
         build_tools
-        RUN_ENV="LD_PRELOAD=$TOOLS/sampler.so IKAROS_SAMPLER_OUT=$OUT/profile-playing.txt" \
+        RUN_ENV="LD_PRELOAD=$TOOLS/sampler.so LITHIUM_SAMPLER_OUT=$OUT/profile-playing.txt" \
             run profile-playing realistic --perf-buffer=256 --perf-rate=48000 --perf-seconds=32
-        RUN_ENV="LD_PRELOAD=$TOOLS/sampler.so IKAROS_SAMPLER_OUT=$OUT/profile-ui.txt" \
+        RUN_ENV="LD_PRELOAD=$TOOLS/sampler.so LITHIUM_SAMPLER_OUT=$OUT/profile-ui.txt" \
             run profile-ui mix --perf-tracks=32 --perf-buffer=256 --perf-rate=48000 --perf-seconds=20 \
                 --perf-actions=ui-mixer,ui-scroll
-        RUN_ENV="LD_PRELOAD=$TOOLS/sampler.so IKAROS_SAMPLER_OUT=$OUT/profile-idle.txt" \
+        RUN_ENV="LD_PRELOAD=$TOOLS/sampler.so LITHIUM_SAMPLER_OUT=$OUT/profile-idle.txt" \
             run profile-idle idle-heavy --perf-buffer=256 --perf-rate=48000 --perf-seconds=20 ;;
     endurance)
         RUN_TIMEOUT=$(( ${ENDURANCE_SECONDS:-3600} + 600 )) \

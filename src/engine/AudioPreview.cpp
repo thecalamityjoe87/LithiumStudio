@@ -1,6 +1,6 @@
 #include "engine/AudioPreview.h"
 
-namespace ikaros
+namespace lithium
 {
 
 AudioPreview::AudioPreview (juce::AudioDeviceManager& dm, juce::AudioFormatManager& f)
@@ -97,4 +97,4 @@ void AudioPreview::changeListenerCallback (juce::ChangeBroadcaster*)
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

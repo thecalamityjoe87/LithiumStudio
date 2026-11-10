@@ -3,7 +3,7 @@
 #include <juce_core/juce_core.h>
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 /** From `beat` on, the song plays at `bpm` (until the next change). Tempo
@@ -193,4 +193,4 @@ private:
     }
 };
 
-} // namespace ikaros
+} // namespace lithium

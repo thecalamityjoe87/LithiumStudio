@@ -4,7 +4,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace detail;
@@ -214,4 +214,4 @@ std::vector<float> EqController::getResponse (TrackId id, const std::vector<floa
     return result;
 }
 
-} // namespace ikaros
+} // namespace lithium

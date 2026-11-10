@@ -2,11 +2,11 @@
 #include "ui/widgets/PaintProbe.h"
 #include "engine/TrackController.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Theme.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -71,7 +71,7 @@ public:
         }
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, r, size::radius);
+            LithiumLookAndFeel::drawFocusRing (g, r, size::radius);
     }
 };
 
@@ -148,7 +148,7 @@ public:
         g.drawEllipse (puck.reduced (1.0f), 2.0f);
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, r, size::radiusCard);
+            LithiumLookAndFeel::drawFocusRing (g, r, size::radiusCard);
     }
 
     void mouseDown (const juce::MouseEvent& e) override
@@ -453,12 +453,12 @@ void DrummerPanel::updateControls()
 //==============================================================================
 void DrummerPanel::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("DrummerPanel");
+    LITHIUM_PERF_PAINT ("DrummerPanel");
     Knob::drawShadow (g, fillsKnob);
     Knob::drawShadow (g, swingKnob);
 
     g.setColour (theme().textSecondary);
-    g.setFont (fonts::uiSemiBold (textSize::xs));
+    g.setFont (fonts::caption (textSize::sm).withExtraKerningFactor (0.08f));
     g.drawText ("PIECES", piecesLabel, juce::Justification::centredLeft, false);
     g.drawText ("TIME-KEEPING", keeperLabel, juce::Justification::centredLeft, false);
 
@@ -542,4 +542,4 @@ void DrummerPanel::resized()
     noticeArea = noticeArea.withX (pad->getX()).withWidth (juce::jmax (padWidth, noticeArea.getWidth()));
 }
 
-} // namespace ikaros
+} // namespace lithium

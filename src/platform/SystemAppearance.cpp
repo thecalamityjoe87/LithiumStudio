@@ -6,7 +6,7 @@
  #include <cstring>
 #endif
 
-namespace ikaros::platform
+namespace lithium::platform
 {
 
 #if JUCE_LINUX
@@ -208,4 +208,4 @@ bool SystemAppearance::prefersDark() const
     return juce::Desktop::getInstance().isDarkModeActive();
 }
 
-} // namespace ikaros::platform
+} // namespace lithium::platform

@@ -1,6 +1,6 @@
 #include "ui/toolbar/MetronomeButton.h"
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -46,4 +46,4 @@ void MetronomeButton::paintIcon (juce::Graphics& g, juce::Rectangle<float> area,
     g.strokePath (arm, juce::PathStrokeType (1.8f * scale, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 }
 
-} // namespace ikaros
+} // namespace lithium

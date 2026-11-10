@@ -2,7 +2,7 @@
 #include "ui/arrangement/ArrangementLayout.h"
 #include "ui/arrangement/ArrangementOverlays.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace arrangement;
@@ -337,4 +337,4 @@ void ArrangementView::RegionDrag::regionMouseUp (RegionComponent&, const juce::M
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

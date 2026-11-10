@@ -7,7 +7,7 @@
 #include "engine/EngineTypes.h"
 #include <algorithm>
 
-namespace ikaros::pianoroll
+namespace lithium::pianoroll
 {
 
 inline constexpr int keysWidth = 44;
@@ -37,4 +37,4 @@ inline bool sameNotes (const std::vector<NoteInfo>& a, const std::vector<NoteInf
     });
 }
 
-} // namespace ikaros::pianoroll
+} // namespace lithium::pianoroll

@@ -5,7 +5,7 @@
 
 namespace LV2AT { class Retuner; }   // external/fat1/retuner.h
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -152,4 +152,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TunePlugin)
 };
 
-} // namespace ikaros
+} // namespace lithium

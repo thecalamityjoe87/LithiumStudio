@@ -3,10 +3,10 @@
 #include "engine/BuiltInEffects.h"
 #include <array>
 
-struct PluginLV2;   // a GxPlugins pedal's DSP (see external/gxplugins/ikaros/GxDsp.h)
-namespace ikaros::gx { struct DspType; }
+struct PluginLV2;   // a GxPlugins pedal's DSP (see external/gxplugins/lithium/GxDsp.h)
+namespace lithium::gx { struct DspType; }
 
-namespace ikaros
+namespace lithium
 {
 
 class KlonCentaurDsp;
@@ -112,12 +112,12 @@ private:
 //==============================================================================
 // The ported pedals. They differ only in their constructors (their stages
 // and settings, in PortedPedals.cpp), so this macro writes the rest of each
-// class. IKAROS_DECLARE_PORTED_PEDAL (YellowDrivePlugin, "Yellow Drive")
+// class. LITHIUM_DECLARE_PORTED_PEDAL (YellowDrivePlugin, "Yellow Drive")
 // declares a GxPedalPlugin subclass called YellowDrivePlugin, with a
 // constructor, a destructor, getPluginName() returning "Yellow Drive", and
 // xmlTypeName, its type name in sessions (set in PortedPedals.cpp; never
 // change one, or older sessions lose that pedal).
-#define IKAROS_DECLARE_PORTED_PEDAL(ClassName, displayName) \
+#define LITHIUM_DECLARE_PORTED_PEDAL(ClassName, displayName) \
     class ClassName  : public GxPedalPlugin \
     { \
     public: \
@@ -131,50 +131,50 @@ private:
 
 /** Yellow Drive: a warm, mid-heavy overdrive. Inspired by the Boss SD-1
     Super OverDrive; GxSD1's DSP. */
-IKAROS_DECLARE_PORTED_PEDAL (YellowDrivePlugin, "Yellow Drive")
+LITHIUM_DECLARE_PORTED_PEDAL (YellowDrivePlugin, "Yellow Drive")
 
 /** Stack Drive: an amp stack's crunch in a box. Inspired by the Marshall
     Guv'nor; GxGuvnor's DSP. */
-IKAROS_DECLARE_PORTED_PEDAL (StackDrivePlugin, "Stack Drive")
+LITHIUM_DECLARE_PORTED_PEDAL (StackDrivePlugin, "Stack Drive")
 
 /** Hot Plate: a hot tube preamp. Inspired by the Matchless Hotbox;
     GxHotBox's DSP. */
-IKAROS_DECLARE_PORTED_PEDAL (HotPlatePlugin, "Hot Plate")
+LITHIUM_DECLARE_PORTED_PEDAL (HotPlatePlugin, "Hot Plate")
 
 /** Tube Drive: a valve overdrive. Inspired by the Electro-Harmonix Bottle
     Rocket; GxBottleRocket's DSP. */
-IKAROS_DECLARE_PORTED_PEDAL (TubeDrivePlugin, "Tube Drive")
+LITHIUM_DECLARE_PORTED_PEDAL (TubeDrivePlugin, "Tube Drive")
 
 /** Mellow Drive: a low-gain, open overdrive. Inspired by the Lovepedal
     Eternity; GxEternity's DSP, oversampled 2x. */
-IKAROS_DECLARE_PORTED_PEDAL (MellowDrivePlugin, "Mellow Drive")
+LITHIUM_DECLARE_PORTED_PEDAL (MellowDrivePlugin, "Mellow Drive")
 
 /** Sun Fuzz: a germanium fuzz. Inspired by the Analogman Sun Face (a Fuzz
     Face); GxSunFace's DSP. */
-IKAROS_DECLARE_PORTED_PEDAL (SunFuzzPlugin, "Sun Fuzz")
+LITHIUM_DECLARE_PORTED_PEDAL (SunFuzzPlugin, "Sun Fuzz")
 
 /** Vintage Fuzz: a three-transistor fuzz. Inspired by the Sola Sound Tone
     Bender; GxSuppaToneBender's DSP, its clipping oversampled 4x. */
-IKAROS_DECLARE_PORTED_PEDAL (VintageFuzzPlugin, "Vintage Fuzz")
+LITHIUM_DECLARE_PORTED_PEDAL (VintageFuzzPlugin, "Vintage Fuzz")
 
 /** Super Fuzz: an octave fuzz. Inspired by the Univox Super-Fuzz;
     GxSuperFuzz's DSP, its clipping oversampled 4x. */
-IKAROS_DECLARE_PORTED_PEDAL (SuperFuzzPlugin, "Super Fuzz")
+LITHIUM_DECLARE_PORTED_PEDAL (SuperFuzzPlugin, "Super Fuzz")
 
 /** Envelope Wah: a filter that opens as you play harder. Inspired by the
     Musitronics Mu-Tron III; GxQuack's DSP. */
-IKAROS_DECLARE_PORTED_PEDAL (EnvelopeWahPlugin, "Envelope Wah")
+LITHIUM_DECLARE_PORTED_PEDAL (EnvelopeWahPlugin, "Envelope Wah")
 
 /** Slow Swell: fades each note in, like turning a volume knob up. Inspired
     by the Boss SG-1 Slow Gear; GxSlowGear's DSP. */
-IKAROS_DECLARE_PORTED_PEDAL (SlowSwellPlugin, "Slow Swell")
+LITHIUM_DECLARE_PORTED_PEDAL (SlowSwellPlugin, "Slow Swell")
 
 /** Jet Flanger: a flanger. Guitarix's gx_flanger DSP. */
-IKAROS_DECLARE_PORTED_PEDAL (JetFlangerPlugin, "Jet Flanger")
+LITHIUM_DECLARE_PORTED_PEDAL (JetFlangerPlugin, "Jet Flanger")
 
 /** Spring Tank: a reverb. Guitarix's stereo gx_reverb DSP (a Freeverb
     variant: neither Guitarix nor Airwindows has a spring model). */
-IKAROS_DECLARE_PORTED_PEDAL (SpringTankPlugin, "Spring Tank")
+LITHIUM_DECLARE_PORTED_PEDAL (SpringTankPlugin, "Spring Tank")
 
 //==============================================================================
 /**
@@ -212,4 +212,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GoldenBoostPlugin)
 };
 
-} // namespace ikaros
+} // namespace lithium

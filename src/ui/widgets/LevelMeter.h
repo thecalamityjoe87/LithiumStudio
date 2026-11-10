@@ -3,7 +3,7 @@
 #include "engine/EngineTypes.h"
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -43,4 +43,4 @@ private:
     float left = 0.0f, right = 0.0f;    // displayed values, 0..1
 };
 
-} // namespace ikaros
+} // namespace lithium

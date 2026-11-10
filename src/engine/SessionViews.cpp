@@ -1,12 +1,12 @@
 #include "engine/SessionViews.h"
 
-namespace ikaros
+namespace lithium
 {
 
 // The store file looks like this, the session used last first:
 //
 //   <SESSIONVIEWS>
-//     <SESSION path="/home/me/Music/My Song.iksession">
+//     <SESSION path="/home/me/Music/My Song.lisession">
 //       <VIEW saved="1792000000000" libraryVisible="1" ... />
 //     </SESSION>
 //     ...
@@ -96,4 +96,4 @@ void SessionViews::set (const juce::File& session, juce::ValueTree view)
     writeFile (store, file);
 }
 
-} // namespace ikaros
+} // namespace lithium

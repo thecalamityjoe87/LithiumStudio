@@ -5,7 +5,7 @@
 #include "ui/widgets/MeterSlider.h"
 #include "ui/state/Selection.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -24,7 +24,7 @@ namespace ikaros
     The pan knob sits right under the arm button, in one column.
     Flex is Flex Time, for dragging the hits in a track's recordings. A
     Drummer track waiting for its kit's sound pack has a download button
-    there instead (it plays the Ikaros Basics kit until then).
+    there instead (it plays the Lithium Basics kit until then).
 
     While the track's automation shows, a picker under the bottom row says
     which setting's automation is drawn over the track's lane.
@@ -110,4 +110,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrackHeader)
 };
 
-} // namespace ikaros
+} // namespace lithium

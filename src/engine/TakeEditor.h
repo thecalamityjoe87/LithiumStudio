@@ -3,7 +3,7 @@
 #include "engine/EngineTypes.h"
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 class AudioEngine;
@@ -30,7 +30,7 @@ struct TakeInfo
 
     Audio takes use Tracktion's TAKES list on the wave clip (one TAKE per
     file), but not its take switching, which only works with Tracktion
-    projects (Ikaros sessions refer to plain files). MIDI takes are
+    projects (Lithium Studio sessions refer to plain files). MIDI takes are
     Tracktion's own: one MidiList per take.
 
     Flex edits (see FlexEditor) belong to the take they were made on: each
@@ -71,4 +71,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TakeEditor)
 };
 
-} // namespace ikaros
+} // namespace lithium

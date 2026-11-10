@@ -3,7 +3,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -141,7 +141,7 @@ std::pair<int, bool> TunePlugin::getEffectiveKey() const
     if (const int k = state.getProperty (keyProp, songKey); k >= 0)   // (from the state: see updateAllowedNotes)
         return { k % 12, k >= 12 };
 
-    // Ikaros keeps one key for the whole session, at the start of the pitch sequence.
+    // Lithium Studio keeps one key for the whole session, at the start of the pitch sequence.
     if (auto* pitch = edit.pitchSequence.getPitch (0))
     {
         const auto scale = pitch->getScale();
@@ -459,4 +459,4 @@ TunePlugin::Reading TunePlugin::getReading() const
     return r;
 }
 
-} // namespace ikaros
+} // namespace lithium

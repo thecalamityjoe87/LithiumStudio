@@ -2,7 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace ikaros::platform
+namespace lithium::platform
 {
 
 /*  Maximise/restore for a window with a custom (app-drawn) title bar.
@@ -45,4 +45,4 @@ void useInlineTitleBar (juce::DocumentWindow&);
 int getInlineTitleBarButtonsWidth (const juce::DocumentWindow&);
 #endif
 
-} // namespace ikaros::platform
+} // namespace lithium::platform

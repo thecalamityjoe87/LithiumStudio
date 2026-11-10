@@ -3,8 +3,9 @@
 #include "engine/SoundLibrary.h"
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
+#include "ui/widgets/Branding.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -33,12 +34,12 @@ void AboutDialog::show (juce::Component& parent, AudioEngine& engine)
 AboutDialog::AboutDialog (AudioEngine& e)
     : engine (e)
 {
-    setTitle ("About Ikaros Studio");
+    setTitle ("About Lithium Studio");
     setWantsKeyboardFocus (true);
     setAlwaysOnTop (true);
 
-    icon = juce::ImageFileFormat::loadFrom (BinaryData::io_github_thecalamityjoe87_IkarosStudio_png,
-                                            (size_t) BinaryData::io_github_thecalamityjoe87_IkarosStudio_pngSize);
+    icon = juce::ImageFileFormat::loadFrom (BinaryData::io_github_thecalamityjoe87_LithiumStudio_png,
+                                            (size_t) BinaryData::io_github_thecalamityjoe87_LithiumStudio_pngSize);
 
     text.setMultiLine (true);
     text.setReadOnly (true);
@@ -145,26 +146,26 @@ void AboutDialog::fillCredits()
     addHeading (text, "Made by");
     addBody (text, "Isaac Joseph\n    calamityjoe87@gmail.com\n    https://github.com/thecalamityjoe87\n");
 
-    addHeading (text, "Ikaros Studio");
+    addHeading (text, "Lithium Studio");
     addBody (text, "Designed and written by Isaac Joseph: the app, its look and feel, and the way it works "
                    "for people making music for the first time.\n"
                    "    https://github.com/thecalamityjoe87/ikaros-studio\n");
 
-    addHeading (text, "Ikaros Basics sounds");
-    addBody (text, "The instruments and loops that come with the app were synthesized for Ikaros Studio "
+    addHeading (text, "Lithium Basics sounds");
+    addBody (text, "The instruments and loops that come with the app were synthesized for Lithium Studio "
                    "by Isaac Joseph (CC0, free for anyone to use).\n");
 
-    addBody (text, "Everyone else whose work is part of Ikaros Studio is under Acknowledgements.");
+    addBody (text, "Everyone else whose work is part of Lithium Studio is under Acknowledgements.");
 }
 
 void AboutDialog::fillReleaseNotes()
 {
-    addHeading (text, juce::JUCEApplication::getInstance()->getApplicationVersion() + " (" IKAROS_STAGE "): first release");
-    addBody (text, "The first release of Ikaros Studio. It's alpha software: ready to try, but expect rough "
+    addHeading (text, juce::JUCEApplication::getInstance()->getApplicationVersion() + " (" LITHIUM_STAGE "): first release");
+    addBody (text, "The first release of Lithium Studio. It's alpha software: ready to try, but expect rough "
                    "edges, and keep a copy of any session you care about.\n");
 
     addHeading (text, "What's in it");
-    addBody (text, bullet + "Sessions saved as one .iksession file that holds every recording and loop it uses\n"
+    addBody (text, bullet + "Sessions saved as one .lisession file that holds every recording and loop it uses\n"
                    + bullet + "Instrument tracks with a built-in synth and sampled instruments, played from the on-screen "
                               "keyboard or a MIDI keyboard\n"
                    + bullet + "Audio tracks: record from an input, and keep several takes of the same part\n"
@@ -173,7 +174,7 @@ void AboutDialog::fillReleaseNotes()
                    + bullet + "Plug-ins: VST3 everywhere, LV2 on Linux and Windows, Audio Units on macOS\n"
                    + bullet + "Export your song as audio, including MP3\n"
                    + bullet + "Autosave, and recovery of your work after a crash\n"
-                   + bullet + "Ikaros Basics, a sound pack that comes with the app; packs you add to your Sounds "
+                   + bullet + "Lithium Basics, a sound pack that comes with the app; packs you add to your Sounds "
                               "folder show up in the library\n");
 
     addHeading (text, "Not yet");
@@ -216,9 +217,9 @@ void AboutDialog::fillAcknowledgements()
                    "sfizz, the SFZ sample player (BSD 2-Clause), with the libraries it includes\n    https://sfz.tools/sfizz\n\n"
                    "miniz (MIT)\n    https://github.com/richgel999/miniz\n\n"
                    "LAME, the MP3 encoder (LGPL)\n    https://lame.sourceforge.io\n\n"
-                   "Figtree and JetBrains Mono fonts (SIL Open Font License 1.1)\n\n"
+                   "Barlow, Barlow Condensed, IBM Plex Mono and Figtree fonts (SIL Open Font License 1.1)\n\n"
                    "Some icons from Lucide (ISC)\n    https://lucide.dev\n\n"
-                   "The full license texts are in the CREDITS file that comes with Ikaros Studio.");
+                   "The full license texts are in the CREDITS file that comes with Lithium Studio.");
 }
 
 void AboutDialog::fillLicense()
@@ -293,13 +294,12 @@ void AboutDialog::paint (juce::Graphics& g)
     g.drawImage (icon, r.removeFromTop (112).toFloat(), juce::RectanglePlacement::centred);
     r.removeFromTop (10);
 
-    g.setColour (theme().text);
-    g.setFont (fonts::uiBold (textSize::hero));
-    g.drawText ("Ikaros Studio", r.removeFromTop (34), juce::Justification::centred);
+    // The wordmark, as in the title bar, only bigger.
+    branding::paintWordmark (g, r.removeFromTop (34).toFloat(), 30.0f, juce::Justification::centred);
 
     g.setColour (theme().textSecondary);
     g.setFont (fonts::uiSemiBold (textSize::md));
-    g.drawText ("Version " + juce::JUCEApplication::getInstance()->getApplicationVersion() + " (" IKAROS_STAGE ")",
+    g.drawText ("Version " + juce::JUCEApplication::getInstance()->getApplicationVersion() + " (" LITHIUM_STAGE ")",
                 r.removeFromTop (22), juce::Justification::centred);
     r.removeFromTop (14);
 
@@ -318,7 +318,7 @@ void AboutDialog::paint (juce::Graphics& g)
     // The GPL's notices: copyright, the license, no warranty. View License
     // (beside Done) shows the full text.
     g.setFont (fonts::ui (textSize::sm));
-    g.drawFittedText (juce::String::fromUTF8 ("\xc2\xa9 2026 Isaac Joseph. Ikaros Studio is free software under the "
+    g.drawFittedText (juce::String::fromUTF8 ("\xc2\xa9 2026 Isaac Joseph. Lithium Studio is free software under the "
                                               "GNU General Public License v3 or later, and comes with no warranty."),
                       contentArea.reduced (40, 0).removeFromBottom (34), juce::Justification::centredBottom, 2, 1.0f);
 }
@@ -361,4 +361,4 @@ void AboutDialog::resized()
     builtWith.setSize (listWidth, builtWith.getHeightForWidth (listWidth));
 }
 
-} // namespace ikaros
+} // namespace lithium

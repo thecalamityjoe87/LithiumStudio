@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -272,4 +272,4 @@ void Tuner::analyse()
     publish (r);
 }
 
-} // namespace ikaros
+} // namespace lithium

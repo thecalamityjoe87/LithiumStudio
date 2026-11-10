@@ -3,7 +3,7 @@
 #include "ui/bottompanel/PedalView.h"
 #include "ui/state/Selection.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -60,4 +60,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PedalboardView)
 };
 
-} // namespace ikaros
+} // namespace lithium

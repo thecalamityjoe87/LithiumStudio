@@ -2,7 +2,7 @@
 
 #include <juce_core/juce_core.h>
 
-namespace ikaros
+namespace lithium
 {
 
 /** A volume as the app shows it: "−3.0 dB", "0.0 dB", "+2.5 dB", or
@@ -21,4 +21,4 @@ inline juce::String decibelText (float db)
     return sign + juce::String (std::abs (rounded), 1) + " dB";
 }
 
-} // namespace ikaros
+} // namespace lithium

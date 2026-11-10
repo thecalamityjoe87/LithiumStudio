@@ -5,7 +5,7 @@
 #include <optional>
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -22,7 +22,7 @@ struct RecoverableSession
 /**
     The files that let a session survive a crash. They all live in the
     session's working copy (see AudioEngine), never next to the user's saved
-    .iksession, so nothing here can overwrite the user's work:
+    .lisession, so nothing here can overwrite the user's work:
 
         Open.lock               held (see platform::FileLock) while the session
                                 is open. There but not held = the app crashed.
@@ -113,4 +113,4 @@ public:
     static juce::Array<juce::MidiMessage> readJournal (const juce::File&);
 };
 
-} // namespace ikaros
+} // namespace lithium

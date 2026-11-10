@@ -2,7 +2,7 @@
 #include "ui/widgets/PaintProbe.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -28,7 +28,7 @@ void ClipLight::setClipped (bool shouldBeLit)
 
 void ClipLight::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("ClipLight");
+    LITHIUM_PERF_PAINT ("ClipLight");
     // A small warning sign, centred: a rounded triangle with "!" in it,
     // outlined in grey when off, filled red when lit.
     const auto side = (float) juce::jmin (getWidth(), getHeight());
@@ -65,4 +65,4 @@ void ClipLight::mouseDown (const juce::MouseEvent&)
         onClear();
 }
 
-} // namespace ikaros
+} // namespace lithium

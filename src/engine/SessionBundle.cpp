@@ -1,7 +1,7 @@
 #include "engine/SessionBundle.h"
 #include <miniz.h>
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -77,7 +77,7 @@ namespace
 //==============================================================================
 bool SessionBundle::isBundleFile (const juce::File& f)
 {
-    return f.hasFileExtension (extension);
+    return f.hasFileExtension (extension) || f.hasFileExtension (previousExtension);
 }
 
 juce::Result SessionBundle::pack (const juce::File& bundle, const std::vector<Entry>& entries,
@@ -178,7 +178,7 @@ juce::Result SessionBundle::unpack (const juce::File& bundle, const juce::File& 
     mz_zip_archive zip;
 
     if (! openForReading (zip, in))
-        return juce::Result::fail (bundle.getFileName() + " isn't an Ikaros Studio session, or it's damaged.");
+        return juce::Result::fail (bundle.getFileName() + " isn't an Lithium Studio session, or it's damaged.");
 
     auto result = juce::Result::ok();
     intoFolder.createDirectory();
@@ -261,4 +261,4 @@ juce::String SessionBundle::makePortableFileName (const juce::String& name)
     return result.isEmpty() ? juce::String ("Untitled") : result;
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -5,7 +5,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -236,4 +236,4 @@ WaveformRange WaveformCache::Overview::getRange (double fromSeconds, double toSe
     return r;
 }
 
-} // namespace ikaros
+} // namespace lithium

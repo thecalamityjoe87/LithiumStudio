@@ -4,7 +4,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -514,4 +514,4 @@ void GoldenBoostPlugin::applyToBuffer (const te::PluginRenderContext& fc)
                       gain->getCurrentValue(), treble->getCurrentValue(), level->getCurrentValue());
 }
 
-} // namespace ikaros
+} // namespace lithium

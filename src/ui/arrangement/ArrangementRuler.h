@@ -4,7 +4,7 @@
 
 #include "ui/arrangement/ArrangementView.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -33,4 +33,4 @@ private:
     double beatAt (int x) const;
 };
 
-} // namespace ikaros
+} // namespace lithium

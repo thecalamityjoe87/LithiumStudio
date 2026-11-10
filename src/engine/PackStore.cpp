@@ -3,7 +3,7 @@
 #include <juce_cryptography/juce_cryptography.h>
 #include <set>
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -66,12 +66,39 @@ namespace
 class PackStore::IndexJob  : public juce::ThreadPoolJob
 {
 public:
-    IndexJob (PackStore& s, juce::URL u)
-        : juce::ThreadPoolJob ("Pack index"), store (&s), url (std::move (u)) {}
+    IndexJob (PackStore& s, juce::Array<juce::URL> u)
+        : juce::ThreadPoolJob ("Pack index"), store (&s), urls (std::move (u)) {}
 
     JobStatus runJob() override
     {
+        // Every index in turn, merged: a pack listed by an earlier index
+        // wins over one with the same id in a later one.
         std::vector<Listing> listings;
+        std::vector<CollectionListing> collections;
+        bool loaded = false;
+
+        for (auto& url : urls)
+            loaded = readIndex (url, listings, collections) || loaded;
+
+        // Back to the message thread with the result. The WeakReference
+        // becomes null if the store has been deleted meanwhile.
+        juce::MessageManager::callAsync ([store = store, listings = std::move (listings),
+                                          collections = std::move (collections), loaded]() mutable
+        {
+            if (store != nullptr)
+                store->indexLoaded (std::move (listings), std::move (collections), loaded);
+        });
+
+        return jobHasFinished;
+    }
+
+private:
+    juce::WeakReference<PackStore> store;
+    juce::Array<juce::URL> urls;
+
+    // Reads one index into the lists. Returns whether it could be read.
+    static bool readIndex (const juce::URL& url, std::vector<Listing>& listings, std::vector<CollectionListing>& collections)
+    {
         int status = 0;
 
         // ParameterHandling::inAddress: a plain GET. (Local files have no
@@ -133,15 +160,16 @@ public:
                                                                            : url.getParentURL().getChildURL (address);
 
                 // Leave out entries we couldn't install safely.
+                const bool listedAlready = std::any_of (listings.begin(), listings.end(),
+                                                        [&] (const Listing& other) { return other.info.id == l.info.id; });
+
                 if (SoundLibrary::isValidPackId (l.info.id) && l.info.name.isNotEmpty()
-                     && address.isNotEmpty() && isSha256 (l.sha256))
+                     && address.isNotEmpty() && isSha256 (l.sha256) && ! listedAlready)
                     listings.push_back (std::move (l));
             }
         }
 
-        // Collections, keeping only packs the index lists (and could install).
-        std::vector<CollectionListing> collections;
-
+        // Collections, keeping only packs the indexes list (and could install).
         if (auto* list = json["collections"].getArray())
         {
             for (auto& c : *list)
@@ -153,28 +181,16 @@ public:
                         if (std::any_of (listings.begin(), listings.end(), [&] (const Listing& l) { return l.info.id == id.toString(); }))
                             collection.packIds.push_back (id.toString());
 
-                if (collection.id.isNotEmpty() && collection.name.isNotEmpty() && ! collection.packIds.empty())
+                const bool listedAlready = std::any_of (collections.begin(), collections.end(),
+                                                        [&] (const CollectionListing& other) { return other.id == collection.id; });
+
+                if (collection.id.isNotEmpty() && collection.name.isNotEmpty() && ! collection.packIds.empty() && ! listedAlready)
                     collections.push_back (std::move (collection));
             }
         }
 
-        const bool loaded = ok && json["packs"].isArray();
-
-        // Back to the message thread with the result. The WeakReference
-        // becomes null if the store has been deleted meanwhile.
-        juce::MessageManager::callAsync ([store = store, listings = std::move (listings),
-                                          collections = std::move (collections), loaded]() mutable
-        {
-            if (store != nullptr)
-                store->indexLoaded (std::move (listings), std::move (collections), loaded);
-        });
-
-        return jobHasFinished;
+        return ok && json["packs"].isArray();
     }
-
-private:
-    juce::WeakReference<PackStore> store;
-    juce::URL url;
 };
 
 //==============================================================================
@@ -456,7 +472,7 @@ private:
                 programs.add (kit);
 
         if (programs.isEmpty())
-            return "This pack has no instruments Ikaros Studio can play.";
+            return "This pack has no instruments Lithium Studio can play.";
 
         std::set<juce::String> usedFolders;
 
@@ -559,13 +575,13 @@ PackStore::~PackStore()
 
 juce::String PackStore::getDefaultIndexUrl()
 {
-    const auto fromEnvironment = juce::SystemStats::getEnvironmentVariable ("IKAROS_PACK_INDEX", {});
+    const auto fromEnvironment = juce::SystemStats::getEnvironmentVariable ("LITHIUM_PACK_INDEX", {});
 
     if (fromEnvironment.isNotEmpty())
         return fromEnvironment;
 
-    // Set at build time (CMake's IKAROS_PACK_INDEX_URL).
-    return IKAROS_PACK_INDEX_URL;
+    // Set at build time (CMake's LITHIUM_PACK_INDEX_URL).
+    return LITHIUM_PACK_INDEX_URL;
 }
 
 void PackStore::refreshIndex()
@@ -577,8 +593,14 @@ void PackStore::refreshIndex()
         return;
     }
 
+    // One address or several, separated by spaces (see getDefaultIndexUrl).
+    juce::Array<juce::URL> urls;
+
+    for (auto& address : juce::StringArray::fromTokens (indexUrl, " \t\n", {}))
+        urls.add (toUrl (address));
+
     indexStatus = IndexStatus::loading;
-    pool.addJob (new IndexJob (*this, toUrl (indexUrl)), true);   // true: the pool deletes the job when it's done
+    pool.addJob (new IndexJob (*this, std::move (urls)), true);   // true: the pool deletes the job when it's done
     sendChangeMessage();
 }
 
@@ -834,4 +856,4 @@ bool PackStore::remove (const juce::String& id)
     return true;
 }
 
-} // namespace ikaros
+} // namespace lithium

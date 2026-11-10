@@ -2,7 +2,7 @@
 
 #include <juce_core/juce_core.h>
 
-namespace ikaros
+namespace lithium
 {
 
 /** True for a controller's MIDI port that carries DAW remote control rather
@@ -35,4 +35,4 @@ inline bool isMackiePort (const juce::String& portName)
     return words.contains ("MCU") || words.contains ("MACKIE");
 }
 
-} // namespace ikaros
+} // namespace lithium

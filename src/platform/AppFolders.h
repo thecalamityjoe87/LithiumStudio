@@ -2,15 +2,15 @@
 
 #include <juce_core/juce_core.h>
 
-namespace ikaros::platform
+namespace lithium::platform
 {
 
 /*  Where the app keeps large files that belong to this computer only (the
     unpacked copies of open sessions, see AudioEngine):
 
-        Linux    $XDG_DATA_HOME/ikaros-studio, or ~/.local/share/ikaros-studio
-        Windows  %LOCALAPPDATA%\Ikaros Studio (not the roaming profile)
-        macOS    ~/Library/Application Support/Ikaros Studio
+        Linux    $XDG_DATA_HOME/lithium-studio, or ~/.local/share/lithium-studio
+        Windows  %LOCALAPPDATA%\Lithium Studio (not the roaming profile)
+        macOS    ~/Library/Application Support/Lithium Studio
 
     Unlike the temp folder, it isn't cleared on restart (so a crashed
     session's work can be found again), and unlike the settings folder it's
@@ -18,4 +18,8 @@ namespace ikaros::platform
 */
 juce::File getLocalDataFolder();
 
-} // namespace ikaros::platform
+/** The same folder under the app's earlier name (Ikaros Studio). Only
+    app/RenameMigration reads it, to move its contents across once. */
+juce::File getPreviousLocalDataFolder();
+
+} // namespace lithium::platform

@@ -4,7 +4,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -235,7 +235,7 @@ void EqView::mouseWheelMove (const juce::MouseEvent& e, const juce::MouseWheelDe
 //==============================================================================
 void EqView::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("EqView");
+    LITHIUM_PERF_PAINT ("EqView");
     // The graph's background and grid.
     g.setColour (theme().wellBg);
     g.fillRoundedRectangle (graphArea.toFloat(), size::radius);
@@ -364,4 +364,4 @@ void EqView::resized()
     updateCurve();
 }
 
-} // namespace ikaros
+} // namespace lithium

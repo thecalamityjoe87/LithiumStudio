@@ -2,7 +2,7 @@
 #include "app/CommandIDs.h"
 #include "engine/EffectsController.h"
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -339,4 +339,4 @@ void SurfaceHandler::apply (const ControllerEvent& e, const TransportState& tran
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

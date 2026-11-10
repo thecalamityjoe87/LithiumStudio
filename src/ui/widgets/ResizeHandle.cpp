@@ -1,7 +1,7 @@
 #include "ui/widgets/ResizeHandle.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -92,4 +92,4 @@ void ResizeHandle::mouseDoubleClick (const juce::MouseEvent&)
         onDoubleClick();
 }
 
-} // namespace ikaros
+} // namespace lithium

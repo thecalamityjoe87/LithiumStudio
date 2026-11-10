@@ -7,7 +7,7 @@
 #include "engine/PitchAnalysis.h"
 #include <cmath>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -172,4 +172,4 @@ namespace pitchcurve
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

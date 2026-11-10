@@ -4,9 +4,9 @@
 #include "ui/arrangement/ArrangementRegionDrag.h"
 #include "engine/LiveWaveform.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -156,7 +156,7 @@ void ArrangementView::Lane::setRecordingRange (double startBeat, double endBeat)
 
 void ArrangementView::Lane::paintOverChildren (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("ArrangementView::Lane::paintOverChildren");
+    LITHIUM_PERF_PAINT ("ArrangementView::Lane::paintOverChildren");
     if (recordEnd > recordStart)
     {
         // A red region that grows with the playhead while recording.
@@ -237,7 +237,7 @@ void ArrangementView::Lane::paintLiveWaveform (juce::Graphics& g, juce::Rectangl
 
 void ArrangementView::Lane::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("ArrangementView::Lane");
+    LITHIUM_PERF_PAINT ("ArrangementView::Lane");
     auto r = getLocalBounds();
 
     if (selected)
@@ -262,7 +262,7 @@ void ArrangementView::Lane::paint (juce::Graphics& g)
     g.fillRect (r.removeFromBottom (1));
 
     if (showFocusRing && hasKeyboardFocus (false))
-        IkarosLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat().reduced (1.0f), size::radiusXs);
+        LithiumLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat().reduced (1.0f), size::radiusXs);
 }
 
 void ArrangementView::Lane::resized()
@@ -300,4 +300,4 @@ void ArrangementView::Lane::mouseDoubleClick (const juce::MouseEvent& e)
         owner.selection.selectRegion (trackId, rid);
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -3,7 +3,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -549,4 +549,4 @@ void AmpPlugin::applyToBuffer (const te::PluginRenderContext& fc)
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

@@ -3,12 +3,12 @@
 #include "ui/bottompanel/AmpView.h"
 #include "ui/dialogs/AddPedalDialog.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Theme.h"
 #include "ui/theme/Tokens.h"
 #include "ui/widgets/Icons.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -89,7 +89,7 @@ public:
                     juce::Justification::centred);
 
         if (hasKeyboardFocus (false))
-            IkarosLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat(), size::radiusCard);
+            LithiumLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat(), size::radiusCard);
     }
 };
 
@@ -504,7 +504,7 @@ void PedalboardView::showAddPedal (juce::Component& from)
 
 void PedalboardView::paint (juce::Graphics& g)
 {
-    IKAROS_PERF_PAINT ("PedalboardView");
+    LITHIUM_PERF_PAINT ("PedalboardView");
     g.fillAll (theme().pedalboardFloor);
 }
 
@@ -514,4 +514,4 @@ void PedalboardView::resized()
     board->updateSize();
 }
 
-} // namespace ikaros
+} // namespace lithium

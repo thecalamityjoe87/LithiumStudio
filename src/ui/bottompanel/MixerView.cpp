@@ -1,7 +1,7 @@
 #include "ui/bottompanel/MixerView.h"
 #include "ui/widgets/PaintProbe.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 #include "ui/theme/TrackColours.h"
 #include "ui/widgets/AutomationHint.h"
@@ -9,7 +9,7 @@
 #include <array>
 #include <tuple>
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -22,6 +22,7 @@ namespace
     constexpr int minStripWidth = 196;
     constexpr int maxStripWidth = 360;
     constexpr int faderAreaWidth = 84;       // meter and fader
+
     constexpr int maxKnobSize = 72;
     constexpr int captionWidth = 56;         // a caption beside a knob
     constexpr int captionHeight = 30;        // a caption under a knob
@@ -29,6 +30,19 @@ namespace
     constexpr int masterStripWidth = 110;
     constexpr int nameRowHeight = 20;        // the strip's name, with M and S beside it
     constexpr int muteSoloWidth = 20;
+
+    // A strip's card, as Lithium Drums draws its mixer strips.
+    void paintStripCard (juce::Graphics& g, juce::Rectangle<float> bounds, bool selected)
+    {
+        const auto r = bounds.reduced (0.5f);
+        g.setColour (selected ? theme().selectedRow : theme().cardBg);
+        g.fillRoundedRectangle (r, size::radius);
+        g.setColour (selected ? theme().accent : theme().borderSoft);
+        g.drawRoundedRectangle (r, size::radius, selected ? 1.5f : 1.0f);
+    }
+
+    // A strip's name, in condensed capitals like the other section labels.
+    juce::Font nameFont()   { return fonts::caption (textSize::lg).withExtraKerningFactor (0.04f); }
 }
 
 //==============================================================================
@@ -42,6 +56,7 @@ public:
 
         // One undo step per drag: start a transaction when the mouse goes down.
         fader.setRange (0.0, 1.0);
+        fader.getProperties().set ("unityValue", TrackController::getFaderPositionForDb (0.0f));   // a tick at 0 dB
         addAndMakeVisible (fader);
 
         fader.onDragStart = [this] { engine.beginUndoStep ("Volume"); selection.selectTrack (trackId); };
@@ -50,7 +65,7 @@ public:
         // Pan: a small knob, centre at 12 o'clock. Double-click puts it back in the middle.
         pan.setRange (-1.0, 1.0);
         pan.setDoubleClickReturnValue (true, 0.0);
-        pan.getProperties().set ("bipolar", true);   // read by IkarosLookAndFeel::drawRotarySlider
+        pan.getProperties().set ("bipolar", true);   // read by LithiumLookAndFeel::drawRotarySlider
         pan.setTooltip ("Pan: left or right (double-click to center)");
         pan.onDragStart = [this] { engine.beginUndoStep ("Pan"); selection.selectTrack (trackId); };
         pan.onValueChange = [this]
@@ -166,7 +181,8 @@ public:
         panText = describePan (t.pan);
         fader.setTitle (t.name + " volume");
         pan.setTitle (t.name + " pan");
-        IkarosLookAndFeel::setFamilyColour (pan, family, IkarosLookAndFeel::FamilyShade::ink);
+        LithiumLookAndFeel::setFamilyColour (pan, family, LithiumLookAndFeel::FamilyShade::ink);
+        LithiumLookAndFeel::setFamilyColour (fader, family, LithiumLookAndFeel::FamilyShade::ink);   // its fill below the cap
 
         const float sends[] { t.reverbSend, t.delaySend };
 
@@ -174,7 +190,7 @@ public:
         {
             auto& knob = sendKnobs[(size_t) bus];
             knob.setTitle (t.name + " " + SendBuses::getBusName (bus).toLowerCase() + " send");
-            IkarosLookAndFeel::setFamilyColour (knob, family, IkarosLookAndFeel::FamilyShade::ink);
+            LithiumLookAndFeel::setFamilyColour (knob, family, LithiumLookAndFeel::FamilyShade::ink);
 
             if (! knob.isMouseButtonDown())
                 knob.setValue (sends[bus], juce::dontSendNotification);
@@ -202,35 +218,21 @@ public:
 
     void paint (juce::Graphics& g) override
     {
-        IKAROS_PERF_PAINT ("MixerView::Strip");
-        auto r = getLocalBounds().toFloat();
-        g.setColour (selected ? theme().selectedBg : theme().cardBg);
-        g.fillRoundedRectangle (r, size::radiusCard);
+        LITHIUM_PERF_PAINT ("MixerView::Strip");
+        // As Lithium Drums' mixer strips: a card with a hairline border, a
+        // shade lighter with an accent border when selected.
+        paintStripCard (g, getLocalBounds().toFloat(), selected);
 
-        // Coloured top edge, as in the design (inset 3px shadow).
-        juce::Graphics::ScopedSaveState save (g);
-        juce::Path shape;
-        shape.addRoundedRectangle (r, size::radiusCard);
-        g.reduceClipRegion (shape);
+        // The track's colour dot, then its name in condensed capitals.
+        auto nameLine = nameArea.toFloat();
         g.setColour (theme().family (family));
-        g.fillRect (r.removeFromTop (3.0f));
-
-        // The selected strip's outline, drawn over the top edge. It's inset
-        // by half its width: a stroke is centred on the edge, and the half
-        // outside would be clipped away.
-        if (selected)
-        {
-            constexpr float width = 1.5f;
-            g.setColour (theme().selectedOutline);
-            g.drawRoundedRectangle (getLocalBounds().toFloat().reduced (width * 0.5f), size::radiusCard - width * 0.5f, width);
-        }
-
+        g.fillEllipse (nameLine.removeFromLeft (9.0f).withSizeKeepingCentre (5.0f, 5.0f).translated (-1.0f, 0.0f));
         g.setColour (theme().text);
-        g.setFont (fonts::uiBold (textSize::md));
-        g.drawText (name, nameArea, juce::Justification::centredLeft, true);
+        g.setFont (nameFont());
+        g.drawText (name.toUpperCase(), nameLine, juce::Justification::centredLeft, true);
 
         // The dB readout, under the fader.
-        g.setColour (theme().textSecondary);
+        g.setColour (theme().text);
         g.setFont (fonts::mono (textSize::sm));
         g.drawText (dbText, dbArea, juce::Justification::centred);
 
@@ -244,8 +246,8 @@ public:
         {
             auto caption = captionAreas[(size_t) i];
             g.setColour (theme().textSecondary);
-            g.setFont (fonts::ui (textSize::xs));
-            g.drawText (names[i], caption.removeFromTop (14), justification);
+            g.setFont (fonts::caption (textSize::xs).withExtraKerningFactor (0.06f));
+            g.drawText (names[i].toUpperCase(), caption.removeFromTop (14), justification);
             g.setColour (theme().text);
             g.setFont (fonts::mono (textSize::sm));
             g.drawText (values[i], caption, justification);
@@ -348,6 +350,8 @@ public:
 
         fader.setTitle ("Master volume");
         fader.setRange (0.0, 1.0);
+        fader.getProperties().set ("unityValue", TrackController::getFaderPositionForDb (0.0f));   // a tick at 0 dB
+        LithiumLookAndFeel::setFamilyColour (fader, Family::master);
         fader.onDragStart = [this] { engine.beginUndoStep ("Master Volume"); };   // one undo step per drag
         fader.onValueChange = [this] { engine.getTracks().setMasterVolume ((float) fader.getValue()); };
         addAndMakeVisible (fader);
@@ -375,25 +379,15 @@ public:
 
     void paint (juce::Graphics& g) override
     {
-        IKAROS_PERF_PAINT ("MixerView::MasterStrip");
-        auto r = getLocalBounds().toFloat();
-        g.setColour (theme().cardBg);
-        g.fillRoundedRectangle (r, size::radiusCard);
-
-        // A neutral top edge, like the track strips' coloured one.
-        juce::Graphics::ScopedSaveState save (g);
-        juce::Path shape;
-        shape.addRoundedRectangle (r, size::radiusCard);
-        g.reduceClipRegion (shape);
-        g.setColour (theme().family (Family::master));
-        g.fillRect (r.removeFromTop (3.0f));
+        LITHIUM_PERF_PAINT ("MixerView::MasterStrip");
+        paintStripCard (g, getLocalBounds().toFloat(), false);
 
         auto area = getLocalBounds().reduced (10);
         g.setColour (theme().text);
-        g.setFont (fonts::uiBold (textSize::md));
-        g.drawText ("Master", area.removeFromTop (18), juce::Justification::centred, true);
+        g.setFont (nameFont());
+        g.drawText ("MASTER", area.removeFromTop (18), juce::Justification::centred, true);
 
-        g.setColour (theme().textSecondary);
+        g.setColour (theme().text);
         g.setFont (fonts::mono (textSize::sm));
         g.drawText (dbText, area.removeFromBottom (16), juce::Justification::centred);
     }
@@ -496,4 +490,4 @@ void MixerView::resized()
     layoutStrips();
 }
 
-} // namespace ikaros
+} // namespace lithium

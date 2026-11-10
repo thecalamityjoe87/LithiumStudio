@@ -5,7 +5,7 @@
 #include "engine/EffectsController.h"
 #include "ui/widgets/CachedShadow.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -87,4 +87,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmpView)
 };
 
-} // namespace ikaros
+} // namespace lithium

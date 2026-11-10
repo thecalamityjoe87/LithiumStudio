@@ -7,7 +7,7 @@
 #include "engine/TrackHelpers.h"
 #include <functional>
 
-namespace ikaros
+namespace lithium
 {
 
 class SoundLibrary;
@@ -31,4 +31,4 @@ struct SoundControlParameter
     every knob has its parameter. */
 std::vector<SoundControlParameter> getSoundControlParameters (te::AudioTrack&, const SoundLibrary&, bool createMissing);
 
-} // namespace ikaros
+} // namespace lithium

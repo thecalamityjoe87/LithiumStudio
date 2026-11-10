@@ -15,7 +15,7 @@
 #include <set>
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 // Tracktion identifies every track and clip with a 64-bit EditItemID.
@@ -492,4 +492,4 @@ struct SystemStats
     std::optional<bool> realtimeAudio;
 };
 
-} // namespace ikaros
+} // namespace lithium

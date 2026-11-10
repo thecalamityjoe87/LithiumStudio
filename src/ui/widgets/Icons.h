@@ -2,7 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace ikaros
+namespace lithium
 {
 
 // Line icons drawn from SVG path data (24×24 viewBox, matching the mockup).
@@ -51,4 +51,4 @@ namespace icons
     std::unique_ptr<juce::Drawable> createDrawable (Icon, juce::Colour);
 }
 
-} // namespace ikaros
+} // namespace lithium

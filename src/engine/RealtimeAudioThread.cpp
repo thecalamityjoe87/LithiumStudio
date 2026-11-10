@@ -3,7 +3,7 @@
 
 #include <tracktion_graph/tracktion_graph.h>
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -178,4 +178,4 @@ void RealtimeAudioThread::keepRealtime (Promotion& p, std::int64_t id, const cha
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

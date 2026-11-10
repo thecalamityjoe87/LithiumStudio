@@ -13,7 +13,7 @@
 #include "ui/toolbar/Toolbar.h"
 #include "ui/widgets/ResizeHandle.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -60,7 +60,7 @@ public:
     void paintOverChildren (juce::Graphics&) override;
     void resized() override;
 
-    // For the stress harness (app/PerfHarness, IKAROS_PERF=1 only).
+    // For the stress harness (app/PerfHarness, LITHIUM_PERF=1 only).
     bool invokeCommandForPerf (juce::CommandID id)       { return commands.invokeDirectly (id, false); }
     void scrollTimelineForPerf (double beats);
     void closeSessionChooserForPerf();
@@ -74,7 +74,7 @@ public:
 private:
     AudioEngine& engine;
 
-    // Debug only (IKAROS_PERF=1): the performance overlay and its Ctrl+Shift+P key.
+    // Debug only (LITHIUM_PERF=1): the performance overlay and its Ctrl+Shift+P key.
     std::unique_ptr<juce::Component> perfOverlay;
     std::unique_ptr<juce::KeyListener> perfKeys;
     void setUpPerfMonitor (PerfMonitor&);
@@ -165,4 +165,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
 
-} // namespace ikaros
+} // namespace lithium

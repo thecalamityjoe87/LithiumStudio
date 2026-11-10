@@ -7,12 +7,12 @@
 #include "engine/DrummerTypes.h"
 #include "engine/TrackHelpers.h"
 
-namespace ikaros
+namespace lithium
 {
 class SoundLibrary;
 }
 
-namespace ikaros::detail
+namespace lithium::detail
 {
 
 // A Drummer track is an instrument track whose kindProp is "drummer" (audio
@@ -50,4 +50,4 @@ std::array<int, numDrumPieces> getDrumKeys (const SoundLibrary&, const juce::Str
     the current undo step, or none (um = nullptr). */
 void moveDrumNotesToKit (te::AudioTrack&, const SoundLibrary&, juce::UndoManager*);
 
-} // namespace ikaros::detail
+} // namespace lithium::detail

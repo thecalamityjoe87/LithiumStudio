@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Makes Ikaros Studio's default sound pack ("Ikaros Basics").
+"""Makes Lithium Studio's default sound pack ("Lithium Basics", in the folder resources/sounds/Ikaros Basics, kept under its first name).
 
 Every sample and loop is synthesised here from scratch, so the pack is our
 own work, with no third-party samples. The sounds are released under CC0
@@ -479,16 +479,16 @@ def write_manifest():
     (PACK / "pack.json").write_text(json.dumps({
         "format": 2,
         "id": PACK_ID,
-        "name": "Ikaros Basics",
+        "name": "Lithium Basics",
         "version": PACK_VERSION,
-        "description": "The sounds that come with Ikaros Studio.",
-        "author": "Ikaros Studio",
+        "description": "The sounds that come with Lithium Studio.",
+        "author": "Lithium Studio",
         "license": "CC0-1.0",
         "installedSize": size,
         "credits": [
             {
                 "what": "Every instrument and loop",
-                "who": "Synthesized for Ikaros Studio by tools/generate_sounds.py",
+                "who": "Synthesized for Lithium Studio by tools/generate_sounds.py",
                 "license": "CC0-1.0",
                 "url": "https://github.com/thecalamityjoe87/ikaros-studio",
                 "attributionRequired": False,

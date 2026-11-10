@@ -1,7 +1,7 @@
 #include "ui/pluginwindow/PluginWindow.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -55,4 +55,4 @@ void PluginWindow::moved()
         onMoved (getBounds());
 }
 
-} // namespace ikaros
+} // namespace lithium

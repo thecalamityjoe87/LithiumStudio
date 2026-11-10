@@ -4,7 +4,7 @@
 #include "ui/widgets/MeterSlider.h"
 #include "ui/toolbar/TransportBar.h"
 
-namespace ikaros
+namespace lithium
 {
 
 class AudioEngine;
@@ -68,4 +68,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Toolbar)
 };
 
-} // namespace ikaros
+} // namespace lithium

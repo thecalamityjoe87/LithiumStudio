@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -43,4 +43,4 @@ private:
     std::unique_ptr<Impl> impl;
 };
 
-} // namespace ikaros
+} // namespace lithium

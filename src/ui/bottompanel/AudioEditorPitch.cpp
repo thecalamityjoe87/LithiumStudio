@@ -8,7 +8,7 @@
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -544,4 +544,4 @@ void AudioEditor::paintPitch (juce::Graphics& g)
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

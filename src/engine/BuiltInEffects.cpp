@@ -2,7 +2,7 @@
 
 namespace te = tracktion;
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -477,4 +477,4 @@ void TremoloPlugin::applyToBuffer (const te::PluginRenderContext& fc)
     }
 }
 
-} // namespace ikaros
+} // namespace lithium

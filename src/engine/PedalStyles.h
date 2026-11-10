@@ -3,7 +3,7 @@
 #include <juce_graphics/juce_graphics.h>
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -45,4 +45,4 @@ const std::vector<PedalStyle>& getPedalStyles();
 /** The pedal that skins an effect of this type, or nullptr if it isn't one. */
 const PedalStyle* findPedalStyle (const juce::String& pluginType);
 
-} // namespace ikaros
+} // namespace lithium

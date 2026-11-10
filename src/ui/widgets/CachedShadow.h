@@ -2,7 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -45,4 +45,4 @@ private:
     void draw (juce::Graphics&, const juce::DropShadow&, juce::Rectangle<float> area, float cornerRadius);
 };
 
-} // namespace ikaros
+} // namespace lithium

@@ -1,9 +1,9 @@
 #include "ui/widgets/IconButton.h"
 #include "ui/theme/Fonts.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/Tokens.h"
 
-namespace ikaros
+namespace lithium
 {
 
 using namespace tokens;
@@ -154,7 +154,7 @@ void IconButton::paintButton (juce::Graphics& g, bool over, bool down)
     }
 
     if (hasKeyboardFocus (false))
-        IkarosLookAndFeel::drawFocusRing (g, r, cornerRadius);
+        LithiumLookAndFeel::drawFocusRing (g, r, cornerRadius);
 }
 
 void IconButton::paintIcon (juce::Graphics& g, juce::Rectangle<float> area, juce::Colour colour)
@@ -162,4 +162,4 @@ void IconButton::paintIcon (juce::Graphics& g, juce::Rectangle<float> area, juce
     icons::draw (g, *icon, area, colour, iconSize);
 }
 
-} // namespace ikaros
+} // namespace lithium

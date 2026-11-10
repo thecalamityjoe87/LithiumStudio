@@ -9,7 +9,7 @@
 
 #include <cmath>
 
-namespace ikaros
+namespace lithium
 {
 
 namespace
@@ -18,7 +18,7 @@ namespace
 
     void log (const juce::String& text)
     {
-        juce::Logger::writeToLog ("IKAROS_PERF harness: " + text);
+        juce::Logger::writeToLog ("LITHIUM_PERF harness: " + text);
     }
 
     // "--perf-tracks=16" -> "16" (empty if the option isn't there).
@@ -719,4 +719,4 @@ std::vector<PerfHarness::Part> PerfHarness::makeParts()
     return list;
 }
 
-} // namespace ikaros
+} // namespace lithium

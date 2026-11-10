@@ -2,7 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
-namespace ikaros
+namespace lithium
 {
 
 // Every menu item / keyboard shortcut is an "application command".
@@ -94,4 +94,4 @@ namespace CommandIDs
     };
 }
 
-} // namespace ikaros
+} // namespace lithium

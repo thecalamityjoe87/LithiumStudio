@@ -1,29 +1,30 @@
-// Ikaros Studio — application entry point.
+// Lithium Studio — application entry point.
 
 #include "app/MainWindow.h"
 #include "app/PerfHarness.h"
+#include "app/RenameMigration.h"
 #include "platform/ExternalDrops.h"
 #include "ui/dialogs/StartupSplash.h"
-#include "ui/theme/IkarosLookAndFeel.h"
+#include "ui/theme/LithiumLookAndFeel.h"
 #include "ui/theme/ThemeManager.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
 /** The JUCEApplication: owns the LookAndFeel, the audio engine and the window. */
-class IkarosApplication  : public juce::JUCEApplication
+class LithiumApplication  : public juce::JUCEApplication
 {
 public:
     const juce::String getApplicationName() override       { return JUCE_APPLICATION_NAME_STRING; }
     const juce::String getApplicationVersion() override    { return JUCE_APPLICATION_VERSION_STRING; }
     // One window at a time, except for the plug-in scan's worker processes:
     // they're copies of this app started with a special command line.
-    // IKAROS_SECOND_INSTANCE=1 also allows one, for testing a build while
+    // LITHIUM_SECOND_INSTANCE=1 also allows one, for testing a build while
     // another copy is open.
     bool moreThanOneInstanceAllowed() override
     {
-        return isScanWorker() || juce::SystemStats::getEnvironmentVariable ("IKAROS_SECOND_INSTANCE", {}).isNotEmpty();
+        return isScanWorker() || juce::SystemStats::getEnvironmentVariable ("LITHIUM_SECOND_INSTANCE", {}).isNotEmpty();
     }
 
     void initialise (const juce::String& commandLine) override
@@ -33,7 +34,7 @@ public:
             return;
 
         // Install the LookAndFeel before creating any components so they all pick it up.
-        lookAndFeel = std::make_unique<IkarosLookAndFeel>();
+        lookAndFeel = std::make_unique<LithiumLookAndFeel>();
         juce::LookAndFeel::setDefaultLookAndFeel (lookAndFeel.get());
 
         // Starting the engine takes a moment and blocks the message loop, so
@@ -43,8 +44,12 @@ public:
 
     void finishStarting (const juce::String& commandLine)
     {
+        // Settings, sessions and sounds kept under the app's earlier name move
+        // across the first time (before the engine opens its settings).
+        moveFilesFromIkarosStudio ("IkarosStudio", "LithiumStudio");
+
         // Doesn't start yet: the engine's stages run below, one at a time.
-        engine = std::make_unique<AudioEngine> ("IkarosStudio", true, false);
+        engine = std::make_unique<AudioEngine> ("LithiumStudio", true, false);
         runNextStartupStep (commandLine);
     }
 
@@ -134,10 +139,10 @@ private:
 
         splash->setStage ("Ready", 1.0f);
 
-        // Started by double-clicking a session (or "ikaros-studio My Song.iksession").
+        // Started by double-clicking a session (or "lithium-studio My Song.lisession").
         openSessionsIn (commandLine);
 
-        // Debug only: a stress run (--perf-scenario=..., with IKAROS_PERF=1).
+        // Debug only: a stress run (--perf-scenario=..., with LITHIUM_PERF=1).
         perfHarness = PerfHarness::createIfRequested (commandLine, *engine, *mainWindow->getMainComponent(),
                                                       [] { juce::JUCEApplication::quit(); });
 
@@ -150,12 +155,13 @@ private:
     // (after the session chooser has appeared, so it can replace it).
     void openSessionsIn (const juce::String& commandLine)
     {
-        // fromTokens with quote handling keeps "My Song.iksession" in one piece.
+        // fromTokens with quote handling keeps "My Song.lisession" in one piece.
         for (auto arg : juce::StringArray::fromTokens (commandLine, true))
         {
             const juce::File file (juce::File::getCurrentWorkingDirectory().getChildFile (arg.unquoted()));
 
             if (file.existsAsFile() && (file.hasFileExtension (AudioEngine::sessionFileExtension)
+                                         || file.hasFileExtension (AudioEngine::previousSessionFileExtension)
                                          || file.hasFileExtension (AudioEngine::legacySessionFileExtension)))
             {
                 juce::MessageManager::callAsync ([window = juce::Component::SafePointer<MainWindow> (mainWindow.get()), file]
@@ -170,10 +176,10 @@ private:
 
     static bool isScanWorker()
     {
-        return getCommandLineParameters().contains ("--IkarosPluginScan:");
+        return getCommandLineParameters().contains ("--LithiumPluginScan:");
     }
 
-    std::unique_ptr<IkarosLookAndFeel> lookAndFeel;
+    std::unique_ptr<LithiumLookAndFeel> lookAndFeel;
     std::unique_ptr<StartupSplash> splash;   // only while starting
     std::unique_ptr<AudioEngine> engine;
     std::unique_ptr<ThemeManager> themeManager;   // after engine: members are destroyed in reverse order
@@ -181,7 +187,7 @@ private:
     std::unique_ptr<PerfHarness> perfHarness;   // only for a stress run
 };
 
-} // namespace ikaros
+} // namespace lithium
 
 // Generates main() (or WinMain) and starts the app's message loop.
-START_JUCE_APPLICATION (ikaros::IkarosApplication)
+START_JUCE_APPLICATION (lithium::LithiumApplication)

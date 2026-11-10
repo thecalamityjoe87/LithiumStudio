@@ -3,7 +3,7 @@
 #include "engine/GrooveLibrary.h"
 #include <vector>
 
-namespace ikaros
+namespace lithium
 {
 
 /** One bar of the song, as the Drummer sees it. */
@@ -97,4 +97,4 @@ namespace drummer
     inline constexpr float loudTimekeeping = 0.7f;
 }
 
-} // namespace ikaros
+} // namespace lithium

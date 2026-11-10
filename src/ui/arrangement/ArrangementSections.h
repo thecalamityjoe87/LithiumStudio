@@ -5,7 +5,7 @@
 #include "ui/arrangement/ArrangementView.h"
 #include "engine/SectionEditor.h"
 
-namespace ikaros
+namespace lithium
 {
 
 //==============================================================================
@@ -100,4 +100,4 @@ private:
     void hideNameField();
 };
 
-} // namespace ikaros
+} // namespace lithium
