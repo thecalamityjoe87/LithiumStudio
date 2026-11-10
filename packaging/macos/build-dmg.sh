@@ -53,7 +53,12 @@ fi
 # The disk image shows the app next to a link to Applications, to drag it onto.
 ln -s /Applications "$out/dmg/Applications"
 dmg="$out/Lithium_Studio-$version-macos.dmg"
-hdiutil create -volname "Lithium Studio" -srcfolder "$out/dmg" -format UDZO -ov "$dmg"
+# hdiutil's own guess at the image size from -srcfolder comes out too small
+# for an app this large ("No space left on device"), so it gets the size:
+# what the folder holds, plus a fifth and 50 MB for the file system.
+size_mb=$(( $(du -sm "$out/dmg" | cut -f1) * 12 / 10 + 50 ))
+hdiutil create -volname "Lithium Studio" -srcfolder "$out/dmg" -fs HFS+ \
+    -size "${size_mb}m" -format UDZO -ov "$dmg"
 
 if [[ -n "${LITHIUM_SIGN_APP:-}" ]]; then
     codesign --force --timestamp --sign "$LITHIUM_SIGN_APP" "$dmg"

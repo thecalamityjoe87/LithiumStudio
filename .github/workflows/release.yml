@@ -38,6 +38,14 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
+          # Ubuntu's default mirrors are slow from GitHub's runners (a download
+          # took 14 minutes, long enough for a security update to replace
+          # packages apt had planned to fetch, which then 404'd). The Azure
+          # mirror the runners themselves use is fast, and failed downloads
+          # are retried.
+          sed -i -e 's|http://archive.ubuntu.com|http://azure.archive.ubuntu.com|' \
+                 -e 's|http://security.ubuntu.com|http://azure.archive.ubuntu.com|' /etc/apt/sources.list
+          echo 'Acquire::Retries "5";' > /etc/apt/apt.conf.d/80retries
           apt-get update
           apt-get install -y --no-install-recommends software-properties-common gpg-agent
           # 22.04's own GCC is too old for the C++20 the app uses.
