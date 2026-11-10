@@ -6,31 +6,18 @@
 namespace lithium
 {
 
+class SoundsBrowser;
+
 //==============================================================================
 /**
     "Manage Sounds": the sound packs on this computer and the ones the user
-    can download, like GarageBand's Sound Library. The library lists a
-    category's packs to download too; this window is where they're all
-    managed. Two sections:
+    can download, like GarageBand's Sound Library. The window is a
+    SoundsBrowser (categories, pack cards and a details pane, laid out like
+    Lithium Drums' kit browser) in a large panel over the main window.
 
-      Installed               with the space they take, Update and Remove
-      Available to download   collections (the starter sounds) first, with
-                              "Download All", then single packs grouped by
-                              library category (Keyboards, Drums, Bass...)
-
-    Chips along the top (All, Keys, Drums...) narrow both sections to one
-    category, so a bass pack is one click away among dozens of packs.
-
-    Each pack shows its name, size and description, and a button for what
-    can be done with it: Download, Update, Remove, or Cancel while it
-    downloads. Packs that come with the app can't be removed.
-
-    It reads everything from the engine's PackStore, and redraws whenever the
-    store says something changed (download progress included). Without the
-    internet it says so and still lists the installed packs.
-
-    On first run it opens in its welcome form instead (showWelcome), offering
-    the starter sounds.
+    On first run it opens in its welcome form instead (showWelcome): a small
+    panel offering the starter sounds, with "Not Now". Without the internet
+    it says so, with Try Again.
 
     Shown inside the main window over a dimmed background, like the New
     Track dialog. Deletes itself when closed.
@@ -70,6 +57,9 @@ private:
     bool starterRequested = false;     // welcome: the user chose to download the starter sounds
     std::function<void()> onClosed;
 
+    std::unique_ptr<SoundsBrowser> browser;   // Manage Sounds (not the welcome)
+
+    // The welcome form.
     juce::Viewport listViewport;
     juce::Component listHolder;
     juce::OwnedArray<Row> rows;
@@ -79,20 +69,15 @@ private:
     juce::String doneText { "Done" };  // what doneButton says (for its width)
     juce::Rectangle<int> panel, statusArea;
 
-    // The category chips: one per group that has packs, plus "All".
-    juce::OwnedArray<IconButton> filterChips;
-    juce::StringArray filterGroups, filterLabels;   // each chip's group (empty for All) and label, in chip order
-    juce::String filter;               // the chosen group: a library category, "Other", or empty for All
     juce::String statusText;
 
     void changeListenerCallback (juce::ChangeBroadcaster*) override;
     void refresh();
-    void setFilter (const juce::String& group);
-    void confirmRemove (const juce::String& packId, const juce::String& name);
     void markStarterOffered();
     void close();
 
-    static constexpr int panelWidth = 680, panelHeight = 600;
+    static constexpr int panelWidth = 680, panelHeight = 600;            // the welcome
+    static constexpr int browserMaxWidth = 1180, browserMaxHeight = 760;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ManageSoundsDialog)
 };

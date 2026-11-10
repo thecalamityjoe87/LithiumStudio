@@ -70,7 +70,7 @@ Every track has a fader, pan and sends to a shared reverb and delay, plus an EQ 
 
 ### Find more sounds
 
-![The Manage Sounds window: sound packs by category, each with its size, license and a Remove or Download button](docs/images/sounds.png)
+![The Manage Sounds window: categories on the left, sound packs as cards under category headings, and the chosen pack's size, license and Download button on the right](docs/images/sounds.png)
 
 The library has instruments by category, loops, your own audio files and plug-ins. The app comes with Lithium Basics, a small set made from scratch, and more sound packs are a click away: packs that aren't installed are listed in their category with a download button, and Sounds > Manage Sounds... lists every pack to download, update or remove. With a free Freesound API key, the loop browser also searches Freesound for loops you're allowed to use.
 
@@ -82,7 +82,7 @@ MIDI controllers from Akai, Alesis, Arturia, Korg, M-Audio, Nektar, Novation and
 
 ## Install
 
-Download the installer for your system from the [Releases](https://github.com/thecalamityjoe87/ikaros-studio/releases) page:
+Download the installer for your system from the [Releases](https://github.com/thecalamityjoe87/LithiumStudio/releases) page:
 
 - **Linux:** unpack `Lithium_Studio-<version>-linux-x86_64.tar.gz` and double-click "Install Lithium Studio". It installs into your home folder (no password), adds Lithium Studio to your app menu, opens `.lisession` files from your file manager, and can download the Starter sounds (piano, drums, bass, guitar and strings, about 380 MB). Run it again to update or remove it. There's also an AppImage.
 - **Windows:** run `Lithium_Studio-<version>-windows-setup.exe`, or unpack the zip.
@@ -113,8 +113,8 @@ It's built on Tracktion Engine (GPLv3 or later) and JUCE (AGPLv3), and the other
 You need CMake 3.22+ and a C++20 compiler. Tracktion Engine (which includes JUCE) lives in `external/tracktion_engine`, sfizz, which plays SFZ instruments, in `external/sfizz`, miniz, which reads and writes session files, in `external/miniz`, Rubber Band, which stretches loops to the song's tempo and key, in `external/rubberband`, the DSP behind the pedals in `external/gxplugins` and `external/kloncentaur`, and behind the amp in `external/guitarix`. The first build takes a while because it compiles all of them.
 
 ```sh
-git clone --recursive https://github.com/thecalamityjoe87/ikaros-studio.git
-cd ikaros-studio
+git clone --recursive https://github.com/thecalamityjoe87/LithiumStudio.git
+cd LithiumStudio
 ```
 
 #### Linux

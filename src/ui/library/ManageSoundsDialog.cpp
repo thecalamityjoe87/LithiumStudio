@@ -1,5 +1,6 @@
 #include "ui/library/ManageSoundsDialog.h"
 #include "engine/PackStore.h"
+#include "ui/library/SoundsBrowser.h"
 #include "ui/dialogs/AlertDialog.h"
 #include "ui/theme/Fonts.h"
 #include "ui/theme/Tokens.h"
@@ -40,53 +41,9 @@ namespace
         bool mainIsCancel = false;     // a grey Cancel rather than an amber action
         bool canRemove = false;
         bool highlighted = false;      // collections stand out from the packs
-        bool heading = false;          // a section heading ("Installed"): just title and facts
-        bool subheading = false;       // ...or a category within a section ("Bass")
+        bool heading = false;          // a section heading: just title and facts
+        bool subheading = false;       // ...or a smaller one
     };
-
-    RowView headingView (const juce::String& key, const juce::String& title, const juce::String& facts = {},
-                         bool subheading = false)
-    {
-        RowView v;
-        v.key = "heading:" + key;
-        v.title = title;
-        v.facts = facts;
-        v.heading = ! subheading;
-        v.subheading = subheading;
-        return v;
-    }
-
-    // The groups packs are filed under: the library's categories, in the
-    // sidebar's order, with their short tile labels for the chips. Packs
-    // with any other category go under Other.
-    struct PackGroup { const char* category; const char* label; };
-
-    const PackGroup packGroups[] {
-        { "Keyboards", "Keys" },
-        { "Drums",     "Drums" },
-        { "Bass",      "Bass" },
-        { "Synths",    "Synths" },
-        { "Guitar",    "Guitar" },
-        { "Strings",   "Strings" },
-        { "Woodwinds", "Woodwinds" },
-        { "Brass",     "Brass" },
-        { "Loops",     "Loops" },
-        { "Other",     "Other" },
-    };
-
-    juce::String groupOf (const StorePack& p)
-    {
-        for (auto& g : packGroups)
-            if (p.category == g.category)
-                return g.category;
-
-        return "Other";
-    }
-
-    juce::String countOfPacks (size_t n)
-    {
-        return juce::String ((int) n) + (n == 1 ? " pack" : " packs");
-    }
 
     RowView viewOf (const StorePack& p)
     {
@@ -397,6 +354,16 @@ ManageSoundsDialog::ManageSoundsDialog (AudioEngine& e, bool isWelcome, const ju
     setWantsKeyboardFocus (true);
     setAlwaysOnTop (true);
 
+    // Manage Sounds: the browser does everything inside the panel.
+    if (! welcome)
+    {
+        browser = std::make_unique<SoundsBrowser> (engine, pendingDownload);
+        browser->onClose = [this] { close(); };
+        addAndMakeVisible (*browser);
+        pendingDownload.clear();
+        return;
+    }
+
     listViewport.setViewedComponent (&listHolder, false);   // false: we own listHolder, the viewport doesn't
     listViewport.setScrollBarsShown (true, false);
     addAndMakeVisible (listViewport);
@@ -438,30 +405,6 @@ ManageSoundsDialog::ManageSoundsDialog (AudioEngine& e, bool isWelcome, const ju
     };
     addAndMakeVisible (doneButton);
 
-    // The category chips. Which ones show depends on the packs (see refresh).
-    // A chosen chip is neutral, like a chosen tab: the accent means "on".
-    if (! welcome)
-    {
-        auto addChip = [this] (const juce::String& group, const juce::String& label)
-        {
-            auto* chip = filterChips.add (new IconButton (group.isEmpty() ? juce::String ("Show all packs")
-                                                                          : "Show " + group + " packs",
-                                                          std::nullopt, label));
-            chip->setColours (IconButton::neutralToggleColours);
-            chip->setCornerRadius (size::radiusPill);
-            chip->setFont (fonts::uiSemiBold (textSize::sm));
-            chip->onClick = [this, group] { setFilter (group); };
-            addChildComponent (chip);
-            filterGroups.add (group);
-            filterLabels.add (label);
-        };
-
-        addChip ({}, "All");
-
-        for (auto& g : packGroups)
-            addChip (g.category, g.label);
-    }
-
     auto& store = engine.getPackStore();
     store.addChangeListener (this);
 
@@ -474,7 +417,7 @@ ManageSoundsDialog::ManageSoundsDialog (AudioEngine& e, bool isWelcome, const ju
 
 ManageSoundsDialog::~ManageSoundsDialog()
 {
-    engine.getPackStore().removeChangeListener (this);
+    engine.getPackStore().removeChangeListener (this);   // (welcome only; harmless otherwise)
 }
 
 void ManageSoundsDialog::changeListenerCallback (juce::ChangeBroadcaster*)
@@ -487,15 +430,11 @@ void ManageSoundsDialog::markStarterOffered()
     engine.setAppSetting (starterOfferedSetting, true);
 }
 
-void ManageSoundsDialog::setFilter (const juce::String& group)
-{
-    filter = group;
-    refresh();
-    listViewport.setViewPosition (0, 0);
-}
-
 void ManageSoundsDialog::refresh()
 {
+    if (browser != nullptr)
+        return;   // Manage Sounds: the browser keeps itself up to date
+
     auto& store = engine.getPackStore();
     const auto status = store.getIndexStatus();
     const auto packs = store.getPacks();
@@ -537,28 +476,11 @@ void ManageSoundsDialog::refresh()
                : nothingToDownload ? "There are no sound packs to download yet. Your installed packs are below."
                : juce::String();
     retryButton.setVisible (offline);
-    // A chip for each group that has packs. If the chosen group has none
-    // left (its last pack was removed), go back to All.
-    auto hasPacksIn = [&packs] (const juce::String& group)
-    {
-        return std::any_of (packs.begin(), packs.end(), [&group] (const StorePack& p) { return groupOf (p) == group; });
-    };
-
-    if (filter.isNotEmpty() && ! hasPacksIn (filter))
-        filter.clear();
-
-    for (int i = 0; i < filterChips.size(); ++i)
-    {
-        const auto& group = filterGroups[i];
-        filterChips[i]->setVisible (! packs.empty() && (group.isEmpty() || hasPacksIn (group)));
-        filterChips[i]->setToggleState (group == filter, juce::dontSendNotification);
-    }
 
     std::vector<RowView> views;
 
-    if (welcome)
     {
-        // Just the starter set and what's in it. The big button at the
+        // The welcome: just the starter set and what's in it. The big button at the
         // bottom downloads them, so the rows have no buttons.
         if (starter.has_value())
         {
@@ -575,74 +497,6 @@ void ManageSoundsDialog::refresh()
                     views.push_back (pv);
                 }
             }
-        }
-    }
-    else
-    {
-        // Installed packs first (with the space they take), then what there
-        // is to download: collections with something left to get, then
-        // single packs by category. A pack moves up to Installed once it's
-        // installed. A chosen chip narrows both to its category.
-        auto listed = [this] (const StorePack& p) { return filter.isEmpty() || groupOf (p) == filter; };
-        std::vector<RowView> installed, available;
-        juce::int64 installedBytes = 0;
-
-        for (auto& p : packs)
-        {
-            if (p.installedVersion.isNotEmpty() && listed (p))
-            {
-                installed.push_back (viewOf (p));
-                installedBytes += p.installedSize;
-            }
-        }
-
-        // Collections hold packs from several categories, so they're only
-        // offered under All.
-        if (filter.isEmpty())
-        {
-            std::vector<RowView> sets;
-
-            for (auto& c : collections)
-                if (c.packsToInstall > 0 || c.packsDownloading > 0)
-                    sets.push_back (viewOf (c, packs));
-
-            if (! sets.empty())
-            {
-                available.push_back (headingView ("collections", "Collections", {}, true));
-                available.insert (available.end(), sets.begin(), sets.end());
-            }
-        }
-
-        for (auto& g : packGroups)
-        {
-            std::vector<RowView> inGroup;
-
-            for (auto& p : packs)
-                if (p.installedVersion.isEmpty() && groupOf (p) == g.category && listed (p))
-                    inGroup.push_back (viewOf (p));
-
-            if (inGroup.empty())
-                continue;
-
-            // Under All, each category gets a subheading. One category
-            // chosen: the chip already says which.
-            if (filter.isEmpty())
-                available.push_back (headingView (juce::String ("group:") + g.category, g.category, countOfPacks (inGroup.size()), true));
-
-            available.insert (available.end(), inGroup.begin(), inGroup.end());
-        }
-
-        if (! installed.empty())
-        {
-            views.push_back (headingView ("installed", "Installed", installedBytes > 0 ? sizeText (installedBytes) + " on this computer"
-                                                                                       : juce::String()));
-            views.insert (views.end(), installed.begin(), installed.end());
-        }
-
-        if (! available.empty())
-        {
-            views.push_back (headingView ("available", "Available to download"));
-            views.insert (views.end(), available.begin(), available.end());
         }
     }
 
@@ -683,8 +537,6 @@ void ManageSoundsDialog::refresh()
                     else
                         s.install (id);
                 };
-
-                row->onRemove = [this, id, name = v.title] { confirmRemove (id, name); };
             }
         }
     }
@@ -706,31 +558,6 @@ void ManageSoundsDialog::refresh()
 
     resized();
     repaint();
-}
-
-void ManageSoundsDialog::confirmRemove (const juce::String& packId, const juce::String& name)
-{
-    auto options = juce::MessageBoxOptions()
-                       .withTitle ("Remove \"" + name + "\"?")
-                       .withMessage ("Its sounds and loops are deleted from this computer. Tracks that use them stay in "
-                                     "your sessions and play again once you download the pack again.")
-                       .withButton ("Remove", 1)
-                       .withButton ("Cancel", 0)
-                       .withAssociatedComponent (this);
-
-    // The answer arrives later (no modal loops), so check we still exist.
-    AlertDialog::show (options, [safeThis = SafePointer<ManageSoundsDialog> (this), packId] (int result)
-    {
-        if (safeThis == nullptr || result != 1)
-            return;
-
-        if (! safeThis->engine.getPackStore().remove (packId))
-            AlertDialog::show (juce::MessageBoxOptions()
-                               .withTitle ("Couldn't remove the pack")
-                               .withMessage ("Wait for downloads to finish, or check that its folder isn't open elsewhere.")
-                               .withButton ("OK", 0)
-                               .withAssociatedComponent (safeThis.getComponent()));
-    });
 }
 
 void ManageSoundsDialog::close()
@@ -757,6 +584,17 @@ void ManageSoundsDialog::close()
 
 bool ManageSoundsDialog::keyPressed (const juce::KeyPress& key)
 {
+    if (browser != nullptr)
+    {
+        if (key == juce::KeyPress::escapeKey)
+        {
+            close();
+            return true;
+        }
+
+        return browser->keyPressed (key);   // arrow keys move between packs
+    }
+
     if (key == juce::KeyPress::escapeKey)
     {
         if (notNowButton.isVisible())
@@ -793,20 +631,21 @@ void ManageSoundsDialog::paint (juce::Graphics& g)
     g.setColour (theme().border);
     g.drawRoundedRectangle (panel.toFloat().reduced (0.5f), size::radiusPill, 1.0f);
 
+    if (browser != nullptr)
+        return;   // the browser draws the rest
+
     auto r = panel.reduced (28, 24);
     g.setColour (theme().text);
     g.setFont (fonts::uiBold (textSize::title));
-    g.drawText (welcome ? juce::String ("Welcome to Lithium Studio") : juce::String ("Manage Sounds"),
-                r.removeFromTop (26), juce::Justification::centredLeft);
+    g.drawText ("Welcome to Lithium Studio", r.removeFromTop (26), juce::Justification::centredLeft);
 
-    const juce::String subtitle = ! welcome ? juce::String ("Download, update and remove sound packs. New sounds appear in the library as soon as they're installed.")
-                                : starterRequested ? "The starter sounds are downloading. You can start making music now: "
+    const juce::String subtitle = starterRequested ? "The starter sounds are downloading. You can start making music now: "
                                                      "each pack appears in the library as soon as it's installed."
                                                    : "Start with the starter sounds: real instruments and loops to play and build "
                                                      "songs with. You can download more any time from Manage Sounds.";
     g.setColour (theme().textSecondary);
     g.setFont (fonts::ui (textSize::md));
-    g.drawFittedText (subtitle, r.removeFromTop (welcome ? 40 : 22), juce::Justification::topLeft, 2, 1.0f);
+    g.drawFittedText (subtitle, r.removeFromTop (40), juce::Justification::topLeft, 2, 1.0f);
 
     if (statusText.isNotEmpty())
     {
@@ -817,29 +656,19 @@ void ManageSoundsDialog::paint (juce::Graphics& g)
 
 void ManageSoundsDialog::resized()
 {
+    if (browser != nullptr)
+    {
+        // A large panel, laid out like Lithium Drums' kit browser.
+        panel = getLocalBounds().withSizeKeepingCentre (juce::jmin (browserMaxWidth, getWidth() - 48),
+                                                        juce::jmin (browserMaxHeight, getHeight() - 48));
+        browser->setBounds (panel.reduced (24, 22));
+        return;
+    }
+
     panel = getLocalBounds().withSizeKeepingCentre (juce::jmin (panelWidth, getWidth() - 32),
                                                     juce::jmin (panelHeight, getHeight() - 32));
     auto r = panel.reduced (28, 24);
-    r.removeFromTop (26 + (welcome ? 40 : 22) + 12);
-
-    // The category chips, left to right, each as wide as its label.
-    if (! welcome)
-    {
-        auto chips = r.removeFromTop (28);
-        const auto chipFont = fonts::uiSemiBold (textSize::sm);
-
-        for (int i = 0; i < filterChips.size(); ++i)
-        {
-            if (! filterChips[i]->isVisible())
-                continue;
-
-            const int w = juce::roundToInt (juce::GlyphArrangement::getStringWidth (chipFont, filterLabels[i])) + 22;
-            filterChips[i]->setBounds (chips.removeFromLeft (w));
-            chips.removeFromLeft (6);
-        }
-
-        r.removeFromTop (12);
-    }
+    r.removeFromTop (26 + 40 + 12);
 
     // Bottom right: the main button, with Not Now to its left.
     auto bottom = r.removeFromBottom (36);

@@ -209,7 +209,7 @@ struct ThemePalette
 
         // Region bodies are the family colour at these alphas over the lane;
         // their headers are the full colour.
-        float regionBodyAlpha = 0.32f, regionBodySelectedAlpha = 0.42f;
+        float regionBodyAlpha = 0.26f, regionBodySelectedAlpha = 0.36f;
     };
 
     Arrangement arrangement;

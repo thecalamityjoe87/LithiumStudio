@@ -7,12 +7,12 @@ namespace lithium
 
 //==============================================================================
 /**
-    The About window's Built With page: the projects Lithium Studio is made
-    from. Tracktion Engine and JUCE get cards with their logos; the rest get a
-    row each with a lettered tile. Clicking a card or row opens the project's
-    website.
+    The About page's BUILT WITH section: the projects Lithium Studio is made
+    from. Tracktion Engine and JUCE get cards with their logos, side by side;
+    the rest are rows of a two-column table (name, license), like Lithium
+    Drums' About panel. Clicking a card or row opens the project's website.
 
-    The license texts themselves stay in Acknowledgements and CREDITS.
+    The full license texts are in the CREDITS file.
 */
 class AboutTechnology  : public juce::Component
 {
@@ -29,7 +29,7 @@ private:
     class Entry;
 
     juce::OwnedArray<Entry> featured, others;
-    juce::Rectangle<int> builtOnHeading, alsoInsideHeading, footer;
+    juce::Rectangle<int> footer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AboutTechnology)
 };

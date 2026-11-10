@@ -172,20 +172,21 @@ namespace
         p.popoverShadow       = { juce::Colours::black.withAlpha (0.5f), 14, { 0, 4 } };
 
         // Instrument families, in the order of tokens::Family: the hues of
-        // Lithium Drums' group and FX colours (drums red, keys blue, loops
-        // teal...), made richer so tracks and regions don't look washed out.
-        // None is the accent cyan.
-        p.familyColours = { hex (0xffff4d5e),    // drums
-                            hex (0xffff8a3d),    // audio
-                            hex (0xffff5fae),    // strings
-                            hex (0xff4fdc6a),    // bass
-                            hex (0xff3d8bff),    // keys
-                            hex (0xff9a6bff),    // synths
-                            hex (0xffffcc33),    // guitar
-                            hex (0xffb4e036),    // woodwinds
-                            hex (0xffe8a33a),    // brass
-                            hex (0xff22d6a8),    // loops
-                            hex (0xffe05ce6),    // plugins
+        // Lithium Drums' group and FX colours, a little more saturated than
+        // Drums' pad colours so tracks and regions still stand out, but
+        // softened so they sit with the blue-black surfaces. None is the
+        // accent cyan.
+        p.familyColours = { hex (0xffd968e0),    // drums: magenta
+                            hex (0xfff98d4e),    // audio
+                            hex (0xfff57cb3),    // strings
+                            hex (0xff6fd672),    // bass
+                            hex (0xff5f9bf0),    // keys
+                            hex (0xffa47eff),    // synths
+                            hex (0xfff2cf55),    // guitar
+                            hex (0xffb3db5a),    // woodwinds
+                            hex (0xffd9a24f),    // brass
+                            hex (0xff42d4ae),    // loops
+                            hex (0xfff65d63),    // plugins: red
                             hex (0xff93a3b1) };  // master: neutral grey
         p.inkColours = p.familyColours;          // dark mode: ink is the family colour
         p.knobArcColours = p.familyColours;
