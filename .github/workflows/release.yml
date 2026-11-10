@@ -1,4 +1,14 @@
-# Release builds for Linux (AppImage), Windows (zip) and macOS (dmg).
+# Release builds for Linux (installer and AppImage), Windows (installer and
+# zip) and macOS (installer and dmg).
+#
+# macOS signing and notarization happen only when these repository secrets
+# exist (Settings > Secrets and variables > Actions), as for Lithium Drums;
+# without them the app is ad-hoc signed and the .pkg unsigned:
+#   MACOS_CERTIFICATES_P12      base64 of a .p12 holding both Developer ID certificates
+#   MACOS_CERTIFICATES_PASSWORD its password
+#   MACOS_SIGN_APP              "Developer ID Application: Isaac Joseph (TEAMID)"
+#   MACOS_SIGN_INSTALLER        "Developer ID Installer: Isaac Joseph (TEAMID)"
+#   APPLE_ID, APPLE_TEAM_ID, APPLE_APP_PASSWORD   for notarization
 #
 # Runs when a version tag is pushed (git tag v0.13.0 && git push origin v0.13.0),
 # and then also makes a draft GitHub release with the three files, to check
@@ -17,7 +27,7 @@ permissions:
 
 jobs:
   linux:
-    name: Linux AppImage
+    name: Linux installer and AppImage
     runs-on: ubuntu-latest
     # An AppImage only runs on systems with a glibc at least as new as the
     # one it was built with, so it's built on an older Ubuntu (22.04, glibc
@@ -62,14 +72,20 @@ jobs:
       - name: Build the AppImage
         run: bash packaging/appimage/build-appimage.sh
 
+      # The graphical installer, with the files it installs, in a .tar.gz.
+      - name: Build the installer
+        run: bash packaging/linux/build-installer.sh
+
       - uses: actions/upload-artifact@v4
         with:
           name: linux
-          path: build-appimage/*.AppImage
+          path: |
+            dist/*.tar.gz
+            build-appimage/*.AppImage
           if-no-files-found: error
 
   windows:
-    name: Windows zip
+    name: Windows installer and zip
     runs-on: windows-latest
     steps:
       # The JUCE patches must match its files byte for byte, Windows line
@@ -90,18 +106,28 @@ jobs:
       - name: Configure
         run: cmake -B build-release -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl
 
-      - name: Build the zip
-        run: ./packaging/windows/build-zip.ps1
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+
+      # Builds the app, the zip, then the installer from the same files.
+      - name: Build the installer and the zip
+        run: ./packaging/windows/build-installer.ps1
 
       - uses: actions/upload-artifact@v4
         with:
           name: windows
-          path: build-zip/*.zip
+          path: |
+            dist/*.exe
+            build-zip/*.zip
           if-no-files-found: error
 
   macos:
-    name: macOS dmg
+    name: macOS installer and dmg
     runs-on: macos-latest
+    env:
+      # Step conditions can't read secrets directly; these say whether they exist.
+      HAS_CERTS: ${{ secrets.MACOS_CERTIFICATES_P12 != '' }}
+      HAS_NOTARY: ${{ secrets.APPLE_ID != '' }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -110,15 +136,43 @@ jobs:
       - name: Install Ninja
         run: brew install ninja
 
+      - name: Import signing certificates
+        if: env.HAS_CERTS == 'true'
+        env:
+          P12: ${{ secrets.MACOS_CERTIFICATES_P12 }}
+          P12_PASSWORD: ${{ secrets.MACOS_CERTIFICATES_PASSWORD }}
+        run: |
+          echo "$P12" | base64 --decode > certs.p12
+          security create-keychain -p ci build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p ci build.keychain
+          security import certs.p12 -k build.keychain -P "$P12_PASSWORD" -T /usr/bin/codesign -T /usr/bin/productbuild
+          security set-key-partition-list -S apple-tool:,apple: -s -k ci build.keychain
+          rm certs.p12
+
+      - name: Store notarization credentials
+        if: env.HAS_NOTARY == 'true'
+        run: |
+          xcrun notarytool store-credentials lithium --apple-id "${{ secrets.APPLE_ID }}" \
+            --team-id "${{ secrets.APPLE_TEAM_ID }}" --password "${{ secrets.APPLE_APP_PASSWORD }}"
+          echo "LITHIUM_NOTARY_PROFILE=lithium" >> "$GITHUB_ENV"
+
       # Builds for Apple Silicon and for Intel, one after the other, and
-      # joins them into one app.
-      - name: Build the dmg
-        run: bash packaging/macos/build-dmg.sh
+      # joins them into one app; then packs that app into the installer.
+      - name: Build the dmg and the installer
+        env:
+          LITHIUM_SIGN_APP: ${{ secrets.MACOS_SIGN_APP }}
+          LITHIUM_SIGN_INSTALLER: ${{ secrets.MACOS_SIGN_INSTALLER }}
+        run: |
+          bash packaging/macos/build-dmg.sh
+          bash packaging/macos/build-pkg.sh
 
       - uses: actions/upload-artifact@v4
         with:
           name: macos
-          path: build-dmg/*.dmg
+          path: |
+            dist/*.pkg
+            build-dmg/*.dmg
           if-no-files-found: error
 
   release:
@@ -140,5 +194,5 @@ jobs:
         run: >
           gh release create "$GITHUB_REF_NAME" dist/*
           --repo "$GITHUB_REPOSITORY" --draft --prerelease
-          --title "Ikaros Studio $GITHUB_REF_NAME"
-          --notes "Builds for Linux (AppImage), Windows (zip) and macOS (dmg, Apple Silicon and Intel)."
+          --title "Lithium Studio $GITHUB_REF_NAME"
+          --notes "Builds for Linux (installer, or AppImage), Windows (installer, or zip) and macOS (installer, or dmg; Apple Silicon and Intel)."
