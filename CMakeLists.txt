@@ -662,7 +662,7 @@ endif()
 set(LITHIUM_SOUNDS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources/sounds")
 
 function(lithium_copy_sounds target)
-    if(APPLE AND target STREQUAL "IkarosStudio")
+    if(APPLE AND target STREQUAL "LithiumStudio")
         set(dest "$<TARGET_FILE_DIR:${target}>/../Resources/Sounds")
     else()
         set(dest "$<TARGET_FILE_DIR:${target}>/Sounds")
