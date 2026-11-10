@@ -32,5 +32,15 @@ DESTDIR="$appdir" cmake --install "$root/build-release" --prefix /usr
     --icon-file "$root/resources/icons/$app_id.svg" \
     --executable "$appdir/usr/bin/lithium-studio"
 
-ARCH=x86_64 VERSION="$version" "$tools/appimagetool" "$appdir" \
+# appimagetool makes .DirIcon (the AppImage's own icon) from a PNG named after
+# the desktop file's Icon= at the top of the AppDir; linuxdeploy only put the
+# SVG there.
+cp "$appdir/usr/share/icons/hicolor/256x256/apps/$app_id.png" "$appdir/$app_id.png"
+
+# --no-appstream: appimagetool only looks for the old <id>.appdata.xml name, not
+# the <id>.metainfo.xml we install, and validating it would need Ubuntu 22.04's
+# appstreamcli (0.15), which predates tags the file uses (<developer>). The
+# metadata still ships in usr/share/metainfo; check it with
+# appstreamcli validate packaging/linux/<id>.metainfo.xml
+ARCH=x86_64 VERSION="$version" "$tools/appimagetool" --no-appstream "$appdir" \
     "$out/Lithium_Studio-$version-x86_64.AppImage"
