@@ -12,8 +12,8 @@ cmake_minimum_required(VERSION 3.22)
 # The version is 0.<milestone>.<patch>: bump IKAROS_MILESTONE when a new
 # milestone starts, IKAROS_PATCH for fix builds within one. IKAROS_STAGE is the
 # label shown beside the version (About, splash) until 1.0.
-set(IKAROS_MILESTONE 13)
-set(IKAROS_PATCH 0)
+set(IKAROS_MILESTONE 14)
+set(IKAROS_PATCH 1)
 set(IKAROS_STAGE "alpha")
 
 # The oldest macOS the app runs on. It has to be set before project(), which
@@ -438,6 +438,10 @@ set(IKAROS_PLATFORM_SOURCES
     src/platform/FileLock.h            src/platform/FileLock.cpp
     src/platform/AudioHardware.h       src/platform/AudioHardware.cpp
     src/platform/SystemAppearance.h    src/platform/SystemAppearance.cpp)
+
+if(APPLE)
+    list(APPEND IKAROS_PLATFORM_SOURCES src/platform/WindowManagerHints_mac.mm)
+endif()
 
 set(IKAROS_UI_SOURCES
     # theme: colours/sizes, fonts, and the LookAndFeel that styles JUCE widgets
