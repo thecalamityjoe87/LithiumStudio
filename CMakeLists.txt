@@ -13,7 +13,7 @@ cmake_minimum_required(VERSION 3.22)
 # milestone starts, LITHIUM_PATCH for fix builds within one. LITHIUM_STAGE is the
 # label shown beside the version (About, splash) until 1.0.
 set(LITHIUM_MILESTONE 15)
-set(LITHIUM_PATCH 1)
+set(LITHIUM_PATCH 2)
 set(LITHIUM_STAGE "alpha")
 
 # The oldest macOS the app runs on. It has to be set before project(), which
@@ -694,8 +694,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
             DESTINATION ${CMAKE_INSTALL_DATADIR}/mime/packages)
     install(FILES resources/icons/${APP_ID}.svg
             DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
-    install(FILES resources/icons/${APP_ID}.png
-            DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps)
+    install(FILES packaging/linux/icons/icon-256.png   # resources/icons' PNG is 1024 px
+            DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps
+            RENAME ${APP_ID}.png)
     install(DIRECTORY resources/sounds/
             DESTINATION ${CMAKE_INSTALL_DATADIR}/lithium-studio/Sounds)
     install(FILES LICENSE CREDITS

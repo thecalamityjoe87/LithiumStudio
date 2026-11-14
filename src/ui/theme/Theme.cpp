@@ -107,20 +107,37 @@ namespace
         p.thumbBorder         = none;
         p.thumbShadow         = none;
         p.volumeSliderTrack   = hex (0xff1d2833);
-        p.thumb               = hex (0xffe6edf2);
-        p.meterThumbRing      = hex (0xff141b22);
-        p.faderCap            = hex (0xff4a535b);   // raisedHigh, brighter (as Lithium Drums' cap)
-        p.faderCapBorder      = hex (0xff5b6670);
+        // The console fader: a dark gunmetal cap.
+        p.faderSlot           = hex (0xff05080b);
+        p.faderCapLight       = hex (0xff56636f);
+        p.faderCapHigh        = hex (0xff3b4752);
+        p.faderCapMid         = hex (0xff2c3640);
+        p.faderCapGroove      = hex (0xff1a2129);
+        p.faderCapBottom      = hex (0xff242d36);
+        p.faderCapBorder      = hex (0xff05080b);
+        p.faderCapHighlight   = juce::Colours::white.withAlpha (0.22f);
+        p.faderCapRibs        = juce::Colours::black.withAlpha (0.38f);
+        p.faderCapShadow      = juce::Colours::black.withAlpha (0.55f);
         p.faderCapLine        = hex (0xffe6edf2);
 
-        p.knobBody            = hex (0xff1d2833);
-        p.knobRim             = hex (0xff22303b);
+        // The machined knob: dark turned metal.
+        p.knobTrack           = hex (0xff0a0e12);
+        p.knobTicks           = hex (0xff3a4c5b);
+        p.knobShadow          = juce::Colours::black.withAlpha (0.5f);
+        p.knobSkirtTop        = hex (0xff2e3c49);
+        p.knobSkirtBottom     = hex (0xff0b1015);
+        p.knobSkirtEdge       = hex (0xff06090c);
+        p.knobCapLight        = hex (0xff7a8895);
+        p.knobCapMid          = hex (0xff3e4a56);
+        p.knobCapDark         = hex (0xff1b232b);
+        p.knobCapEdge         = hex (0xff0a0e12);
+        p.knobSheen           = juce::Colours::white.withAlpha (0.2f);
+        p.knobRings           = juce::Colours::white.withAlpha (0.07f);
+        p.knobGroove          = hex (0xff0b1015);
+        p.knobGrooveHighlight = juce::Colours::white.withAlpha (0.22f);
         p.knobPointer         = hex (0xffe6edf2);
-        p.knobTrack           = hex (0xff223040);
-        p.compactKnobBody     = hex (0xff11171e);
-        p.compactKnobRim      = hex (0xff22303b);
-        p.compactKnobPointer  = hex (0xffe6edf2);
-        p.compactKnobTrack    = hex (0xff2a3946);
+        p.knobGlow            = 0.3f;
+        p.faderGlow           = 0.3f;
 
         p.smartCardBg         = hex (0xff18212a);
         p.smartCardBorder     = hex (0xff22303b);
@@ -332,20 +349,37 @@ namespace
         p.thumbBorder         = hex (0xffc6cbd3);
         p.thumbShadow         = juce::Colours::black.withAlpha (0.15f);
         p.volumeSliderTrack   = hex (0xffdfe2e7);
-        p.thumb               = hex (0xffffffff);
-        p.meterThumbRing      = hex (0xffc6cbd3);
-        p.faderCap            = hex (0xffffffff);
-        p.faderCapBorder      = hex (0xffc6cbd3);
+        // The console fader: a brushed aluminium cap.
+        p.faderSlot           = hex (0xffb9bfc8);
+        p.faderCapLight       = hex (0xffffffff);
+        p.faderCapHigh        = hex (0xffeef1f4);
+        p.faderCapMid         = hex (0xffdde2e7);
+        p.faderCapGroove      = hex (0xffb5bdc6);
+        p.faderCapBottom      = hex (0xffcfd5dc);
+        p.faderCapBorder      = hex (0xff8f98a2);
+        p.faderCapHighlight   = hex (0xffffffff);
+        p.faderCapRibs        = juce::Colours::black.withAlpha (0.13f);
+        p.faderCapShadow      = hex (0xff141b22).withAlpha (0.25f);
         p.faderCapLine        = hex (0xff1a1d22);
 
-        p.knobBody            = hex (0xffffffff);
-        p.knobRim             = hex (0xffc6cbd3);
+        // The machined knob: silver turned metal.
+        p.knobTrack           = hex (0xffd3d7de);
+        p.knobTicks           = hex (0xff9aa2ad);
+        p.knobShadow          = hex (0xff1a1d22).withAlpha (0.2f);
+        p.knobSkirtTop        = hex (0xffe4e8ec);
+        p.knobSkirtBottom     = hex (0xff8e98a3);
+        p.knobSkirtEdge       = hex (0xff7d8792);
+        p.knobCapLight        = hex (0xffffffff);
+        p.knobCapMid          = hex (0xffd3d9df);
+        p.knobCapDark         = hex (0xff97a1ab);
+        p.knobCapEdge         = hex (0xff7d8792);
+        p.knobSheen           = juce::Colours::white.withAlpha (0.6f);
+        p.knobRings           = hex (0xff1a1d22).withAlpha (0.07f);
+        p.knobGroove          = hex (0xff5f6672);
+        p.knobGrooveHighlight = juce::Colours::white.withAlpha (0.8f);
         p.knobPointer         = hex (0xff1a1d22);
-        p.knobTrack           = hex (0xffe2e5ea);
-        p.compactKnobBody     = p.knobBody;
-        p.compactKnobRim      = p.knobRim;
-        p.compactKnobPointer  = p.knobPointer;
-        p.compactKnobTrack    = p.knobTrack;
+        p.knobGlow            = 0.18f;
+        p.faderGlow           = 0.0f;
 
         p.smartCardBg         = hex (0xffffffff);
         p.smartCardBorder     = hex (0xffe2e5ea);

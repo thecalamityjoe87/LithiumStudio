@@ -253,6 +253,7 @@ void TrackHeader::update (const TrackInfo& t, bool isSelected)
     pan.setTooltip ("Pan: " + (panAmount == 0 ? juce::String ("center") : (t.pan < 0.0f ? "left " : "right ") + juce::String (panAmount))
                     + " (double-click to center)");
     LithiumLookAndFeel::setFamilyColour (pan, colour::familyOf (t), LithiumLookAndFeel::FamilyShade::ink);
+    LithiumLookAndFeel::setFamilyColour (volume, colour::familyOf (t), LithiumLookAndFeel::FamilyShade::ink);   // its cap's line
 
     const bool wasAudio = monitorButton.isVisible();
     const bool hadClipLight = clipLight.isVisible();

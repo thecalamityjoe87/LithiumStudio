@@ -186,6 +186,25 @@ void LithiumLookAndFeel::drawButtonBackground (juce::Graphics& g, juce::Button& 
 }
 
 //==============================================================================
+namespace
+{
+    // The console fader's slot: sunk into the panel, so darker at its edges
+    // than down its middle, with a faint highlight along its lower lip.
+    void drawSlot (juce::Graphics& g, juce::Rectangle<float> slot)
+    {
+        const auto radius = juce::jmin (slot.getWidth(), slot.getHeight()) * 0.5f;
+        const bool vertical = slot.getHeight() > slot.getWidth();
+        g.setColour (theme().faderCapHighlight.withMultipliedAlpha (0.25f));
+        g.fillRoundedRectangle (slot.translated (0.0f, 1.0f), radius);
+
+        const auto edge = theme().faderSlot.darker (0.6f);
+        juce::ColourGradient shade (edge, slot.getTopLeft(), edge, vertical ? slot.getTopRight() : slot.getBottomLeft(), false);
+        shade.addColour (0.5, theme().faderSlot);
+        g.setGradientFill (shade);
+        g.fillRoundedRectangle (slot, radius);
+    }
+}
+
 void LithiumLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, int w, int h,
                                           float sliderPos, float, float,
                                           juce::Slider::SliderStyle style, juce::Slider& s)
@@ -200,31 +219,23 @@ void LithiumLookAndFeel::drawLinearSlider (juce::Graphics& g, int x, int y, int 
 
     if (vertical)
     {
-        // Mixer fader, as on Lithium Drums: a thin track filled below the cap
-        // in the channel's colour (trackColourId, or its family), a tick
-        // across it at unity gain (the "unityValue" property, if set), and a
-        // small raised cap with a line across its middle.
-        const auto track = bounds.withSizeKeepingCentre (4.0f, bounds.getHeight());
-        g.setColour (theme().wellBg);
-        g.fillRoundedRectangle (track, 2.0f);
-
-        g.setColour (trackColour.withMultipliedAlpha (s.isEnabled() ? 0.8f : 0.3f));
-        g.fillRoundedRectangle (track.withTop (sliderPos), 2.0f);
+        // The console fader: a sunken slot, a tick across it at unity gain
+        // (the "unityValue" property, if set), and the ribbed cap. The cap is
+        // as tall as JUCE keeps free at each end of the travel, so it never
+        // leaves the slider's bounds.
+        const auto slot = bounds.withSizeKeepingCentre (6.0f, bounds.getHeight() + 8.0f);
+        drawSlot (g, slot);
 
         if (const auto& unity = s.getProperties()["unityValue"]; ! unity.isVoid())
         {
             const auto uy = (float) s.getPositionOfValue ((double) unity);
             g.setColour (theme().borderStrong);
-            g.fillRect (juce::Rectangle<float> (track.getX() - 6.0f, uy - 0.5f, track.getWidth() + 12.0f, 1.0f));
+            g.fillRect (juce::Rectangle<float> (slot.getX() - 6.0f, uy - 0.5f, slot.getWidth() + 12.0f, 1.0f));
         }
 
-        const auto cap = juce::Rectangle<float> (juce::jmin (26.0f, bounds.getWidth()), 14.0f).withCentre ({ track.getCentreX(), sliderPos });
-        g.setColour ((automated ? theme().automated : theme().faderCap).withMultipliedAlpha (s.isEnabled() ? 1.0f : 0.5f));
-        g.fillRoundedRectangle (cap, 3.0f);
-        g.setColour (theme().faderCapBorder);
-        g.drawRoundedRectangle (cap.reduced (0.5f), 3.0f, 1.0f);
-        g.setColour (theme().faderCapLine);
-        g.fillRect (cap.withSizeKeepingCentre (cap.getWidth() - 8.0f, 1.5f));
+        const auto capHeight = 2.0f * (float) getSliderThumbRadius (s);
+        const auto cap = juce::Rectangle<float> (juce::jmin (28.0f, bounds.getWidth()), capHeight).withCentre ({ slot.getCentreX(), sliderPos });
+        drawConsoleCap (g, cap, true, s);
     }
     else
     {
@@ -330,41 +341,29 @@ void LithiumLookAndFeel::drawRotarySlider (juce::Graphics& g, int x, int y, int 
         return;
     }
 
-    // A small knob (e.g. a track header's pan knob) uses the compact
-    // colours, so its ring stays visible on a selected track. Set with
-    // slider.getProperties().set ("compact", true).
-    if ((bool) s.getProperties()["compact"])
-    {
-        drawCompactKnob (g, juce::Rectangle<int> (x, y, w, h).toFloat(), pos, startAngle, endAngle, s);
-        return;
-    }
-
-    // The big knobs keep a little margin inside their bounds.
-    drawKnob (g, juce::Rectangle<int> (x, y, w, h).toFloat().reduced (4.0f), pos, startAngle, endAngle, s,
-              theme().knobTrack, theme().knobBody, theme().knobRim, theme().knobPointer);
+    // Every other knob is the machined knob: a small one (e.g. a track
+    // header's pan knob, set with slider.getProperties().set ("compact",
+    // true)) in its compact form, filling its bounds; the big knobs keep a
+    // little margin inside theirs.
+    const auto area = juce::Rectangle<int> (x, y, w, h).toFloat();
+    const bool compact = s.getProperties()["compact"];
+    drawMachinedKnob (g, compact ? area : area.reduced (4.0f), pos, startAngle, endAngle, s, compact);
 }
 
-void LithiumLookAndFeel::drawCompactKnob (juce::Graphics& g, juce::Rectangle<float> area, float pos,
-                                          float startAngle, float endAngle, juce::Slider& s)
+void LithiumLookAndFeel::drawMachinedKnob (juce::Graphics& g, juce::Rectangle<float> area, float pos,
+                                           float startAngle, float endAngle, juce::Slider& s, bool compact)
 {
-    // The same knob, in the compact colours: the ring is a shade lighter so it
-    // still shows on a selected track's lighter background.
-    drawKnob (g, area, pos, startAngle, endAngle, s,
-              theme().compactKnobTrack, theme().compactKnobBody, theme().compactKnobRim, theme().compactKnobPointer);
-}
-
-void LithiumLookAndFeel::drawKnob (juce::Graphics& g, juce::Rectangle<float> area, float pos, float startAngle, float endAngle,
-                                   juce::Slider& s, juce::Colour trackColour, juce::Colour bodyColour,
-                                   juce::Colour rimColour, juce::Colour pointerColour)
-{
-    // Lithium Drums' knob: a thin ring, the value arc along it in the
-    // knob's colour, a flat round body inside with a hairline rim, and a
-    // straight pointer from near the middle to the body's edge.
+    // Drawn in units of a hundredth of the knob's size (u), so it scales.
+    // Outside in: the tick scale (big knobs only), the value arc in its
+    // groove, the skirt with its shadow, the turned-metal cap with two
+    // bands of sheen, and the pointer. The shading is fixed (lit from the
+    // top left); only the arc and pointer move with the value.
     const auto size = juce::jmin (area.getWidth(), area.getHeight());
-    const auto centre = area.getCentre();
-    const auto radius = size * 0.5f - 2.0f;
-    const auto thickness = juce::jmax (2.0f, size * 0.08f);
+    compact = compact || size < 32.0f;   // too small for the ticks and the engraving
+    const auto u = size / 100.0f;
+    const auto c = area.getCentre();
     const auto enabled = s.isEnabled();
+    const bool automated = s.getProperties()["automated"];
     const auto angle = startAngle + pos * (endAngle - startAngle);
 
     // A "bipolar" knob (e.g. pan) draws its arc out from 12 o'clock. Set with
@@ -372,41 +371,198 @@ void LithiumLookAndFeel::drawKnob (juce::Graphics& g, juce::Rectangle<float> are
     const bool bipolar = s.getProperties()["bipolar"];
     const auto fromAngle = bipolar ? (startAngle + endAngle) * 0.5f : startAngle;
 
-    auto arc = [&] (float a0, float a1)
+    auto circle = [&] (float radius, float dy = 0.0f)
+    {
+        return juce::Rectangle<float> (radius * 2.0f, radius * 2.0f).withCentre (c.translated (0.0f, dy));
+    };
+    auto arc = [&] (float radius, float a0, float a1)
     {
         juce::Path p;
-        p.addCentredArc (centre.x, centre.y, radius, radius, 0.0f, a0, a1, true);
+        p.addCentredArc (c.x, c.y, radius, radius, 0.0f, a0, a1, true);
         return p;
     };
+    auto roundStroke = [] (float width) { return juce::PathStrokeType (width, juce::PathStrokeType::curved, juce::PathStrokeType::rounded); };
 
-    const juce::PathStrokeType stroke (thickness, juce::PathStrokeType::curved, juce::PathStrokeType::rounded);
-    g.setColour (trackColour);
-    g.strokePath (arc (startAngle, endAngle), stroke);
+    if (! compact)
+    {
+        juce::Path ticks;
+
+        for (int i = 0; i <= 10; ++i)
+        {
+            const auto a = startAngle + (endAngle - startAngle) * (float) i / 10.0f;
+            ticks.startNewSubPath (c.getPointOnCircumference (45.5f * u, a));
+            ticks.lineTo (c.getPointOnCircumference (49.5f * u, a));
+        }
+
+        g.setColour (theme().knobTicks);
+        g.strokePath (ticks, roundStroke (juce::jmax (1.0f, 1.6f * u)));
+    }
+
+    // The value arc, in the knob's colour (knobArcColourId or its family),
+    // with a soft glow in dark mode; in the "automated" colour while
+    // automation moves it (see setAutomatedLook).
+    const auto arcRadius = (compact ? 44.0f : 40.0f) * u;
+    const auto arcWidth = juce::jmax (2.0f, (compact ? 7.0f : 4.5f) * u);
+    g.setColour (theme().knobTrack);
+    g.strokePath (arc (arcRadius, startAngle, endAngle), roundStroke (arcWidth));
 
     if (std::abs (angle - fromAngle) > 0.001f)
     {
-        const auto colour = valueColourFor (s, knobArcColourId);
-        g.setColour (enabled ? colour : colour.withMultipliedAlpha (0.35f));
-        g.strokePath (arc (juce::jmin (fromAngle, angle), juce::jmax (fromAngle, angle)), stroke);
+        const auto value = arc (arcRadius, juce::jmin (fromAngle, angle), juce::jmax (fromAngle, angle));
+        auto colour = automated ? theme().automated : valueColourFor (s, knobArcColourId);
+
+        if (! enabled)
+            colour = colour.withMultipliedAlpha (0.35f);
+        else if (! compact && theme().knobGlow > 0.0f)
+        {
+            g.setColour (colour.withMultipliedAlpha (theme().knobGlow));
+            g.strokePath (value, roundStroke (arcWidth * 2.2f));
+        }
+
+        g.setColour (colour);
+        g.strokePath (value, roundStroke (arcWidth));
     }
 
-    const auto bodyRadius = radius - thickness - 2.0f;
-    const auto body = juce::Rectangle<float> (bodyRadius * 2.0f, bodyRadius * 2.0f).withCentre (centre);
-    g.setColour (s.isMouseOverOrDragging() && enabled ? bodyColour.brighter (0.12f) : bodyColour);
-    g.fillEllipse (body);
-    g.setColour (rimColour);
-    g.drawEllipse (body, 1.0f);
+    // The skirt, on its shadow.
+    const auto skirt = circle ((compact ? 31.0f : 32.0f) * u);
+    g.setColour (theme().knobShadow);
+    g.fillEllipse (circle (skirt.getWidth() * 0.5f, 3.5f * u));
+    g.setGradientFill (juce::ColourGradient (theme().knobSkirtTop, skirt.getTopLeft(),
+                                             theme().knobSkirtBottom, skirt.getBottomLeft(), false));
+    g.fillEllipse (skirt);
+    g.setColour (theme().knobSkirtEdge);
+    g.drawEllipse (skirt.reduced (0.5f), 1.0f);
 
-    // getPointOnCircumference measures angles clockwise from 12 o'clock, like the slider does.
-    // An automated knob's pointer is in the "automated" colour (see drawLinearSlider).
-    const auto tip = centre.getPointOnCircumference (bodyRadius - 1.5f, angle);
-    const auto root = centre.getPointOnCircumference (bodyRadius * 0.35f, angle);
-    g.setColour ((bool) s.getProperties()["automated"] ? theme().automated
-                                                        : (enabled ? pointerColour : theme().textSecondary));
-    g.drawLine ({ root, tip }, juce::jmax (1.5f, size * 0.05f));
+    // The cap: lit from the top left, two bands of sheen from the bottom
+    // left to the top right, and (on big knobs) faint turning rings.
+    const auto cap = circle ((compact ? 22.0f : 24.0f) * u);
+    juce::ColourGradient capFill (theme().knobCapLight, cap.getX() + cap.getWidth() * 0.15f, cap.getY() + cap.getHeight() * 0.1f,
+                                  theme().knobCapDark, cap.getX() + cap.getWidth() * 0.85f, cap.getY() + cap.getHeight() * 0.95f, false);
+    capFill.addColour (0.5, theme().knobCapMid);
+    g.setGradientFill (capFill);
+    g.fillEllipse (cap);
+
+    const auto sheen = theme().knobSheen;
+    juce::ColourGradient sheenFill (sheen.withAlpha (0.0f), cap.getBottomLeft(), sheen.withAlpha (0.0f), cap.getTopRight(), false);
+    sheenFill.addColour (0.32, sheen);
+    sheenFill.addColour (0.5, sheen.withAlpha (0.0f));
+    sheenFill.addColour (0.68, sheen.withMultipliedAlpha (0.8f));
+    g.setGradientFill (sheenFill);
+    g.fillEllipse (cap);
+
+    if (s.isMouseOverOrDragging() && enabled)
+    {
+        g.setColour (juce::Colours::white.withAlpha (0.06f));
+        g.fillEllipse (cap);
+    }
+
+    if (! compact)
+    {
+        g.setColour (theme().knobRings);
+        g.drawEllipse (circle (18.0f * u), 1.0f);
+        g.drawEllipse (circle (11.0f * u), 1.0f);
+        g.setColour (theme().knobCapEdge);
+        g.drawEllipse (cap, 1.0f);
+    }
+
+    // The pointer, drawn pointing up and turned to the value (getPointOnCircumference
+    // and AffineTransform::rotation both go clockwise from 12 o'clock, like
+    // the slider). A big knob has a bright mark on the skirt that runs into
+    // an engraved groove across the cap; a compact one a plain bar.
+    const auto turn = juce::AffineTransform::rotation (angle, c.x, c.y);
+    auto line = [&] (float r0, float r1, float width, juce::Colour colour, float dx = 0.0f)
+    {
+        juce::Path p;
+        p.startNewSubPath (c.x + dx, c.y - r0);
+        p.lineTo (c.x + dx, c.y - r1);
+        g.setColour (colour);
+        g.strokePath (p, roundStroke (width), turn);
+    };
+
+    const auto pointer = ! enabled ? theme().textSecondary : automated ? theme().automated : theme().knobPointer;
+
+    if (compact)
+    {
+        line (29.0f * u, 14.0f * u, juce::jmax (1.5f, 6.0f * u), pointer);
+    }
+    else
+    {
+        line (30.5f * u, 24.0f * u, juce::jmax (1.5f, 3.2f * u), pointer);
+        line (22.0f * u, 10.0f * u, juce::jmax (1.2f, 2.6f * u), theme().knobGroove);
+        line (21.5f * u, 10.5f * u, juce::jmax (0.6f, 0.8f * u), theme().knobGrooveHighlight, 1.2f * u);
+    }
 
     if (s.hasKeyboardFocus (false))
-        drawFocusRing (g, juce::Rectangle<float> (size, size).withCentre (centre).expanded (2.0f), size * 0.5f);
+        drawFocusRing (g, juce::Rectangle<float> (size, size).withCentre (c).expanded (2.0f), size * 0.5f);
+}
+
+void LithiumLookAndFeel::drawConsoleCap (juce::Graphics& g, juce::Rectangle<float> cap, bool vertical, juce::Slider& s)
+{
+    const bool automated = s.getProperties()["automated"];
+    const auto corner = juce::jmin (4.0f, juce::jmin (cap.getWidth(), cap.getHeight()) * 0.25f);
+    const auto line = automated ? theme().automated
+                    : s.getProperties().contains ("family") ? valueColourFor (s, juce::Slider::trackColourId)
+                                                            : theme().faderCapLine;
+
+    if (! s.isEnabled())
+        g.beginTransparencyLayer (0.5f);
+
+    // Its shadow: two soft steps below it (cheaper than blurring a
+    // DropShadow on every repaint while the fader moves).
+    g.setColour (theme().faderCapShadow.withMultipliedAlpha (0.35f));
+    g.fillRoundedRectangle (cap.translated (0.0f, 4.0f).expanded (1.0f), corner + 1.0f);
+    g.setColour (theme().faderCapShadow.withMultipliedAlpha (0.6f));
+    g.fillRoundedRectangle (cap.translated (0.0f, 2.0f), corner);
+
+    // The body, shaded along the fader's travel, darkest in the middle
+    // where the line runs.
+    juce::ColourGradient body (theme().faderCapLight, cap.getTopLeft(),
+                               theme().faderCapBottom, vertical ? cap.getBottomLeft() : cap.getTopRight(), false);
+    body.addColour (0.10, theme().faderCapHigh);
+    body.addColour (0.42, theme().faderCapMid);
+    body.addColour (0.50, theme().faderCapGroove);
+    body.addColour (0.58, theme().faderCapMid);
+    body.addColour (0.90, theme().faderCapHigh);
+    g.setGradientFill (body);
+    g.fillRoundedRectangle (cap, corner);
+
+    if (automated)
+    {
+        g.setColour (theme().automated.withAlpha (0.45f));
+        g.fillRoundedRectangle (cap, corner);
+    }
+
+    // The ribs: across the cap every 3px, either side of the line.
+    const auto start = vertical ? cap.getY() : cap.getX();
+    const auto mid = start + (vertical ? cap.getHeight() : cap.getWidth()) * 0.5f;
+    const auto across = (vertical ? cap.getWidth() : cap.getHeight()) - 6.0f;
+    g.setColour (theme().faderCapRibs);
+
+    for (auto t = start + 3.0f; t < mid - 3.0f; t += 3.0f)
+        for (const auto rib : { t, 2.0f * mid - t - 1.0f })
+            g.fillRect (vertical ? juce::Rectangle<float> (cap.getX() + 3.0f, rib, across, 1.0f)
+                                 : juce::Rectangle<float> (rib, cap.getY() + 3.0f, 1.0f, across));
+
+    g.setColour (theme().faderCapBorder);
+    g.drawRoundedRectangle (cap.reduced (0.5f), corner, 1.0f);
+    g.setColour (theme().faderCapHighlight);
+    g.fillRect (juce::Rectangle<float> (cap.getX() + corner, cap.getY() + 1.0f, cap.getWidth() - 2.0f * corner, 1.0f));
+
+    // The line, in the track's colour, with a soft glow in dark mode.
+    const auto lineArea = vertical ? juce::Rectangle<float> (cap.getWidth() - 4.0f, 2.0f).withCentre (cap.getCentre())
+                                   : juce::Rectangle<float> (2.0f, cap.getHeight() - 4.0f).withCentre (cap.getCentre());
+
+    if (theme().faderGlow > 0.0f)
+    {
+        g.setColour (line.withMultipliedAlpha (theme().faderGlow));
+        g.fillRoundedRectangle (lineArea.expanded (2.0f), 2.0f);
+    }
+
+    g.setColour (line);
+    g.fillRoundedRectangle (lineArea, 1.0f);
+
+    if (! s.isEnabled())
+        g.endTransparencyLayer();
 }
 
 int LithiumLookAndFeel::getSliderThumbRadius (juce::Slider& s)

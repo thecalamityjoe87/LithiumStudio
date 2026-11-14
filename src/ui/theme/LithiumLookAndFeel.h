@@ -40,7 +40,7 @@ public:
     void drawButtonBackground (juce::Graphics&, juce::Button&, const juce::Colour& backgroundColour,
                                bool isMouseOverButton, bool isButtonDown) override;
 
-    // Sliders: thin linear track with a round thumb, and the arc-style knob.
+    // Sliders: thin linear track with a round thumb, the console fader, and the machined knob.
     void drawLinearSlider (juce::Graphics&, int x, int y, int width, int height,
                            float sliderPos, float minSliderPos, float maxSliderPos,
                            juce::Slider::SliderStyle, juce::Slider&) override;
@@ -103,18 +103,23 @@ public:
         time the slider is drawn, so it follows theme changes. */
     static void setFamilyColour (juce::Slider&, tokens::Family, FamilyShade = FamilyShade::ink);
 
+    /** The console fader cap (see drawLinearSlider), in `cap`: ribbed, with
+        a line across its middle in the slider's family colour (or the
+        theme's faderCapLine), all of it in the "automated" colour while
+        automation moves it. A horizontal cap has its ribs and line upright.
+        MeterSlider draws its handle with this too. */
+    static void drawConsoleCap (juce::Graphics&, juce::Rectangle<float> cap, bool vertical, juce::Slider&);
+
 private:
     // The colour of a slider's value arc or fill: its family's, if it has
     // one, else the given colour ID.
     static juce::Colour valueColourFor (juce::Slider&, int colourId);
 
-    // drawRotarySlider for knobs with the property "compact" = true.
-    void drawCompactKnob (juce::Graphics&, juce::Rectangle<float> area, float sliderPos,
-                          float startAngle, float endAngle, juce::Slider&);
-
-    // Every knob but a pedal's: Lithium Drums' knob, in the given colours.
-    static void drawKnob (juce::Graphics&, juce::Rectangle<float> area, float sliderPos, float startAngle, float endAngle,
-                          juce::Slider&, juce::Colour track, juce::Colour body, juce::Colour rim, juce::Colour pointer);
+    // Every knob but a pedal's: the machined knob. A compact one (the
+    // property "compact" = true, or too small for the tick scale) has no
+    // ticks and a plain pointer.
+    static void drawMachinedKnob (juce::Graphics&, juce::Rectangle<float> area, float sliderPos,
+                                  float startAngle, float endAngle, juce::Slider&, bool compact);
 };
 
 } // namespace lithium

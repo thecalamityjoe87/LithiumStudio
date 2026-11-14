@@ -63,6 +63,11 @@
   <!-- TODO(release): add screenshots before submitting to Flathub. -->
 
   <releases>
+    <release version="0.15.2" date="2026-11-13" type="development">
+      <description>
+        <p>New knobs and faders: machined metal knobs with a tick scale, and console-style faders with ribbed caps, in both the dark and light themes. The track volume sliders and the master volume have the same caps.</p>
+      </description>
+    </release>
     <release version="0.15.1" date="2026-11-09" type="development">
       <description>
         <p>Softer instrument colors that sit with the Lithium look, a new Manage Sounds window laid out like Lithium Drums' kit browser, and a new About window with up-to-date credits.</p>

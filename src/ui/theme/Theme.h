@@ -114,14 +114,25 @@ struct ThemePalette
     // The volume sliders with a level meter in them (MeterSlider): the
     // master's in the toolbar uses sliderTrack, the track headers' this one.
     juce::Colour volumeSliderTrack;
-    juce::Colour thumb, meterThumbRing;
-    // The mixer's vertical faders: a small raised cap with a line across
-    // its middle, as on Lithium Drums.
-    juce::Colour faderCap, faderCapBorder, faderCapLine;
+    // The console fader cap (the mixer's faders, the volume sliders):
+    // a ribbed cap shaded, top to bottom, light, high, mid, groove (its
+    // middle, where the line is), mid, high, bottom; in a sunken slot.
+    // faderCapLine is the line when the slider has no family colour.
+    juce::Colour faderSlot, faderCapLight, faderCapHigh, faderCapMid, faderCapGroove, faderCapBottom;
+    juce::Colour faderCapBorder, faderCapHighlight, faderCapRibs, faderCapShadow, faderCapLine;
 
-    // Knobs: the big Smart Controls knobs and the compact ones (pan, sends).
-    juce::Colour knobBody, knobRim, knobPointer, knobTrack;
-    juce::Colour compactKnobBody, compactKnobRim, compactKnobPointer, compactKnobTrack;
+    // The machined knob: a turned-metal cap on a skirt, an engraved pointer,
+    // a tick scale around the value arc (big knobs only), all lit from the
+    // top left. The light stays put while the knob turns; only the pointer
+    // moves.
+    juce::Colour knobTrack, knobTicks, knobShadow;
+    juce::Colour knobSkirtTop, knobSkirtBottom, knobSkirtEdge;
+    juce::Colour knobCapLight, knobCapMid, knobCapDark, knobCapEdge;
+    juce::Colour knobSheen, knobRings, knobGroove, knobGrooveHighlight, knobPointer;
+
+    // The soft glow around knob value arcs and fader cap lines, as an alpha
+    // (0 = none: light mode).
+    float knobGlow = 0.0f, faderGlow = 0.0f;
 
     // Smart Controls cards
     juce::Colour smartCardBg, smartCardBorder, smartCardShadow;

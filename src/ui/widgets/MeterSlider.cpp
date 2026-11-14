@@ -45,19 +45,15 @@ void MeterSlider::paint (juce::Graphics& g)
     bars.removeFromTop (barGap);
     LevelMeter::paintBar (g, bars.removeFromTop (barHeight), right, LevelMeter::Orientation::horizontal, unlit);
 
-    // The handle, with a ring so it stands out against the lit bars, and a
-    // soft shadow in light mode.
     const auto x = (float) getPositionOfValue (getValue());
-    auto thumb = juce::Rectangle<float> (12.0f, 12.0f).withCentre ({ x, centreY });
-    juce::Path disc;
-    disc.addEllipse (thumb.expanded (1.5f));
-    juce::DropShadow (theme().thumbShadow, 3, { 0, 1 }).drawForPath (g, disc);
-    g.setColour (theme().meterThumbRing);
-    g.fillEllipse (thumb.expanded (1.5f));
-    // In the "automated" colour while automation moves it (see setAutomatedLook).
-    const bool automated = getProperties()["automated"];
-    g.setColour (! isEnabled() ? theme().textSecondary : automated ? theme().automated : theme().thumb);
-    g.fillEllipse (thumb);
+
+    // The handle is the console fader's cap, turned on its side: on a track
+    // header its line is in the track's colour, on the master's the neutral
+    // faderCapLine. It is as wide as JUCE keeps free at each end of the
+    // travel, so it stays inside the slider.
+    const auto capWidth = 2.0f * (float) getLookAndFeel().getSliderThumbRadius (*this);
+    const auto cap = juce::Rectangle<float> (capWidth, juce::jmin (20.0f, (float) getHeight())).withCentre ({ x, centreY });
+    LithiumLookAndFeel::drawConsoleCap (g, cap, false, *this);
 
     if (hasKeyboardFocus (false))
         LithiumLookAndFeel::drawFocusRing (g, getLocalBounds().toFloat().expanded (2.0f), size::radiusXs);
