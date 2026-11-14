@@ -7,6 +7,7 @@
 #include "ui/widgets/AutomationHint.h"
 #include "ui/widgets/IconButton.h"
 #include <array>
+#include <limits>
 #include <tuple>
 
 namespace lithium
@@ -27,7 +28,7 @@ namespace
     constexpr int captionWidth = 56;         // a caption beside a knob
     constexpr int captionHeight = 30;        // a caption under a knob
     constexpr int stripGap = 10;
-    constexpr int masterStripWidth = 110;
+    constexpr int masterStripWidth = 120;   // room for the dB readout centred under its fader
     constexpr int nameRowHeight = 20;        // the strip's name, with M and S beside it
     constexpr int muteSoloWidth = 20;
 
@@ -43,6 +44,80 @@ namespace
 
     // A strip's name, in condensed capitals like the other section labels.
     juce::Font nameFont()   { return fonts::caption (textSize::lg).withExtraKerningFactor (0.04f); }
+
+    // A strip's level meter, dB scale and fader, side by side and centred.
+    // The fader reaches 7px past the meter at each end: JUCE keeps its
+    // cap's half-height (12px) free there, so the cap's travel ends 5px
+    // inside the meter's.
+    constexpr int meterWidth = 22, scaleWidth = 26, faderWidth = 34;
+
+    struct FaderLayout  { juce::Rectangle<int> meter, scale, fader; };
+
+    FaderLayout layoutFader (juce::Rectangle<int> area)
+    {
+        auto row = area.withSizeKeepingCentre (meterWidth + scaleWidth + faderWidth, area.getHeight());
+        FaderLayout l;
+        l.meter = row.removeFromLeft (meterWidth);
+        l.scale = row.removeFromLeft (scaleWidth);
+        l.fader = row.withTrimmedTop (-7).withTrimmedBottom (-7);
+        return l;
+    }
+
+    // The dB scale between the meter and the fader: a label and a tick at
+    // each of the usual marks, at the fader's own positions for them. Going
+    // up from −∞, a label too close to the one below it is left out (a
+    // short mixer).
+    void paintFaderScale (juce::Graphics& g, juce::Rectangle<int> scale, juce::Slider& fader)
+    {
+        struct Mark { float db; const char* label; };   // UTF-8: real minus signs
+        static const Mark marks[] { { -1000.0f, "\xe2\x88\x92\xe2\x88\x9e" }, { -40.0f, "\xe2\x88\x92" "40" },
+                                    { -24.0f, "\xe2\x88\x92" "24" }, { -12.0f, "\xe2\x88\x92" "12" },
+                                    { -6.0f, "\xe2\x88\x92" "6" }, { 0.0f, "0" }, { 6.0f, "+6" } };
+
+        g.setFont (fonts::mono (textSize::xs));
+        auto lastY = std::numeric_limits<float>::max();
+
+        for (const auto& m : marks)
+        {
+            const auto position = m.db < -100.0f ? 0.0f : TrackController::getFaderPositionForDb (m.db);
+            const auto y = (float) fader.getY() + (float) fader.getPositionOfValue (position);
+
+            if (lastY - y < 12.0f)
+                continue;
+
+            lastY = y;
+            g.setColour (m.db == 0.0f ? theme().textSecondary : theme().borderStrong);
+            g.fillRect (juce::Rectangle<float> ((float) scale.getRight() - 5.0f, y - 0.5f, 4.0f, 1.0f));
+            g.setColour (theme().textSecondary);
+            g.drawText (juce::String::fromUTF8 (m.label),
+                        juce::Rectangle<float> ((float) scale.getX(), y - 7.0f, (float) scale.getWidth() - 7.0f, 14.0f),
+                        juce::Justification::centredRight, false);
+        }
+    }
+
+    // The dB readout under a fader, in a box like a text field's.
+    void paintDbReadout (juce::Graphics& g, juce::Rectangle<int> area, const juce::String& text)
+    {
+        const auto box = area.toFloat().reduced (0.5f);
+        g.setColour (theme().inputBg);
+        g.fillRoundedRectangle (box, size::radiusXs);
+        g.setColour (theme().borderSoft);
+        g.drawRoundedRectangle (box, size::radiusXs, 1.0f);
+        g.setColour (theme().text);
+        g.setFont (fonts::mono (textSize::sm));
+        g.drawText (text, area, juce::Justification::centred);
+    }
+
+    // The dB readout's box: centred under the fader (it shows the fader's
+    // setting), wide enough for "−60.0 dB", so it overhangs the fader a
+    // little on both sides.
+    constexpr int dbReadoutWidth = 64;
+    constexpr int dbReadoutOverhang = (dbReadoutWidth - faderWidth) / 2;   // past each side of the fader
+
+    juce::Rectangle<int> dbReadoutArea (const FaderLayout& l, juce::Rectangle<int> bottomRow)
+    {
+        return juce::Rectangle<int> (dbReadoutWidth, 20).withCentre ({ l.fader.getCentreX(), bottomRow.getCentreY() + 2 });
+    }
 }
 
 //==============================================================================
@@ -231,10 +306,9 @@ public:
         g.setFont (nameFont());
         g.drawText (name.toUpperCase(), nameLine, juce::Justification::centredLeft, true);
 
-        // The dB readout, under the fader.
-        g.setColour (theme().text);
-        g.setFont (fonts::mono (textSize::sm));
-        g.drawText (dbText, dbArea, juce::Justification::centred);
+        // The dB scale beside the fader, and the readout under it.
+        paintFaderScale (g, scaleArea, fader);
+        paintDbReadout (g, dbArea, dbText);
 
         // Each knob's caption: its name, and its setting underneath.
         const juce::String names[] { "Pan", SendBuses::getBusName (SendBuses::reverb), SendBuses::getBusName (SendBuses::delay) };
@@ -309,11 +383,11 @@ public:
 
         area.removeFromTop (4);
 
-        auto meterArea = area.withSizeKeepingCentre (64, area.getHeight());
-        dbArea = bottomRow.withX (meterArea.getX()).withWidth (meterArea.getWidth()).withTrimmedTop (8);
-        meter.setBounds (meterArea.removeFromLeft (24));
-        meterArea.removeFromLeft (6);
-        fader.setBounds (meterArea.withTrimmedTop (-7).withTrimmedBottom (-7));
+        const auto layout = layoutFader (area);
+        meter.setBounds (layout.meter);
+        fader.setBounds (layout.fader);
+        scaleArea = layout.scale;
+        dbArea = dbReadoutArea (layout, bottomRow);
     }
 
 private:
@@ -329,7 +403,7 @@ private:
     IconButton muteButton { "Mute", std::nullopt, "M" };
     IconButton soloButton { "Solo", std::nullopt, "S" };
     bool muted = false, soloed = false;
-    juce::Rectangle<int> nameArea, dbArea;              // see resized
+    juce::Rectangle<int> nameArea, scaleArea, dbArea;   // see resized
     std::array<juce::Rectangle<int>, 3> captionAreas;   // pan, reverb, delay
     bool captionsBelow = false;                         // knobs side by side, captions under them
     std::array<juce::String, SendBuses::numBuses> sendTexts { "0%", "0%" };
@@ -387,21 +461,23 @@ public:
         g.setFont (nameFont());
         g.drawText ("MASTER", area.removeFromTop (18), juce::Justification::centred, true);
 
-        g.setColour (theme().text);
-        g.setFont (fonts::mono (textSize::sm));
-        g.drawText (dbText, area.removeFromBottom (16), juce::Justification::centred);
+        paintFaderScale (g, scaleArea, fader);
+        paintDbReadout (g, dbArea, dbText);
     }
 
     void resized() override
     {
         auto area = getLocalBounds().reduced (10);
         area.removeFromTop (22);
-        area.removeFromBottom (24);
+        const auto bottomRow = area.removeFromBottom (24);
 
-        auto meterArea = area.withSizeKeepingCentre (64, area.getHeight());
-        meter.setBounds (meterArea.removeFromLeft (24));
-        meterArea.removeFromLeft (6);
-        fader.setBounds (meterArea.withTrimmedTop (-7).withTrimmedBottom (-7));
+        // The meter, scale and fader sit a little left of centre, so that
+        // they and the readout's overhang right of the fader are centred.
+        const auto layout = layoutFader (area.withTrimmedRight (dbReadoutOverhang));
+        meter.setBounds (layout.meter);
+        fader.setBounds (layout.fader);
+        scaleArea = layout.scale;
+        dbArea = dbReadoutArea (layout, bottomRow);
     }
 
 private:
@@ -409,6 +485,7 @@ private:
     LevelMeter meter;
     juce::Slider fader { juce::Slider::LinearVertical, juce::Slider::NoTextBox };
     juce::String dbText;
+    juce::Rectangle<int> scaleArea, dbArea;   // see resized
 };
 
 //==============================================================================

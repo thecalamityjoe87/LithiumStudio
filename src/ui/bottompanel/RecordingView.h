@@ -12,8 +12,8 @@ namespace lithium
 /**
     The "Recording" section of the track inspector.
 
-      Audio track:      input, monitoring on/off, and an input level meter
-                        with a clip light
+      Audio track:      input with the monitoring button beside it, and an
+                        input level meter with a clip light
       Instrument track: which keyboards it records from
 */
 class RecordingView  : public juce::Component
@@ -39,7 +39,7 @@ private:
     juce::String shownState;   // what the section shows now (see refresh)
 
     juce::ComboBox inputBox;
-    IconButton monitorButton { "Monitoring", std::nullopt, "Monitoring" };
+    IconButton monitorButton { "Input monitoring", Icon::waveform };   // as on the track headers
     LevelMeter meter;
     ClipLight clipLight;
     juce::Rectangle<int> inputLabelArea, hintArea;

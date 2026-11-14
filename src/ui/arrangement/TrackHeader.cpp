@@ -33,6 +33,7 @@ namespace
     constexpr int roundSize = TrackHeader::controlColumnWidth;   // the column the arm button and the pan knob under it share
     constexpr int armSize = 24;   // the arm button: as wide as the pan knob's ring (not its whole box), so they look the same size
     constexpr int flexWidth = 38, flexHeight = 22;   // as tall as the Monitor button beside it
+    constexpr int panValueWidth = 36, panValueHeight = 12;   // the pan knob's setting, under it
 
     // The text a slider's value bubble shows while it's dragged.
     juce::String panText (double pan)
@@ -218,6 +219,7 @@ void TrackHeader::update (const TrackInfo& t, bool isSelected)
     // The volume (in "Sound name · -3.0 dB") moves on every tick while
     // automation plays: then only that line is redrawn, not the header.
     const bool volumeTextChanged = decibelText (t.volumeDb) != decibelText (info.volumeDb);
+    const bool panTextChanged = panText (t.pan) != panText (info.pan);   // the value under the pan knob
 
     if (t.automationShown)
     {
@@ -279,9 +281,17 @@ void TrackHeader::update (const TrackInfo& t, bool isSelected)
     updateAccessibleNames();
 
     if (needsRepaint)
+    {
         repaint();
-    else if (volumeTextChanged)
-        repaint (soundArea);
+    }
+    else
+    {
+        if (volumeTextChanged)
+            repaint (soundArea);
+
+        if (panTextChanged)
+            repaint (panValueArea);
+    }
 }
 
 void TrackHeader::updateMeter()
@@ -540,6 +550,14 @@ void TrackHeader::paint (juce::Graphics& g)
         g.drawText (db, row, juce::Justification::centredLeft, false);
     }
 
+    // The pan setting, under the pan knob.
+    if (g.clipRegionIntersects (panValueArea))
+    {
+        g.setColour (theme().textSecondary);
+        g.setFont (fonts::mono (textSize::xs));
+        g.drawText (panText (info.pan), panValueArea, juce::Justification::centred, false);
+    }
+
     if (info.automationShown && g.clipRegionIntersects (pickerArea))
     {
         // The automation picker: the setting's name (amber if it has
@@ -619,7 +637,9 @@ void TrackHeader::resized()
 
     // The pan knob shares the arm button's column, centred under it. Its
     // ring is as wide as the arm button; the box around it is the column.
+    // Its setting goes under it (wider than the column: "L 100").
     pan.setBounds (bottom.removeFromRight (roundSize).withSizeKeepingCentre (roundSize, roundSize));
+    panValueArea = juce::Rectangle<int> (panValueWidth, panValueHeight).withCentre ({ pan.getBounds().getCentreX(), pan.getBottom() + panValueHeight / 2 });
     bottom.removeFromRight (18);   // room for the clip light, clear of the volume's thumb
 
     // The clip light sits midway between where the meter's bars end (the
@@ -630,9 +650,9 @@ void TrackHeader::resized()
     bottom.removeFromLeft (12 - smallButtonGap);
     volume.setBounds (bottom);
 
-    // Under the bottom row, as wide as the rows: the automation picker
-    // (while it shows).
-    pickerArea = bottomRow.withY (bottomRow.getBottom() + 4).withHeight (18);
+    // Under the bottom row: the automation picker (while it shows), as wide
+    // as the rows up to the pan setting.
+    pickerArea = bottomRow.withY (bottomRow.getBottom() + 4).withHeight (18).withRight (panValueArea.getX() - 6);
 }
 
 } // namespace lithium

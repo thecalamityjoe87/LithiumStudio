@@ -22,10 +22,15 @@ RecordingView::RecordingView (AudioEngine& e, Selection& s) : engine (e), select
     };
     addChildComponent (inputBox);
 
-    monitorButton.setColours (IconButton::powerColours);
-    monitorButton.setFont (fonts::uiSemiBold (textSize::sm));
-    monitorButton.setCornerRadius (6.0f);
-    monitorButton.setTooltip ("Hear the input through your speakers or headphones");
+    // The track headers' monitoring button: grey, green while monitoring.
+    monitorButton.setColours ([]
+    {
+        return IconButton::Colours { theme().buttonFill, theme().buttonIcon, theme().effectOn, theme().textOnAccent,
+                                     theme().buttonBorder, std::nullopt, std::nullopt, theme().effectOn };
+    });
+    monitorButton.setCornerRadius (size::radiusSmall);
+    monitorButton.setIconSize (14.0f);
+    monitorButton.setTooltip ("Input monitoring: hear the input through your speakers or headphones");
     monitorButton.onClick = [this]
     {
         setMonitoringWithWarning (engine, trackId, ! monitorButton.getToggleState(), this);
@@ -93,7 +98,7 @@ void RecordingView::refresh()
             inputBox.setTextWhenNothingSelected ("No audio inputs");
 
         monitorButton.setToggleState (settings.monitoring, juce::dontSendNotification);
-        monitorButton.setText (settings.monitoring ? "Monitoring on" : "Monitoring off");
+        monitorButton.setTitle (settings.monitoring ? "Stop monitoring" : "Monitor input");
     }
     else
     {
@@ -122,7 +127,7 @@ int RecordingView::getIdealHeight() const
     if (trackId == 0)
         return 40;
 
-    return isAudio ? 8 + 30 + 10 + 30 + 10 + 12 + 10 + 36 + 10
+    return isAudio ? 8 + 30 + 10 + 12 + 10 + 36 + 10
                    : 70;
 }
 
@@ -155,12 +160,16 @@ void RecordingView::resized()
     auto r = getLocalBounds().reduced (sidePadding, 0);
     r.removeFromTop (8);
 
+    // "Input", the drop-down right after it (the label's own width plus a
+    // small gap, in the font paint() draws it in), and the monitoring
+    // button at the end of the row, as tall as the drop-down.
     auto row = r.removeFromTop (30);
-    inputLabelArea = row.removeFromLeft (52);
+    const auto labelWidth = juce::roundToInt (juce::GlyphArrangement::getStringWidth (fonts::ui (textSize::sm), "Input"));
+    inputLabelArea = row.removeFromLeft (labelWidth + 1);
+    row.removeFromLeft (10);
+    monitorButton.setBounds (row.removeFromRight (row.getHeight()));
+    row.removeFromRight (6);
     inputBox.setBounds (row);
-    r.removeFromTop (10);
-
-    monitorButton.setBounds (r.removeFromTop (30).withWidth (130));
     r.removeFromTop (10);
 
     auto meterRow = r.removeFromTop (12);

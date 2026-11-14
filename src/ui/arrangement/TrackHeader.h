@@ -15,6 +15,7 @@ namespace lithium
         ▌┌──┐ Track name                  [Flex][~] (●)
         ▌└──┘ Sound name · −3.0 dB
         ▌     [M][S][⟋] ───────○──────────────  (◔)
+        ▌                                       C
 
     A 3px edge in the track colour, an icon tile, then three rows: the name
     with Flex and Monitor (audio tracks only: instrument tracks always play
@@ -93,7 +94,7 @@ private:
     juce::TextEditor nameEditor;
     bool renaming = false;
 
-    juce::Rectangle<int> iconArea, nameArea, soundArea, pickerArea;
+    juce::Rectangle<int> iconArea, nameArea, soundArea, pickerArea, panValueArea;
     juce::String measuredFor;                       // the sound name and font the widths below are for (see paint)
     float soundNameWidth = 0.0f, separatorWidth = 0.0f;
 
