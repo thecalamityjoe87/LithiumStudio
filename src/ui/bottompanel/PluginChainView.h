@@ -20,8 +20,8 @@ namespace lithium
       - the ⋯ button offers Replace and Remove
       - drag an effect up/down to reorder the chain
       - "+ Add effect" adds a built-in or third-party effect at the end
-      - under it, once the track's EQ has been used, an "EQ" row: the EQ
-        tab's equaliser, which comes after the effects. Its power button
+      - after the effects (above "+ Add effect"), once the track's EQ has
+        been used, an "EQ" row: the EQ tab's equaliser. Its power button
         turns the EQ on/off and clicking it shows the EQ tab. It's part of
         every track, so it can't be moved, replaced or removed.
 */

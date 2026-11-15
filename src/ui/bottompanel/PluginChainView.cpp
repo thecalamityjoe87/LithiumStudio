@@ -422,7 +422,7 @@ int PluginChainView::getIdealHeight() const
     h += instrument.has_value() ? labelHeight + rowHeight + 12 : 0;   // instrument (not on audio tracks)
     h += labelHeight + (int) chain.size() * (rowHeight + rowGap);
     h += (int) chain.size() < EffectsController::maxEffectsPerTrack ? rowHeight : 0;
-    h += hasEq ? rowGap * 2 + rowHeight : 0;
+    h += hasEq ? rowHeight + rowGap : 0;
     return h + 14;
 }
 
@@ -512,13 +512,15 @@ void PluginChainView::resized()
         r.removeFromTop (rowGap);
     }
 
-    if (addRow->isVisible())
-        addRow->setBounds (r.removeFromTop (rowHeight));
+    // The EQ comes after the effects (new effects still go above it), with
+    // "+ Add effect" last.
+    if (hasEq)
+    {
+        eqRow->setBounds (r.removeFromTop (rowHeight));
+        r.removeFromTop (rowGap);
+    }
 
-    // A little more space above the EQ than between effects: it isn't one
-    // of them, and new effects go above it.
-    r.removeFromTop (rowGap * 2);
-    eqRow->setBounds (r.removeFromTop (rowHeight));
+    addRow->setBounds (r.removeFromTop (rowHeight));
 }
 
 //==============================================================================
