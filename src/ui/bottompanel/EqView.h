@@ -29,9 +29,10 @@ namespace lithium
     line. They're off (a hollow point) until clicked or dragged; a
     double-click turns one off again.
 
-    Beside the graph, knobs for the selected band (click its point, or its
-    readout underneath, to select it): Frequency, Gain and Q. A cut has an
-    On/Off button instead of Gain, and turning one of its knobs turns it on.
+    Beside the graph, a card with knobs for the selected band (click its
+    point, or its readout underneath, to select it): Frequency, Gain and Q.
+    A cut has just Frequency and Q, with an On/Off button beside its name;
+    turning one of its knobs turns it on.
 */
 class EqView  : public juce::Component
 {
@@ -71,7 +72,7 @@ private:
     Knob frequencyKnob { "Frequency" }, gainKnob { "Gain" }, qKnob { "Q" };
     IconButton cutButton { "Turn band on or off", Icon::power, "Off" };
 
-    juce::Rectangle<int> graphArea, readoutArea, knobsArea, bandTitleArea;
+    juce::Rectangle<int> graphArea, readoutArea, knobCard, bandTitleArea, knobRow;
     int dragBand = -1, hoverBand = -1;
     int selectedBand = 1;   // Low, to start with
 
@@ -87,6 +88,7 @@ private:
     void setBand (int band, float frequencyHz, float gainDb, float q);
     void selectBand (int band);
     void updateKnobs();
+    void layOutKnobs();
     void turnSelectedCutOn();
     int readoutColumnAt (juce::Point<float>) const;
     void updateCurve();

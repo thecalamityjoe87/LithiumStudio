@@ -29,7 +29,7 @@ namespace
     constexpr float displayRangeDb = 24.0f;   // the graph shows -24..+24 dB (bands go to ±20)
     constexpr float pointRadius = 7.0f;
     constexpr int readoutHeight = 40;
-    constexpr int knobGap = 10, bandTitleHeight = 28;
+    constexpr int knobGap = 10, bandTitleHeight = 28, cardPadding = 14;
 
     // The knobs turn 0..1. Frequency and Q go on a log scale (each turn of
     // the knob is the same musical step), gain straight across.
@@ -159,14 +159,30 @@ void EqView::updateKnobs()
     gainKnob.setValue (juce::jmap (b.gainDb, EqController::minGain, EqController::maxGain, 0.0f, 1.0f), gainText (b.gainDb));
     qKnob.setValue (logTo01 (b.q, EqController::minQ, EqController::maxQ), juce::String (b.q, 2));
 
-    // A cut has no gain: its On/Off sits where the Gain knob would be.
+    // A cut has no gain: just Frequency and Q, with On/Off beside its name.
     gainKnob.setVisible (! b.isCut());
     cutButton.setVisible (b.isCut());
+    layOutKnobs();
     cutButton.setEnabled (target != 0);
     cutButton.setToggleState (b.on, juce::dontSendNotification);
     cutButton.setText (b.on ? "On" : "Off");
     cutButton.setTitle ((b.on ? "Turn off " : "Turn on ") + b.name);
     cutButton.setTooltip (b.on ? "On (click to turn it off)" : "Off (click to turn it on)");
+}
+
+void EqView::layOutKnobs()
+{
+    // Left to right: Frequency, Gain (not on a cut), Q.
+    auto row = knobRow;
+
+    for (auto* knob : { &frequencyKnob, &gainKnob, &qKnob })
+    {
+        if (! knob->isVisible())
+            continue;
+
+        knob->setBounds (row.removeFromLeft (Knob::preferredWidth));
+        row.removeFromLeft (knobGap);
+    }
 }
 
 void EqView::turnSelectedCutOn()
@@ -364,9 +380,19 @@ void EqView::paint (juce::Graphics& g)
 {
     LITHIUM_PERF_PAINT ("EqView");
 
-    // The selected band's name, over its knobs.
+    // The selected band's card: its name (and a cut's On/Off), over its knobs.
     {
+        const auto card = knobCard.toFloat();
+        g.setColour (theme().panelBoxBg);
+        g.fillRoundedRectangle (card, size::radiusCard);
+        g.setColour (theme().border);
+        g.drawRoundedRectangle (card.reduced (0.5f), size::radiusCard, 1.0f);
+
         auto r = bandTitleArea;
+
+        if (cutButton.isVisible())
+            r.setRight (cutButton.getX() - 8);
+
         g.setColour (settings.enabled && target != 0 ? bandColour (selectedBand) : theme().textSecondary);
         g.fillEllipse (r.removeFromLeft (10).withSizeKeepingCentre (10, 10).toFloat());
         r.removeFromLeft (8);
@@ -516,20 +542,17 @@ void EqView::resized()
     resetButton.setBounds (top.removeFromRight (72));
     r.removeFromTop (10);
 
-    // The selected band's knobs, to the right of the graph and readouts.
-    knobsArea = r.removeFromRight (3 * Knob::preferredWidth + 2 * knobGap);
+    // The selected band's card, to the right of the graph and readouts.
+    auto column = r.removeFromRight (3 * Knob::preferredWidth + 2 * knobGap + 2 * cardPadding);
     r.removeFromRight (16);
-    bandTitleArea = knobsArea.removeFromTop (bandTitleHeight);
-    knobsArea.removeFromTop (6);
+    knobCard = column.removeFromTop (cardPadding * 2 + bandTitleHeight + 10 + Knob::preferredHeight);
 
-    auto knobRow = knobsArea.removeFromTop (Knob::preferredHeight);
-    frequencyKnob.setBounds (knobRow.removeFromLeft (Knob::preferredWidth));
-    knobRow.removeFromLeft (knobGap);
-    const auto middle = knobRow.removeFromLeft (Knob::preferredWidth);
-    gainKnob.setBounds (middle);
-    cutButton.setBounds (middle.withSizeKeepingCentre (72, 28));
-    knobRow.removeFromLeft (knobGap);
-    qKnob.setBounds (knobRow.removeFromLeft (Knob::preferredWidth));
+    auto inside = knobCard.reduced (cardPadding);
+    bandTitleArea = inside.removeFromTop (bandTitleHeight);
+    cutButton.setBounds (bandTitleArea.withLeft (bandTitleArea.getRight() - 72));
+    inside.removeFromTop (10);
+    knobRow = inside.removeFromTop (Knob::preferredHeight);
+    layOutKnobs();
 
     readoutArea = r.removeFromBottom (readoutHeight);
     r.removeFromBottom (6);
