@@ -305,6 +305,27 @@ float SongExporter::getProgress() const
     return ((float) job->targets.size() + encodeShare * job->encodeProgress) / numSteps;
 }
 
+std::optional<double> SongExporter::getRenderPositionBeats() const
+{
+    auto* edit = engine.getEdit();
+
+    if (job == nullptr || edit == nullptr)
+        return {};
+
+    // The song itself ends minLength in; the render goes on past it for the tail.
+    const auto start = job->range.getStart();
+    const auto songEnd = start + te::TimeDuration::fromSeconds ((double) job->minLength / sampleRate);
+    auto position = songEnd;
+
+    if (job->current < job->targets.size())
+    {
+        const auto done = job->render != nullptr ? (double) job->render->getProgress() : 0.0;
+        position = juce::jmin (songEnd, start + job->range.getLength() * done);
+    }
+
+    return timeToBeat (*edit, position);
+}
+
 //==============================================================================
 juce::Result SongExporter::start (const ExportSettings& settings, std::function<void (const ExportResult&)> onFinished)
 {

@@ -118,6 +118,56 @@ namespace
     {
         return juce::Rectangle<int> (dbReadoutWidth, 20).withCentre ({ l.fader.getCentreX(), bottomRow.getCentreY() + 2 });
     }
+
+    //==========================================================================
+    // Typing a level into the dB readout: click the box, type (e.g. -6 or
+    // 2.5), Enter. Escape leaves it as it was; clicking elsewhere keeps what
+    // was typed. Laid over the readout's box while it's open.
+    class DbEntry  : public juce::TextEditor
+    {
+    public:
+        std::function<void (float db)> onEntered;
+
+        DbEntry()
+        {
+            setFont (fonts::mono (textSize::sm));
+            setJustification (juce::Justification::centred);
+            setIndents (2, 0);
+            setInputRestrictions (7, "-+.0123456789");
+            setSelectAllWhenFocused (true);
+            onReturnKey = [this] { finish (true); };
+            onEscapeKey = [this] { finish (false); };
+            onFocusLost = [this] { finish (true); };
+        }
+
+        void start (float currentDb)
+        {
+            setText (currentDb <= -99.0f ? juce::String() : juce::String (currentDb, 1), false);
+            setVisible (true);
+            grabKeyboardFocus();
+            selectAll();
+        }
+
+        // Where a level in dB puts a fader, kept within the fader's travel.
+        static float faderPositionFor (float db)
+        {
+            return juce::jlimit (0.0f, 1.0f, TrackController::getFaderPositionForDb (db));
+        }
+
+    private:
+        void finish (bool keep)
+        {
+            if (! isVisible())
+                return;
+
+            setVisible (false);   // first: hiding it takes its focus, which calls this again
+
+            const auto text = getText().trim();
+
+            if (keep && text.containsAnyOf ("0123456789") && onEntered != nullptr)
+                onEntered ((float) text.getDoubleValue());
+        }
+    };
 }
 
 //==============================================================================
@@ -136,6 +186,14 @@ public:
 
         fader.onDragStart = [this] { engine.beginUndoStep ("Volume"); selection.selectTrack (trackId); };
         fader.onValueChange = [this] { engine.getTracks().setVolume (trackId, (float) fader.getValue()); };
+
+        dbEntry.setTitle ("Volume in dB");
+        dbEntry.onEntered = [this] (float db)
+        {
+            engine.beginUndoStep ("Volume");
+            engine.getTracks().setVolume (trackId, DbEntry::faderPositionFor (db));
+        };
+        addChildComponent (dbEntry);
 
         // Pan: a small knob, centre at 12 o'clock. Double-click puts it back in the middle.
         pan.setRange (-1.0, 1.0);
@@ -253,6 +311,7 @@ public:
         family = colour::familyOf (t);
         selected = isSelected;
         dbText = describeDb (t.volumeDb);
+        volumeDb = t.volumeDb;
         panText = describePan (t.pan);
         fader.setTitle (t.name + " volume");
         pan.setTitle (t.name + " pan");
@@ -286,9 +345,17 @@ public:
 
     void setLevel (StereoLevel l)   { meter.setLevel (l); }
 
-    void mouseDown (const juce::MouseEvent&) override
+    void mouseDown (const juce::MouseEvent& e) override
     {
         selection.selectTrack (trackId);
+
+        if (dbArea.contains (e.getPosition()))
+            dbEntry.start (volumeDb);
+    }
+
+    void mouseMove (const juce::MouseEvent& e) override
+    {
+        setMouseCursor (dbArea.contains (e.getPosition()) ? juce::MouseCursor::IBeamCursor : juce::MouseCursor::NormalCursor);
     }
 
     void paint (juce::Graphics& g) override
@@ -388,6 +455,7 @@ public:
         fader.setBounds (layout.fader);
         scaleArea = layout.scale;
         dbArea = dbReadoutArea (layout, bottomRow);
+        dbEntry.setBounds (dbArea);
     }
 
 private:
@@ -400,6 +468,8 @@ private:
     std::array<juce::Slider, SendBuses::numBuses> sendKnobs { juce::Slider { juce::Slider::RotaryHorizontalVerticalDrag, juce::Slider::NoTextBox },
                                                               juce::Slider { juce::Slider::RotaryHorizontalVerticalDrag, juce::Slider::NoTextBox } };
     juce::String name, dbText, panText { "C" };
+    float volumeDb = 0.0f;
+    DbEntry dbEntry;   // typing a level into the dB readout
     IconButton muteButton { "Mute", std::nullopt, "M" };
     IconButton soloButton { "Solo", std::nullopt, "S" };
     bool muted = false, soloed = false;
@@ -429,6 +499,25 @@ public:
         fader.onDragStart = [this] { engine.beginUndoStep ("Master Volume"); };   // one undo step per drag
         fader.onValueChange = [this] { engine.getTracks().setMasterVolume ((float) fader.getValue()); };
         addAndMakeVisible (fader);
+
+        dbEntry.setTitle ("Master volume in dB");
+        dbEntry.onEntered = [this] (float db)
+        {
+            engine.beginUndoStep ("Master Volume");
+            engine.getTracks().setMasterVolume (DbEntry::faderPositionFor (db));
+        };
+        addChildComponent (dbEntry);
+    }
+
+    void mouseDown (const juce::MouseEvent& e) override
+    {
+        if (dbArea.contains (e.getPosition()))
+            dbEntry.start (engine.getTracks().getMasterVolumeDb());
+    }
+
+    void mouseMove (const juce::MouseEvent& e) override
+    {
+        setMouseCursor (dbArea.contains (e.getPosition()) ? juce::MouseCursor::IBeamCursor : juce::MouseCursor::NormalCursor);
     }
 
     void refresh()
@@ -478,6 +567,7 @@ public:
         fader.setBounds (layout.fader);
         scaleArea = layout.scale;
         dbArea = dbReadoutArea (layout, bottomRow);
+        dbEntry.setBounds (dbArea);
     }
 
 private:
@@ -486,6 +576,7 @@ private:
     juce::Slider fader { juce::Slider::LinearVertical, juce::Slider::NoTextBox };
     juce::String dbText;
     juce::Rectangle<int> scaleArea, dbArea;   // see resized
+    DbEntry dbEntry;   // typing a level into the dB readout
 };
 
 //==============================================================================

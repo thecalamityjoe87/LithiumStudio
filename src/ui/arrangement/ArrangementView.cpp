@@ -8,6 +8,7 @@
 #include "ui/arrangement/ArrangementTempoLane.h"
 #include "ui/arrangement/ArrangementSections.h"
 #include "app/CommandIDs.h"
+#include "engine/SongExporter.h"
 #include "engine/AudioPreview.h"
 #include "engine/PluginLibrary.h"
 #include "engine/SoundLibrary.h"
@@ -551,6 +552,15 @@ void ArrangementView::updateTransport()
 
     auto state = engine.getTransportState();
     ruler->setLoop (state.looping, state.loopStartBeats, state.loopEndBeats);
+
+    // While exporting, the playhead sweeps through the song as it renders
+    // (turning the page as it would while playing); the transport itself
+    // stays put, so afterwards it's back where it was.
+    if (const auto exportPosition = engine.getExporter().getRenderPositionBeats())
+    {
+        state.positionBeats = *exportPosition;
+        state.playing = true;
+    }
 
     auto x = geometry.beatToX (state.positionBeats);
     const auto width = (float) getLaneWidth();

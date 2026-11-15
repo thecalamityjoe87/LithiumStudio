@@ -4,6 +4,7 @@
 #include <atomic>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <vector>
 
 namespace lithium
@@ -96,6 +97,12 @@ public:
 
     /** 0..1, across every file. */
     float getProgress() const;
+
+    /** While exporting, where the render has got to, in beats, for the
+        playhead to show: it sweeps the song (or the cycle range) once per
+        file, and waits at the end while a reverb tail renders and the files
+        are written. Empty when no export is running. */
+    std::optional<double> getRenderPositionBeats() const;
 
     /** Stops the export soon; onFinished then reports it as cancelled and
         nothing is left behind. */
