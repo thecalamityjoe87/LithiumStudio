@@ -63,6 +63,11 @@
   <!-- TODO(release): add screenshots before submitting to Flathub. -->
 
   <releases>
+    <release version="0.15.4" date="2026-11-15" type="development">
+      <description>
+        <p>The EQ now has eight bands, like the EQs in other studio apps: a Low Cut and a High Cut filter, low and high shelves, and four bells in between. The cut filters are off until you click or drag them. Sessions made with the old four-band EQ open with their settings kept.</p>
+      </description>
+    </release>
     <release version="0.15.3" date="2026-11-14" type="development">
       <description>
         <p>Fixes: the arrangement follows the playhead when it jumps off screen while stopped, the inspector's meter moves with playback like the track's, the collapsed bottom panel has an easy-to-see Show Panel tab, the hide button is labeled, and the window remembers its size and whether it was maximized.</p>

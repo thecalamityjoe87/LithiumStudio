@@ -208,6 +208,93 @@ public:
 };
 
 //==============================================================================
+// The EQ tab's equaliser, after the effects: [power] EQ. Click it to show
+// the EQ tab. No ⋯ menu and no dragging: every track has it.
+class PluginChainView::EqRow  : public juce::Component,
+                                public juce::SettableTooltipClient
+{
+public:
+    explicit EqRow (PluginChainView& o) : owner (o)
+    {
+        setWantsKeyboardFocus (true);
+        setMouseCursor (juce::MouseCursor::PointingHandCursor);
+        setTooltip ("The track's EQ. Click to show the EQ tab.");
+
+        power.setColours (IconButton::powerColours);
+        power.setCornerRadius (6.0f);
+        power.setIconSize (14.0f);
+        power.onClick = [this] { owner.engine.getTracks().eq().setEnabled (owner.trackId, ! owner.eqEnabled); };
+        addAndMakeVisible (power);
+    }
+
+    void update()
+    {
+        const bool on = owner.eqEnabled;
+        power.setToggleState (on, juce::dontSendNotification);
+        power.setTitle (on ? "Turn off EQ" : "Turn on EQ");
+        power.setTooltip (on ? "On (click to bypass)" : "Off (click to turn on)");
+        setTitle (on ? "EQ" : "EQ (off)");
+        repaint();
+    }
+
+    void paint (juce::Graphics& g) override
+    {
+        auto r = getLocalBounds().toFloat();
+        g.setColour (isMouseOver (true) ? theme().raised : theme().cardBg);
+        g.fillRoundedRectangle (r, size::radius);
+
+        g.setColour (owner.eqEnabled ? theme().text : theme().textSecondary);
+        g.setFont (fonts::ui (textSize::md));
+        g.drawText ("EQ", nameArea, juce::Justification::centredLeft, true);
+
+        if (showFocusRing && hasKeyboardFocus (false))
+            LithiumLookAndFeel::drawFocusRing (g, r, size::radius);
+    }
+
+    void resized() override
+    {
+        auto r = getLocalBounds().reduced (5);
+        power.setBounds (r.removeFromLeft (24));
+        r.removeFromLeft (8);
+        nameArea = r;
+    }
+
+    void mouseEnter (const juce::MouseEvent&) override   { repaint(); }
+    void mouseExit (const juce::MouseEvent&) override    { repaint(); }
+
+    void mouseUp (const juce::MouseEvent& e) override
+    {
+        if (! e.mouseWasDraggedSinceMouseDown() && owner.onOpenEq)
+            owner.onOpenEq();
+    }
+
+    bool keyPressed (const juce::KeyPress& key) override
+    {
+        if ((key == juce::KeyPress::returnKey || key == juce::KeyPress::spaceKey) && owner.onOpenEq)
+        {
+            owner.onOpenEq();
+            return true;
+        }
+
+        return false;
+    }
+
+    void focusGained (FocusChangeType cause) override
+    {
+        showFocusRing = cause != focusChangedByMouseClick;
+        repaint();
+    }
+
+    void focusLost (FocusChangeType) override   { showFocusRing = false; repaint(); }
+
+private:
+    PluginChainView& owner;
+    IconButton power { "Turn EQ on or off", Icon::power };
+    juce::Rectangle<int> nameArea;
+    bool showFocusRing = false;
+};
+
+//==============================================================================
 PluginChainView::PluginChainView (AudioEngine& e, Selection& s) : engine (e), selection (s)
 {
     setTitle ("Plug-ins");
@@ -216,6 +303,9 @@ PluginChainView::PluginChainView (AudioEngine& e, Selection& s) : engine (e), se
     addRow = std::make_unique<AddRow>();
     addRow->onClick = [this] { showAddMenu(); };
     addAndMakeVisible (*addRow);
+
+    eqRow = std::make_unique<EqRow> (*this);
+    addChildComponent (*eqRow);
 
     instrumentWindowButton.setColours (IconButton::ghostColours);
     instrumentWindowButton.setCornerRadius (6.0f);
@@ -257,6 +347,8 @@ void PluginChainView::refresh()
     family = track.has_value() ? colour::familyOf (*track) : Family::master;
     instrument = tracks.effects().getInstrument (trackId);
     chain = tracks.effects().getEffectChain (trackId);
+    hasEq = trackId != 0 && tracks.eq().hasEq (trackId);
+    eqEnabled = hasEq && tracks.eq().getEq (trackId).enabled;
 
     // This is called on every change in the session (many a second while
     // automation plays): leave the rows alone, and don't redraw, unless
@@ -272,6 +364,8 @@ void PluginChainView::refresh()
 
     for (auto& s : chain)
         state += describe (s);
+
+    state += hasEq ? (eqEnabled ? "eq|on\n" : "eq|off\n") : "";
 
     if (state == shownState)
         return;
@@ -289,6 +383,8 @@ void PluginChainView::refresh()
         rows[i]->update (chain[(size_t) i], i);
 
     addRow->setVisible (trackId != 0 && (int) chain.size() < EffectsController::maxEffectsPerTrack);
+    eqRow->setVisible (hasEq);
+    eqRow->update();
     instrumentWindowButton.setVisible (instrument.has_value() && instrument->isThirdParty && ! instrument->missing);
 
     resized();
@@ -326,6 +422,7 @@ int PluginChainView::getIdealHeight() const
     h += instrument.has_value() ? labelHeight + rowHeight + 12 : 0;   // instrument (not on audio tracks)
     h += labelHeight + (int) chain.size() * (rowHeight + rowGap);
     h += (int) chain.size() < EffectsController::maxEffectsPerTrack ? rowHeight : 0;
+    h += hasEq ? rowGap * 2 + rowHeight : 0;
     return h + 14;
 }
 
@@ -415,7 +512,13 @@ void PluginChainView::resized()
         r.removeFromTop (rowGap);
     }
 
-    addRow->setBounds (r.removeFromTop (rowHeight));
+    if (addRow->isVisible())
+        addRow->setBounds (r.removeFromTop (rowHeight));
+
+    // A little more space above the EQ than between effects: it isn't one
+    // of them, and new effects go above it.
+    r.removeFromTop (rowGap * 2);
+    eqRow->setBounds (r.removeFromTop (rowHeight));
 }
 
 //==============================================================================

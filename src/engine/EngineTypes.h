@@ -225,18 +225,29 @@ struct ModelChanges
     }
 };
 
-// One band of the 4-band EQ (the "EQ" tab).
+// One band of the EQ (the "EQ" tab).
 struct EqBand
 {
-    juce::String name;         // "Low", "Low Mid", "High Mid", "High"
+    // What the band does. The cuts take away everything below (Low Cut) or
+    // above (High Cut) their frequency, at 12 dB per octave, and have no
+    // gain; the shelves and bells boost or cut.
+    enum class Kind { lowCut, lowShelf, bell, highShelf, highCut };
+
+    juce::String name;         // "Low Cut", "Low", "Low Mid", ... "High Cut"
+    Kind kind = Kind::bell;
     float frequencyHz = 1000.0f;
-    float gainDb = 0.0f;       // -20..+20
-    float q = 0.7f;            // how wide a band is (higher = narrower)
+    float gainDb = 0.0f;       // -20..+20 (always 0 for a cut)
+    float q = 0.7f;            // how wide a band is (higher = narrower); a cut's resonance
+    bool on = true;            // a cut is off until it's used; the other bands are always on
+
+    bool isCut() const         { return kind == Kind::lowCut || kind == Kind::highCut; }
 };
 
+// Eight bands, low to high: Low Cut, a low shelf, four bells, a high shelf
+// and High Cut.
 struct EqSettings
 {
-    static constexpr int numBands = 4;
+    static constexpr int numBands = 8;
     std::array<EqBand, numBands> bands;
     bool enabled = true;       // false = bypassed
 };

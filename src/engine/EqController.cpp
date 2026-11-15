@@ -1,5 +1,6 @@
 #include "engine/EqController.h"
 #include "engine/AudioEngine.h"
+#include "engine/EqPlugin.h"
 #include "engine/TrackHelpers.h"
 
 namespace te = tracktion;
@@ -12,35 +13,14 @@ using namespace detail;
 namespace
 {
     // The EQ plugin on a track (or the master), if it has one yet.
-    te::EqualiserPlugin* findEq (te::PluginList& list)
+    EqPlugin* findEq (te::PluginList& list)
     {
         for (auto* p : list)
             if (isEqPlugin (*p))
-                if (auto* eq = dynamic_cast<te::EqualiserPlugin*> (p))
+                if (auto* eq = dynamic_cast<EqPlugin*> (p))
                     return eq;
 
         return nullptr;
-    }
-
-    // Each band's three parameters, and the properties Tracktion stores them
-    // in. Bands go low shelf, low mid, high mid, high shelf.
-    struct BandParams
-    {
-        te::AutomatableParameter* frequency;
-        te::AutomatableParameter* gain;
-        te::AutomatableParameter* q;
-        juce::Identifier frequencyId, gainId, qId;
-    };
-
-    BandParams bandParams (te::EqualiserPlugin& eq, int band)
-    {
-        switch (band)
-        {
-            case 0:  return { eq.loFreq.get(),   eq.loGain.get(),   eq.loQ.get(),   te::IDs::loFreq,   te::IDs::loGain,   te::IDs::loQ };
-            case 1:  return { eq.midFreq1.get(), eq.midGain1.get(), eq.midQ1.get(), te::IDs::midFreq1, te::IDs::midGain1, te::IDs::midQ1 };
-            case 2:  return { eq.midFreq2.get(), eq.midGain2.get(), eq.midQ2.get(), te::IDs::midFreq2, te::IDs::midGain2, te::IDs::midQ2 };
-            default: return { eq.hiFreq.get(),   eq.hiGain.get(),   eq.hiQ.get(),   te::IDs::hiFreq,   te::IDs::hiGain,   te::IDs::hiQ };
-        }
     }
 
     // Where a new EQ goes: after a track's effects, just before its volume
@@ -56,29 +36,15 @@ namespace
     }
 
     // The EQ, added (as part of the current undo step) if it isn't there yet.
-    te::EqualiserPlugin* findOrAddEq (te::Edit& edit, te::PluginList& list)
+    // It starts flat: its settings' defaults are where the bands start, so
+    // nothing needs writing into its state.
+    EqPlugin* findOrAddEq (te::Edit& edit, te::PluginList& list)
     {
         if (auto* eq = findEq (list))
             return eq;
 
-        // The starting settings go into its state before it's created, so
-        // making it isn't a pile of separate undo steps.
-        auto state = te::createValueTree (te::IDs::PLUGIN, te::IDs::type, te::EqualiserPlugin::xmlTypeName);
+        auto state = te::createValueTree (te::IDs::PLUGIN, te::IDs::type, EqPlugin::xmlTypeName);
         state.setProperty (eqProp, true, nullptr);
-
-        const auto defaults = EqController::getDefaults();
-
-        for (int b = 0; b < EqSettings::numBands; ++b)
-        {
-            const auto& band = defaults.bands[(size_t) b];
-            const juce::Identifier ids[4][3] { { te::IDs::loFreq,   te::IDs::loGain,   te::IDs::loQ },
-                                               { te::IDs::midFreq1, te::IDs::midGain1, te::IDs::midQ1 },
-                                               { te::IDs::midFreq2, te::IDs::midGain2, te::IDs::midQ2 },
-                                               { te::IDs::hiFreq,   te::IDs::hiGain,   te::IDs::hiQ } };
-            state.setProperty (ids[b][0], band.frequencyHz, nullptr);
-            state.setProperty (ids[b][1], band.gainDb, nullptr);
-            state.setProperty (ids[b][2], band.q, nullptr);
-        }
 
         auto plugin = edit.getPluginCache().createNewPlugin (state);
         list.insertPlugin (plugin, insertIndex (list), nullptr);
@@ -86,7 +52,7 @@ namespace
     }
 
     // The settings a plugin holds (or the defaults without one).
-    EqSettings readSettings (te::EqualiserPlugin* eq)
+    EqSettings readSettings (EqPlugin* eq)
     {
         auto settings = EqController::getDefaults();
 
@@ -95,11 +61,12 @@ namespace
 
         for (int b = 0; b < EqSettings::numBands; ++b)
         {
-            auto params = bandParams (*eq, b);
+            auto params = eq->getBand (b);
             auto& band = settings.bands[(size_t) b];
             band.frequencyHz = params.frequency->getCurrentValue();
-            band.gainDb = params.gain->getCurrentValue();
+            band.gainDb = params.gain != nullptr ? params.gain->getCurrentValue() : 0.0f;
             band.q = params.q->getCurrentValue();
+            band.on = params.on == nullptr || params.on->getCurrentValue() >= 0.5f;
         }
 
         settings.enabled = eq->isEnabled();
@@ -114,20 +81,19 @@ EqController::EqController (AudioEngine& o) : owner (o)
 
 EqSettings EqController::getDefaults()
 {
-    // Gentle, musical starting points: a shelf below the bass and above the
-    // vocals' presence range, and two wide bands in between.
-    EqSettings s;
-    s.bands = {{ { "Low",      100.0f,   0.0f, 0.7f },
-                 { "Low Mid",  400.0f,   0.0f, 0.7f },
-                 { "High Mid", 2500.0f,  0.0f, 0.7f },
-                 { "High",     10000.0f, 0.0f, 0.7f } }};
-    return s;
+    return EqPlugin::getDefaults();
 }
 
 EqSettings EqController::getEq (TrackId id) const
 {
     auto* list = findPluginList (owner.getEdit(), id);
     return readSettings (list != nullptr ? findEq (*list) : nullptr);
+}
+
+bool EqController::hasEq (TrackId id) const
+{
+    auto* list = findPluginList (owner.getEdit(), id);
+    return list != nullptr && findEq (*list) != nullptr;
 }
 
 void EqController::setBand (TrackId id, int band, float frequencyHz, float gainDb, float q)
@@ -143,10 +109,29 @@ void EqController::setBand (TrackId id, int band, float frequencyHz, float gainD
     if (eq == nullptr)
         return;
 
-    auto params = bandParams (*eq, band);
+    auto params = eq->getBand (band);
     setParameterUndoably (*eq, *params.frequency, params.frequencyId, juce::jlimit (minFrequency, maxFrequency, frequencyHz));
-    setParameterUndoably (*eq, *params.gain, params.gainId, juce::jlimit (minGain, maxGain, gainDb));
+
+    if (params.gain != nullptr)
+        setParameterUndoably (*eq, *params.gain, params.gainId, juce::jlimit (minGain, maxGain, gainDb));
+
     setParameterUndoably (*eq, *params.q, params.qId, juce::jlimit (minQ, maxQ, q));
+}
+
+void EqController::setBandOn (TrackId id, int band, bool on)
+{
+    auto* edit = owner.getEdit();
+    auto* list = findPluginList (edit, id);
+
+    if (list == nullptr || ! juce::isPositiveAndBelow (band, EqSettings::numBands)
+         || ! getDefaults().bands[(size_t) band].isCut() || getEq (id).bands[(size_t) band].on == on)
+        return;
+
+    if (auto* eq = findOrAddEq (*edit, *list))
+    {
+        auto params = eq->getBand (band);
+        setParameterUndoably (*eq, *params.on, params.onId, on ? 1.0f : 0.0f);
+    }
 }
 
 void EqController::setEnabled (TrackId id, bool enabled)
@@ -178,6 +163,9 @@ void EqController::reset (TrackId id)
     {
         const auto& band = defaults.bands[(size_t) b];
         setBand (id, b, band.frequencyHz, band.gainDb, band.q);
+
+        if (band.isCut())
+            setBandOn (id, b, band.on);
     }
 }
 
@@ -189,26 +177,20 @@ std::vector<float> EqController::getResponse (TrackId id, const std::vector<floa
     if (! settings.enabled)
         return result;
 
-    // The same filters Tracktion's equaliser uses (low shelf, two peaks,
-    // high shelf). Each one's effect, in dB, adds up. The sample rate only
-    // matters near the top of the range, so a typical one does.
+    // The plugin's own filters. Each one's effect, in dB, adds up. The
+    // sample rate only matters near the top of the range, so a typical one
+    // does.
     constexpr double sampleRate = 48000.0;
-    using Coefficients = juce::dsp::IIR::Coefficients<float>;
 
-    for (int b = 0; b < EqSettings::numBands; ++b)
+    for (const auto& band : settings.bands)
     {
-        const auto& band = settings.bands[(size_t) b];
+        if (! EqPlugin::isActive (band))
+            continue;   // a flat band (or a cut that's off) changes nothing
 
-        if (std::abs (band.gainDb) < 0.01f)
-            continue;   // a flat band changes nothing
-
-        const auto gain = juce::Decibels::decibelsToGain (band.gainDb);
-        auto coefficients = b == 0 ? Coefficients::makeLowShelf (sampleRate, band.frequencyHz, band.q, gain)
-                          : b == 3 ? Coefficients::makeHighShelf (sampleRate, band.frequencyHz, band.q, gain)
-                                   : Coefficients::makePeakFilter (sampleRate, band.frequencyHz, band.q, gain);
+        const auto coefficients = EqPlugin::design (band, sampleRate);
 
         for (size_t i = 0; i < frequencies.size(); ++i)
-            result[i] += (float) juce::Decibels::gainToDecibels (coefficients->getMagnitudeForFrequency (frequencies[i], sampleRate));
+            result[i] += (float) EqPlugin::responseDb (coefficients, frequencies[i], sampleRate);
     }
 
     return result;

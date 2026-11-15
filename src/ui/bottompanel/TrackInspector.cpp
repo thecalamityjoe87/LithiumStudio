@@ -30,6 +30,7 @@ TrackInspector::TrackInspector (AudioEngine& e, Selection& s)
     recording.onHeightChanged = [this] { layoutSections(); };
     plugins.onHeightChanged = [this] { layoutSections(); };
     plugins.onOpenEffect = [this] (PluginId id) { if (onOpenEffect) onOpenEffect (id); };
+    plugins.onOpenEq = [this] { if (onOpenEq) onOpenEq(); };
     tune.onOpenEffect = [this] (PluginId id) { if (onOpenEffect) onOpenEffect (id); };
 
     viewport.setViewedComponent (&sectionHolder, false);

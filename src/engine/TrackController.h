@@ -32,7 +32,7 @@ class AudioEngine;
         takes()    - a region's takes: picking one, deleting unused ones, flattening
         effects()  - the Sound tab's knobs, the instrument and the effect chain
         sends()    - each track's sends to the shared Reverb and Delay buses
-        eq()       - the EQ tab's 4-band EQ, on a track or the master
+        eq()       - the EQ tab's 8-band EQ, on a track or the master
         automation() - automation curves and the lanes that show them
         sections() - the arrangement markers (song sections) above the tracks
         flex()     - Flex Time: moving the hits in audio recordings

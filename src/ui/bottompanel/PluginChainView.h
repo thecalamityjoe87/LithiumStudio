@@ -20,6 +20,10 @@ namespace lithium
       - the ⋯ button offers Replace and Remove
       - drag an effect up/down to reorder the chain
       - "+ Add effect" adds a built-in or third-party effect at the end
+      - under it, once the track's EQ has been used, an "EQ" row: the EQ
+        tab's equaliser, which comes after the effects. Its power button
+        turns the EQ on/off and clicking it shows the EQ tab. It's part of
+        every track, so it can't be moved, replaced or removed.
 */
 class PluginChainView  : public juce::Component
 {
@@ -42,6 +46,9 @@ public:
     /** The user asked to see an effect's settings (clicked it, or just added it). */
     std::function<void (PluginId)> onOpenEffect;
 
+    /** The user clicked the EQ row: show the EQ tab. */
+    std::function<void()> onOpenEq;
+
     /** Highlights the effect whose settings are showing (0 = none). */
     void setOpenEffect (PluginId);
 
@@ -51,6 +58,7 @@ public:
 private:
     class EffectRow;
     class AddRow;
+    class EqRow;
     friend class EffectRow;
 
     AudioEngine& engine;
@@ -60,11 +68,13 @@ private:
     bool masterMode = false;
     std::optional<PluginSlot> instrument;
     std::vector<PluginSlot> chain;
+    bool hasEq = false, eqEnabled = true;   // the EQ tab's equaliser (see EqRow)
     juce::String shownState;   // what the rows show now (see refresh)
     tokens::Family family = tokens::Family::master;   // the target track's (colour looked up when painting)
 
     juce::OwnedArray<EffectRow> rows;
     std::unique_ptr<AddRow> addRow;
+    std::unique_ptr<EqRow> eqRow;
 
     // An effect that was just added; its settings open once its row exists.
     PluginId openWhenShown = 0;

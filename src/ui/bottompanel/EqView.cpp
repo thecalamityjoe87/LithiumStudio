@@ -19,7 +19,8 @@ namespace
 
         for (size_t i = 0; i < a.bands.size(); ++i)
             if (a.bands[i].name != b.bands[i].name || a.bands[i].frequencyHz != b.bands[i].frequencyHz
-                 || a.bands[i].gainDb != b.bands[i].gainDb || a.bands[i].q != b.bands[i].q)
+                 || a.bands[i].gainDb != b.bands[i].gainDb || a.bands[i].q != b.bands[i].q
+                 || a.bands[i].on != b.bands[i].on)
                 return false;
 
         return true;
@@ -50,7 +51,7 @@ EqView::EqView (AudioEngine& e) : engine (e)
 
     resetButton.setColours (IconButton::borderedColours);
     resetButton.setFont (fonts::uiSemiBold (textSize::md));
-    resetButton.setTooltip ("Put every band back to 0 dB");
+    resetButton.setTooltip ("Put every band back to 0 dB and turn the cuts off");
     resetButton.onClick = [this] { engine.getTracks().eq().reset (target); };
     addAndMakeVisible (resetButton);
 }
@@ -125,7 +126,7 @@ float EqView::yToGain (float y) const
 juce::Point<float> EqView::bandPoint (int band) const
 {
     const auto& b = settings.bands[(size_t) band];
-    return { frequencyToX (b.frequencyHz), gainToY (b.gainDb) };
+    return { frequencyToX (b.frequencyHz), gainToY (b.isCut() ? 0.0f : b.gainDb) };
 }
 
 int EqView::bandAt (juce::Point<float> p) const
@@ -187,8 +188,17 @@ void EqView::mouseDown (const juce::MouseEvent& e)
 {
     dragBand = target != 0 ? bandAt (e.position) : -1;
 
-    if (dragBand >= 0)
-        engine.beginUndoStep ("EQ");   // the whole drag undoes in one go
+    if (dragBand < 0)
+        return;
+
+    engine.beginUndoStep ("EQ");   // the whole drag undoes in one go
+
+    // Clicking a cut that's off turns it on.
+    if (settings.bands[(size_t) dragBand].isCut() && ! settings.bands[(size_t) dragBand].on)
+    {
+        engine.getTracks().eq().setBandOn (target, dragBand, true);
+        refresh();
+    }
 }
 
 void EqView::mouseDrag (const juce::MouseEvent& e)
@@ -209,12 +219,21 @@ void EqView::mouseUp (const juce::MouseEvent&)
 
 void EqView::mouseDoubleClick (const juce::MouseEvent& e)
 {
-    // Back to 0 dB, keeping the frequency and width.
+    // Back to 0 dB, keeping the frequency and width; a cut turns off.
     if (const auto band = target != 0 ? bandAt (e.position) : -1; band >= 0)
     {
         const auto& b = settings.bands[(size_t) band];
         engine.beginUndoStep ("EQ");
-        setBand (band, b.frequencyHz, 0.0f, b.q);
+
+        if (b.isCut())
+        {
+            engine.getTracks().eq().setBandOn (target, band, false);
+            refresh();
+        }
+        else
+        {
+            setBand (band, b.frequencyHz, 0.0f, b.q);
+        }
     }
 }
 
@@ -303,16 +322,21 @@ void EqView::paint (juce::Graphics& g)
         g.strokePath (line, juce::PathStrokeType (2.0f));
     }
 
-    // The band points, numbered.
+    // The band points, numbered. A cut that's off is a hollow ring.
     for (int b = 0; b < EqSettings::numBands; ++b)
     {
         const auto p = bandPoint (b);
         const bool active = b == hoverBand || b == dragBand;
+        const bool off = ! settings.bands[(size_t) b].on;
         const auto c = settings.enabled ? bandColour (b) : theme().textSecondary;
         auto circle = juce::Rectangle<float> (pointRadius * 2.0f, pointRadius * 2.0f).withCentre (p);
 
         g.setColour (c.withAlpha (active ? 1.0f : 0.85f));
-        g.fillEllipse (circle);
+
+        if (off)
+            g.drawEllipse (circle.reduced (0.75f), 1.5f);
+        else
+            g.fillEllipse (circle);
 
         if (active)
         {
@@ -320,7 +344,7 @@ void EqView::paint (juce::Graphics& g)
             g.drawEllipse (circle.expanded (2.0f), 1.5f);
         }
 
-        g.setColour (theme().textOnAccent);
+        g.setColour (off ? c : theme().textOnAccent);
         g.setFont (fonts::uiBold (textSize::tiny));
         g.drawText (juce::String (b + 1), circle, juce::Justification::centred);
     }
@@ -334,7 +358,13 @@ void EqView::paint (juce::Graphics& g)
         auto r = readoutArea.withX (readoutArea.getX() + b * columnWidth).withWidth (columnWidth).reduced (4, 0);
 
         g.setColour (settings.enabled ? bandColour (b) : theme().textSecondary);
-        g.fillEllipse (r.removeFromLeft (8).withSizeKeepingCentre (8, 8).toFloat());
+        const auto dot = r.removeFromLeft (8).withSizeKeepingCentre (8, 8).toFloat();
+
+        if (band.on)
+            g.fillEllipse (dot);
+        else
+            g.drawEllipse (dot.reduced (0.5f), 1.0f);
+
         r.removeFromLeft (6);
 
         g.setColour (theme().text);
@@ -343,9 +373,11 @@ void EqView::paint (juce::Graphics& g)
 
         g.setColour (theme().textSecondary);
         g.setFont (fonts::ui (textSize::sm));
+        // A cut shows Off, or its resonance; the other bands their gain and width.
         const auto gain = (band.gainDb > 0.05f ? "+" : "") + juce::String (band.gainDb, 1) + " dB";
-        g.drawText (describeFrequency (band.frequencyHz) + "  " + gain + "  Q " + juce::String (band.q, 1),
-                    r, juce::Justification::topLeft, true);
+        const auto details = band.isCut() ? (band.on ? "Q " + juce::String (band.q, 1) : juce::String ("Off"))
+                                          : gain + "  Q " + juce::String (band.q, 1);
+        g.drawText (describeFrequency (band.frequencyHz) + "  " + details, r, juce::Justification::topLeft, true);
     }
 }
 

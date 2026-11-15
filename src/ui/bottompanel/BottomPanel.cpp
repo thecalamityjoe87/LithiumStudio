@@ -410,6 +410,7 @@ BottomPanel::BottomPanel (AudioEngine& e, Selection& s)
     setTitle ("Track controls");
     addAndMakeVisible (inspector);
     inspector.onOpenEffect = [this] (PluginId id) { openEffect (id); };
+    inspector.onOpenEq = [this] { setTab (Tab::eq); if (onViewStateChanged) onViewStateChanged(); };
 
     effectViewport.setScrollBarsShown (true, false);
     addChildComponent (effectViewport);

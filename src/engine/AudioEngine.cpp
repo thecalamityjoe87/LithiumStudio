@@ -26,6 +26,7 @@
 #include "engine/TrackHelpers.h"
 #include "engine/Tuner.h"
 #include "engine/TunePlugin.h"
+#include "engine/EqPlugin.h"
 #include "engine/ControllerMap.h"
 #include "engine/LiveWaveform.h"
 #include "platform/AppFolders.h"
@@ -314,6 +315,9 @@ struct AudioEngine::Impl  : private juce::ValueTree::Listener,
         engine.getPluginManager().createBuiltInType<DistortionPlugin>();
         engine.getPluginManager().createBuiltInType<TremoloPlugin>();
         engine.getPluginManager().createBuiltInType<TunePlugin>();
+
+        // The EQ tab's equaliser (see EqController); not offered as an effect.
+        engine.getPluginManager().createBuiltInType<EqPlugin>();
 
         // The pedals ported from other projects (see PedalStyles.cpp).
         engine.getPluginManager().createBuiltInType<GoldenBoostPlugin>();
@@ -1396,6 +1400,7 @@ void AudioEngine::loadEdit (const juce::ValueTree& state, const juce::File& work
     impl->legacySessionFile = legacySessionFile;
     impl->untitled = bundle == juce::File();
     plugins->applyDisabledPlugins();   // before the plug-ins load
+    EqPlugin::upgradeLegacyEqs (state);   // an older session's 4-band EQ tab
     impl->edit = impl->createEdit (state);   // the old Edit is destroyed here
     prepareRegions (*impl->edit, *sounds);
 

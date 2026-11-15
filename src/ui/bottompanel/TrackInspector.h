@@ -35,6 +35,9 @@ public:
     std::function<void (PluginId)> onOpenEffect;
     void setOpenEffect (PluginId id)    { plugins.setOpenEffect (id); }
 
+    /** Forwarded from the Plug-ins section: show the EQ tab. */
+    std::function<void()> onOpenEq;
+
     /** Master mode: just the master channel's effects (no Recording section). */
     void setMasterMode (bool);
 

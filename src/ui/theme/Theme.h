@@ -170,8 +170,8 @@ struct ThemePalette
 
     juce::DropShadow dialogShadow, popoverShadow;
 
-    // The EQ's four bands, low to high.
-    std::array<juce::Colour, 4> eqBands;
+    // The EQ's eight bands, low to high.
+    std::array<juce::Colour, 8> eqBands;
 
     // Automation curves, by what they move (see getAutomationColour).
     juce::Colour automationVolume, automationPan, automationReverb,

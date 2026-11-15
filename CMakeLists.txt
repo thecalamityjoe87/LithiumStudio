@@ -13,7 +13,7 @@ cmake_minimum_required(VERSION 3.22)
 # milestone starts, LITHIUM_PATCH for fix builds within one. LITHIUM_STAGE is the
 # label shown beside the version (About, splash) until 1.0.
 set(LITHIUM_MILESTONE 15)
-set(LITHIUM_PATCH 3)
+set(LITHIUM_PATCH 4)
 set(LITHIUM_STAGE "alpha")
 
 # The oldest macOS the app runs on. It has to be set before project(), which
@@ -379,6 +379,7 @@ set(LITHIUM_ENGINE_SOURCES
     src/engine/SoundControls.h
     src/engine/SendBuses.h          src/engine/SendBuses.cpp
     src/engine/EqController.h       src/engine/EqController.cpp
+    src/engine/EqPlugin.h           src/engine/EqPlugin.cpp
     src/engine/SfzPlugin.h          src/engine/SfzPlugin.cpp
     src/engine/SoundShaper.h        src/engine/SoundShaper.cpp
     src/engine/BuiltInEffects.h     src/engine/BuiltInEffects.cpp

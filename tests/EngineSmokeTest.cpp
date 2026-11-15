@@ -29,6 +29,7 @@
 #include "engine/FlexHelpers.h"                   // ...and their warp markers
 #include "engine/TakeHelpers.h"                   // splitIntoPassTakes, to make takes without recording
 #include "engine/TunePlugin.h"                    // the Tune effect, driven directly
+#include "engine/EqPlugin.h"                      // upgrading an older session's EQ
 #include "engine/SfzPlugin.h"                     // to point an SFZ instrument at a test file
 #include "engine/PitchAnalysis.h"                 // Pitch mode's analysis, and re-analysing renders
 #include "engine/PitchRender.h"
@@ -8185,30 +8186,61 @@ int main (int argc, char* argv[])
         {
             auto& eq = tracks.eq();
             const auto flat = eq.getEq (t1);
-            check (flat.enabled && flat.bands[1].name == "Low Mid" && flat.bands[1].gainDb == 0.0f
-                     && flat.bands[1].frequencyHz == EqController::getDefaults().bands[1].frequencyHz,
+            check (flat.enabled && flat.bands[2].name == "Low Mid" && flat.bands[2].gainDb == 0.0f
+                     && flat.bands[2].frequencyHz == EqController::getDefaults().bands[2].frequencyHz,
                    "a track's EQ starts flat");
+            check (EqSettings::numBands == 8 && flat.bands[0].name == "Low Cut" && ! flat.bands[0].on
+                     && flat.bands[7].name == "High Cut" && ! flat.bands[7].on,
+                   "it has 8 bands, and the cuts start off");
             check (eq.getResponse (t1, { 100.0f, 1000.0f })[1] == 0.0f, "a flat EQ draws a flat line");
 
             const auto effectCount = tracks.effects().getEffectChain (t1).size();
+
+            // The cuts: off until turned on, then everything past them goes.
             engine.beginUndoStep ("EQ");
-            eq.setBand (t1, 1, 400.0f, 6.0f, 0.7f);
+            eq.setBandOn (t1, 0, true);
+            eq.setBand (t1, 0, 200.0f, 12.0f, 0.71f);
+            pumpMessages();
+            auto cut = eq.getEq (t1);
+            check (cut.bands[0].on && std::abs (cut.bands[0].frequencyHz - 200.0f) < 0.5f && cut.bands[0].gainDb == 0.0f,
+                   "Low Cut turns on and moves (and has no gain)");
+            auto response = eq.getResponse (t1, { 25.0f, 200.0f, 5000.0f });
+            check (response[0] < -30.0f && std::abs (response[1] + 3.0f) < 1.0f && std::abs (response[2]) < 0.5f,
+                   "Low Cut takes away the lows, 12 dB an octave");
+            engine.undo();
+            pumpMessages();
+            check (! eq.getEq (t1).bands[0].on && std::abs (eq.getEq (t1).bands[0].frequencyHz - 30.0f) < 0.5f,
+                   "undo turns it off again");
+            engine.beginUndoStep ("EQ");
+            eq.setBandOn (t1, 7, true);
+            eq.setBand (t1, 7, 2000.0f, 0.0f, 0.71f);
+            eq.setBandOn (t1, 2, false);   // not a cut: always on
+            pumpMessages();
+            response = eq.getResponse (t1, { 100.0f, 16000.0f });
+            check (eq.getEq (t1).bands[2].on && response[1] < -30.0f && std::abs (response[0]) < 0.5f,
+                   "High Cut takes away the highs; only the cuts turn off");
+            engine.undo();
+            pumpMessages();
+            check (! eq.getEq (t1).bands[7].on && eq.getResponse (t1, { 16000.0f })[0] == 0.0f, "and flat again");
+
+            engine.beginUndoStep ("EQ");
+            eq.setBand (t1, 2, 400.0f, 6.0f, 0.7f);
             pumpMessages();
             auto changed = eq.getEq (t1);
-            check (std::abs (changed.bands[1].gainDb - 6.0f) < 0.01f && std::abs (changed.bands[1].frequencyHz - 400.0f) < 0.5f,
+            check (std::abs (changed.bands[2].gainDb - 6.0f) < 0.01f && std::abs (changed.bands[2].frequencyHz - 400.0f) < 0.5f,
                    "a band can be boosted");
             check (tracks.effects().getEffectChain (t1).size() == effectCount, "the EQ isn't listed as an effect");
-            auto response = eq.getResponse (t1, { 30.0f, 400.0f, 15000.0f });
+            response = eq.getResponse (t1, { 30.0f, 400.0f, 15000.0f });
             check (std::abs (response[1] - 6.0f) < 0.1f && std::abs (response[0]) < 0.5f && std::abs (response[2]) < 0.5f,
                    "its curve peaks at the band");
             check (engine.getUndoDescription() == "EQ", "the change is one undo step");
 
             engine.undo();
             pumpMessages();
-            check (eq.getEq (t1).bands[1].gainDb == 0.0f, "undo flattens it again");
+            check (eq.getEq (t1).bands[2].gainDb == 0.0f, "undo flattens it again");
             engine.redo();
             pumpMessages();
-            check (std::abs (eq.getEq (t1).bands[1].gainDb - 6.0f) < 0.01f, "redo boosts it again");
+            check (std::abs (eq.getEq (t1).bands[2].gainDb - 6.0f) < 0.01f, "redo boosts it again");
 
             eq.setEnabled (t1, false);
             pumpMessages();
@@ -8218,16 +8250,16 @@ int main (int argc, char* argv[])
 
             // The master channel has an EQ and effects of its own.
             engine.beginUndoStep ("EQ");
-            eq.setBand (masterTrackId, 3, 8000.0f, -4.0f, 0.7f);
+            eq.setBand (masterTrackId, 6, 8000.0f, -4.0f, 0.7f);
             pumpMessages();
-            check (std::abs (eq.getEq (masterTrackId).bands[3].gainDb + 4.0f) < 0.01f, "the master has its own EQ");
-            check (eq.getEq (t1).bands[3].gainDb == 0.0f, "separate from the tracks'");
+            check (std::abs (eq.getEq (masterTrackId).bands[6].gainDb + 4.0f) < 0.01f, "the master has its own EQ");
+            check (eq.getEq (t1).bands[6].gainDb == 0.0f, "separate from the tracks'");
             auto masterReverb = tracks.effects().addEffect (masterTrackId, "reverb");
             pumpMessages();
             // (New sessions start with a limiter on the master.)
             check (masterReverb != 0 && tracks.effects().getEffectChain (masterTrackId).size() == 2,
                    "the master can have effects");
-            check (tracks.effects().getEffectChain (0).empty() && eq.getEq (0).bands[3].gainDb == 0.0f,
+            check (tracks.effects().getEffectChain (0).empty() && eq.getEq (0).bands[6].gainDb == 0.0f,
                    "\"no track\" (0) never touches the master");
 
             // Chorus and Phaser keep their settings as properties, not
@@ -8285,9 +8317,65 @@ int main (int argc, char* argv[])
                 check (engine.openSession (broken) && tracks.effects().getEffectChain (t1).back().name == "Echo",
                        "a session saved with invalid effect attributes still opens");
             }
-            check (std::abs (eq.getEq (t1).bands[1].gainDb - 6.0f) < 0.01f
-                     && std::abs (eq.getEq (masterTrackId).bands[3].gainDb + 4.0f) < 0.01f,
+            check (std::abs (eq.getEq (t1).bands[2].gainDb - 6.0f) < 0.01f
+                     && std::abs (eq.getEq (masterTrackId).bands[6].gainDb + 4.0f) < 0.01f,
                    "track and master EQ survive save and reopen");
+
+            // Sessions from before the 8-band EQ have Tracktion's 4-band one
+            // on the EQ tab. Opening one turns it into the new EQ, keeping
+            // its settings (its bands are Low, Low Mid, High Mid and High).
+            {
+                namespace te = tracktion;
+                auto upgraded = juce::parseXML (SessionBundle::readEntry (AudioEngine::getSessionFileFor (eqSession),
+                                                                          SessionBundle::sessionEntry).toString());
+                int eqs = 0;
+
+                std::function<void (juce::XmlElement&)> makeLegacy = [&] (juce::XmlElement& e)
+                {
+                    if (e.hasTagName ("PLUGIN") && e.getStringAttribute ("type") == EqPlugin::xmlTypeName)
+                    {
+                        ++eqs;
+                        e.setAttribute ("type", te::EqualiserPlugin::xmlTypeName);
+                        const std::pair<const char*, const char*> renames[] = {
+                            { "lowFreq", "loFreq" }, { "lowGain", "loGain" }, { "lowQ", "loQ" },
+                            { "lowMidFreq", "midFreq1" }, { "lowMidGain", "midGain1" }, { "lowMidQ", "midQ1" },
+                            { "highMidFreq", "midFreq2" }, { "highMidGain", "midGain2" }, { "highMidQ", "midQ2" },
+                            { "highFreq", "hiFreq" }, { "highGain", "hiGain" }, { "highQ", "hiQ" } };
+
+                        for (auto [from, to] : renames)
+                        {
+                            if (e.hasAttribute (from))
+                            {
+                                e.setAttribute (to, e.getStringAttribute (from));
+                                e.removeAttribute (from);
+                            }
+                        }
+                    }
+
+                    for (auto* child : e.getChildIterator())
+                        makeLegacy (*child);
+                };
+
+                if (upgraded != nullptr)
+                    makeLegacy (*upgraded);
+
+                check (eqs == 2, "(the session has a track EQ and a master EQ)");
+                auto legacyEdit = dir.getChildFile ("Legacy EQ.tracktionedit");
+                auto legacy = dir.getChildFile ("Legacy EQ.lisession");
+                legacyEdit.replaceWithText (upgraded != nullptr ? upgraded->toString() : juce::String());
+                SessionBundle::pack (legacy, { { SessionBundle::sessionEntry, legacyEdit, true } }, {});
+                const auto chainBefore = tracks.effects().getEffectChain (t1).size();
+                check (engine.openSession (legacy), "(open the older session)");
+                pumpMessages();
+                const auto trackEq = eq.getEq (t1), masterEq = eq.getEq (masterTrackId);
+                check (std::abs (trackEq.bands[2].gainDb - 6.0f) < 0.01f && std::abs (trackEq.bands[2].frequencyHz - 400.0f) < 0.5f
+                         && std::abs (masterEq.bands[6].gainDb + 4.0f) < 0.01f && std::abs (masterEq.bands[6].frequencyHz - 8000.0f) < 1.0f
+                         && ! trackEq.bands[0].on && ! trackEq.bands[7].on,
+                       "an older session's 4-band EQ becomes the 8-band one, settings kept");
+                check (tracks.effects().getEffectChain (t1).size() == chainBefore,
+                       "and still isn't listed as an effect");
+                check (std::abs (eq.getResponse (t1, { 400.0f })[0] - 6.0f) < 0.1f, "it sounds the same");
+            }
             check (tracks.effects().getEffectChain (masterTrackId).size() == 2, "and so do master effects");
         }
 

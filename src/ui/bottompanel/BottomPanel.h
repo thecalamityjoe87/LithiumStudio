@@ -31,7 +31,7 @@ namespace lithium
       Editor: the selected region, close up: the piano roll for a MIDI
               region, the audio editor for an audio region, the Drummer
               editor for a Drummer region (tracks only)
-      EQ:     a 4-band EQ
+      EQ:     an 8-band EQ
       Pedals: an audio track's pedalboard (the segment only shows when the
               track has one: guitar and bass tracks do by default, other
               audio tracks once View > Pedalboard turns it on; see

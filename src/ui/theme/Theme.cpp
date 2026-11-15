@@ -209,7 +209,16 @@ namespace
         p.knobArcColours = p.familyColours;
 
         using F = tokens::Family;
-        p.eqBands = { p.family (F::keys), p.family (F::bass), p.family (F::guitar), p.family (F::synths) };
+        // Low, Low Mid, High Mid and High keep the colours they had when the
+        // EQ had four bands; the new ones fill in around them.
+        p.eqBands = { p.family (F::strings),    // Low Cut
+                      p.family (F::keys),       // Low
+                      p.family (F::bass),       // Low Mid
+                      p.family (F::loops),      // Mid
+                      p.family (F::guitar),     // High Mid
+                      p.family (F::audio),      // Presence
+                      p.family (F::synths),     // High
+                      p.family (F::drums) };    // High Cut
 
         // Automation curves: a shade lighter than the track colours, to stand
         // out over regions.

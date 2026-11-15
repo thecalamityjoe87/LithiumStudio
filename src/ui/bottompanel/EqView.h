@@ -9,19 +9,24 @@ namespace lithium
 
 //==============================================================================
 /**
-    The "EQ" tab: a 4-band EQ for the selected track or for the master.
+    The "EQ" tab: an 8-band EQ for the selected track or for the master:
+    Low Cut, a low shelf, four bells, a high shelf and High Cut.
 
         [⏻ On]                                              [Reset]
         ┌────────────────────────────────────────────────────────┐
         │ +12 ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │  the curve: how
-        │   0 ───①──────╱‾‾②‾╲────────────③──────────④────────│  loud each
+        │   0 ─①──②───③─╱‾④‾╲──⑤─────⑥─────────⑦────⑧───│  loud each
         │ -12           100 Hz        1 kHz          10 kHz      │  frequency gets
         └────────────────────────────────────────────────────────┘
-          Low 100 Hz +0 dB   Low Mid 400 Hz +6 dB   ...
+          Low Cut 30 Hz Off   Low 100 Hz +0 dB   Low Mid ...
 
     Drag a band's point: sideways for its frequency, up and down to boost or
     cut. The mouse wheel over a point makes the band wider or narrower, and a
     double-click puts it back to 0 dB. Every drag is one undo step.
+
+    The two cuts (① and ⑧) have no gain, so their points stay on the 0 dB
+    line. They're off (a hollow point) until clicked or dragged; a
+    double-click turns one off again.
 */
 class EqView  : public juce::Component
 {

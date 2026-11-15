@@ -13,7 +13,7 @@ out="$root/build-installer"   # the staging folder
 dist="$root/dist"              # where the finished installers go
 app_id="io.github.thecalamityjoe87.LithiumStudio"
 
-cmake --build "$build" -j2 --target LithiumStudio LithiumStudioInstaller
+cmake --build "$build" -j6 --target LithiumStudio LithiumStudioInstaller
 version="$(cat "$build/version.txt")"   # written by CMake
 
 name="Lithium_Studio-$version-linux-$(uname -m)"
