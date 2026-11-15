@@ -38,14 +38,66 @@ namespace
 
     constexpr float cornerRadius = 6.0f;
 
-    // The buttons' text as Lithium Drums' installer sets it: condensed
-    // capitals, a little spaced out, half the button's height (9.5..14 px).
-    // Only here: the app's own buttons keep the app's look.
+    // The installer's fonts, sized as Lithium Drums sizes its own: by the
+    // em (point) height, like CSS, not by JUCE's ascent-plus-descent height,
+    // so the same numbers give the same text as Drums' installer.
+    namespace look
+    {
+        juce::Font body (float size)         { return fonts::ui (size).withPointHeight (size); }
+        juce::Font bodySemiBold (float size) { return fonts::uiSemiBold (size).withPointHeight (size); }
+        juce::Font label (float size)        { return fonts::caption (size).withPointHeight (size); }
+        juce::Font labelBold (float size)    { return fonts::captionBold (size).withPointHeight (size); }
+        juce::Font mono (float size)         { return fonts::mono (size).withPointHeight (size); }
+
+        float trackedWidth (const juce::String& text, const juce::Font& font, float tracking)
+        {
+            return juce::GlyphArrangement::getStringWidth (font.withExtraKerningFactor (tracking), text);
+        }
+    }
+
+    // The buttons as Lithium Drums' installer draws them: condensed capitals,
+    // a little spaced out, half the button's height (9.5..14), muted text
+    // on the raised colour, a soft border. Only here: the app's own buttons
+    // keep the app's look.
     struct InstallerLookAndFeel final : public LithiumLookAndFeel
     {
+        InstallerLookAndFeel()
+        {
+            const auto& c = palette();
+            setColour (juce::TextButton::buttonColourId, c.cardBg);
+            setColour (juce::TextButton::buttonOnColourId, c.accent);
+            setColour (juce::TextButton::textColourOffId, c.textSecondary);
+            setColour (juce::TextButton::textColourOnId, c.windowBg);
+        }
+
         juce::Font getTextButtonFont (juce::TextButton&, int buttonHeight) override
         {
-            return fonts::caption (juce::jlimit (9.5f, 14.0f, (float) buttonHeight * 0.5f));
+            return look::label (juce::jlimit (9.5f, 14.0f, (float) buttonHeight * 0.5f));
+        }
+
+        void drawButtonBackground (juce::Graphics& g, juce::Button& button, const juce::Colour&,
+                                   bool over, bool down) override
+        {
+            const auto& c = palette();
+            const auto bounds = button.getLocalBounds().toFloat().reduced (0.5f);
+            const auto on = button.getToggleState();
+            auto fill = button.findColour (on ? juce::TextButton::buttonOnColourId : juce::TextButton::buttonColourId);
+
+            if (down)
+                fill = fill.brighter (0.15f);
+            else if (over)
+                fill = on ? fill.brighter (0.08f) : c.selectedRow;
+
+            if (! button.isEnabled())
+                fill = fill.withMultipliedAlpha (0.5f);
+
+            g.setColour (fill);
+            g.fillRoundedRectangle (bounds, cornerRadius - 1.0f);
+            g.setColour (on ? fill : (over ? c.border : c.borderSoft));
+            g.drawRoundedRectangle (bounds, cornerRadius - 1.0f, 1.0f);
+
+            if (button.hasKeyboardFocus (false))
+                drawFocusRing (g, bounds, cornerRadius - 1.0f);
         }
 
         void drawButtonText (juce::Graphics& g, juce::TextButton& button, bool, bool) override
@@ -118,8 +170,7 @@ namespace
 
             area.reduce (14.0f, 0.0f);
             const auto box = area.removeFromLeft (18.0f).withSizeKeepingCentre (18.0f, 18.0f);
-            const auto boxColour = component.required ? c.accent.withMultipliedAlpha (0.55f) : c.accent;
-            g.setColour (on ? boxColour : c.border);
+            g.setColour (on ? c.accent : c.border);
             on ? g.fillRoundedRectangle (box, 4.0f) : g.drawRoundedRectangle (box.reduced (0.75f), 4.0f, 1.5f);
 
             if (on)
@@ -133,16 +184,16 @@ namespace
             }
 
             area.removeFromLeft (14.0f);
-            const auto where = area.removeFromRight (120.0f);
+            const auto where = area.removeFromRight (150.0f);
             const auto alpha = isEnabled() ? 1.0f : 0.5f;
 
             g.setColour (c.text.withMultipliedAlpha (alpha));
-            g.setFont (fonts::uiSemiBold (15.0f));
+            g.setFont (look::bodySemiBold (15.0f));
             g.drawText (component.name, area.withTrimmedTop (9.0f).withHeight (20.0f), juce::Justification::centredLeft, true);
             g.setColour (c.textSecondary.withMultipliedAlpha (alpha));
-            g.setFont (fonts::ui (13.0f));
+            g.setFont (look::body (13.0f));
             g.drawText (component.description, area.withTrimmedTop (29.0f).withHeight (18.0f), juce::Justification::centredLeft, true);
-            g.setFont (fonts::mono (12.0f));
+            g.setFont (look::mono (12.0f));
             g.drawText (component.where, where, juce::Justification::centredRight, true);
         }
     };
@@ -191,12 +242,12 @@ namespace
             g.drawRoundedRectangle (card.reduced (0.5f), 10.0f, 1.0f);
 
             g.setColour (c.text);
-            g.setFont (fonts::captionBold (20.0f).withExtraKerningFactor (0.12f));
+            g.setFont (look::labelBold (20.0f).withExtraKerningFactor (0.12f));
             g.drawText (title.toUpperCase(), card.reduced (28.0f, 0.0f).withTrimmedTop (24.0f).withHeight (28.0f),
                         juce::Justification::centredLeft, true);
 
             g.setColour (c.textSecondary);
-            g.setFont (fonts::ui (14.0f));
+            g.setFont (look::body (14.0f));
             g.drawFittedText (message, cardBounds().reduced (28, 0).withTrimmedTop (70).withTrimmedBottom (64),
                               juce::Justification::topLeft, 4, 1.0f);
         }
@@ -252,7 +303,7 @@ namespace
             for (const auto& c : components())
                 addAndMakeVisible (rows.add (std::make_unique<ComponentRow> (c)));
 
-            licenseLink.setFont (fonts::ui (13.0f), false, juce::Justification::centredLeft);
+            licenseLink.setFont (look::body (13.0f), false, juce::Justification::centredLeft);
             licenseLink.setColour (juce::HyperlinkButton::textColourId, palette().accent);
             licenseLink.onClick = [this]
             {
@@ -287,7 +338,7 @@ namespace
                 setStatus (error, true);
 
             refreshExisting();
-            setSize (680, 670);
+            setSize (680, 624);
         }
 
         ~InstallerView() override
@@ -301,30 +352,48 @@ namespace
             const auto& c = palette();
             g.fillAll (c.windowBg);
 
-            // The header: the logo and wordmark as in the app, then who made it.
+            // The header, laid out as Lithium Drums' installer's: the logo,
+            // the wordmark with the version after it, then who made it.
             g.setColour (c.toolbarBg);
             g.fillRect (getLocalBounds().removeFromTop (headerHeight));
             g.setColour (c.borderSoft);
             g.fillRect (0, headerHeight - 1, getWidth(), 1);
 
             // The logo's tile, as in the app's title bar (no border).
-            branding::paintLogo (g, { 28.0f, 20.0f, 40.0f, 40.0f });
+            branding::paintLogo (g, { 28.0f, 22.0f, 36.0f, 36.0f });
 
-            const juce::Rectangle<float> row (82.0f, 14.0f, 400.0f, 30.0f);
-            branding::paintWordmark (g, row, 26.0f, juce::Justification::centredLeft);
-
+            constexpr auto tracking = 0.14f;
+            const auto bold = look::labelBold (26.0f), semiBold = look::label (26.0f);
+            const auto lithiumWidth = look::trackedWidth ("LITHIUM", bold, tracking);
+            const auto studioWidth = look::trackedWidth ("STUDIO", semiBold, tracking);
+            const juce::Rectangle<float> row (80.0f, 16.0f, 400.0f, 30.0f);
+            g.setColour (c.text);
+            g.setFont (bold.withExtraKerningFactor (tracking));
+            g.drawText ("LITHIUM", row, juce::Justification::centredLeft, false);
             g.setColour (c.textSecondary);
-            g.setFont (fonts::ui (14.0f));
-            g.drawText ("Version " LITHIUM_VERSION_STRING ", by Isaac Joseph, Calamity Audio",
-                        juce::Rectangle<float> (83.0f, 44.0f, 500.0f, 20.0f), juce::Justification::centredLeft, false);
+            g.setFont (semiBold.withExtraKerningFactor (tracking));
+            g.drawText ("STUDIO", row.withTrimmedLeft (lithiumWidth + 8.0f), juce::Justification::centredLeft, false);
+
+            // The version after the wordmark, sitting on the same baseline.
+            {
+                const auto wordmarkBaseline = row.getCentreY() - bold.getHeight() * 0.5f + bold.getAscent();
+                juce::GlyphArrangement glyphs;
+                glyphs.addLineOfText (look::mono (13.0f), "v" LITHIUM_VERSION_STRING,
+                                      row.getX() + lithiumWidth + studioWidth + 16.0f, wordmarkBaseline);
+                glyphs.draw (g);
+            }
+
+            g.setFont (look::body (14.0f));
+            g.drawText ("by Isaac Joseph, Calamity Audio", juce::Rectangle<float> (81.0f, 46.0f, 400.0f, 20.0f),
+                        juce::Justification::centredLeft, false);
 
             g.setColour (c.text);
-            g.setFont (fonts::ui (15.0f));
+            g.setFont (look::body (15.0f));
             g.drawFittedText ("A music studio: record instruments and vocals, play virtual instruments, arrange, mix and export your songs.",
                               introArea, juce::Justification::topLeft, 2, 1.0f);
 
             g.setColour (c.textSecondary);
-            g.setFont (fonts::ui (13.0f));
+            g.setFont (look::body (13.0f));
             g.drawFittedText ("It comes with a small set of sounds. More sound packs can be downloaded from inside the app "
                               "(Sounds > Manage Sounds). Nothing needs your password: everything goes into your home folder.",
                               noteArea, juce::Justification::topLeft, 2, 1.0f);
@@ -341,7 +410,7 @@ namespace
             }
 
             g.setColour (statusIsError ? c.record : c.text);
-            g.setFont (fonts::ui (14.0f));
+            g.setFont (look::body (14.0f));
             g.drawFittedText (status, statusArea, juce::Justification::topLeft, 3, 1.0f);
         }
 
@@ -362,7 +431,7 @@ namespace
             area.removeFromTop (2);
             noteArea = area.removeFromTop (38);
             licenseArea = area.removeFromTop (22);
-            const auto textWidth = (int) std::ceil (juce::GlyphArrangement::getStringWidth (fonts::ui (13.0f), licenseText));
+            const auto textWidth = (int) std::ceil (juce::GlyphArrangement::getStringWidth (look::body (13.0f), licenseText));
             licenseLink.setBounds (licenseArea.getX() + textWidth + 8, licenseArea.getY(), 96, licenseArea.getHeight());
 
             auto buttons = area.removeFromBottom (40);
