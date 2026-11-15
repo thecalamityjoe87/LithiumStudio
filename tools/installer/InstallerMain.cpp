@@ -38,6 +38,26 @@ namespace
 
     constexpr float cornerRadius = 6.0f;
 
+    // The buttons' text as Lithium Drums' installer sets it: condensed
+    // capitals, a little spaced out, half the button's height (9.5..14 px).
+    // Only here: the app's own buttons keep the app's look.
+    struct InstallerLookAndFeel final : public LithiumLookAndFeel
+    {
+        juce::Font getTextButtonFont (juce::TextButton&, int buttonHeight) override
+        {
+            return fonts::caption (juce::jlimit (9.5f, 14.0f, (float) buttonHeight * 0.5f));
+        }
+
+        void drawButtonText (juce::Graphics& g, juce::TextButton& button, bool, bool) override
+        {
+            const auto colour = button.findColour (button.getToggleState() ? juce::TextButton::textColourOnId
+                                                                           : juce::TextButton::textColourOffId);
+            g.setColour (button.isEnabled() ? colour : colour.withMultipliedAlpha (0.5f));
+            g.setFont (getTextButtonFont (button, button.getHeight()).withExtraKerningFactor (0.06f));
+            g.drawText (button.getButtonText().toUpperCase(), button.getLocalBounds(), juce::Justification::centred, false);
+        }
+    };
+
     juce::File payloadFolder()
     {
         if (const auto env = juce::SystemStats::getEnvironmentVariable ("LITHIUM_INSTALLER_PAYLOAD", {}); env.isNotEmpty())
@@ -627,7 +647,7 @@ namespace
             setActivePalette (darkPalette());
 
             // Made here, not as a member: its fonts need JUCE running.
-            lookAndFeel = std::make_unique<LithiumLookAndFeel>();
+            lookAndFeel = std::make_unique<InstallerLookAndFeel>();
             juce::LookAndFeel::setDefaultLookAndFeel (lookAndFeel.get());
             window = std::make_unique<MainWindow>();
         }
