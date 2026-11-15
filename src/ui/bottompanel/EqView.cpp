@@ -29,6 +29,14 @@ namespace
     constexpr float displayRangeDb = 24.0f;   // the graph shows -24..+24 dB (bands go to ±20)
     constexpr float pointRadius = 7.0f;
     constexpr int readoutHeight = 40;
+    constexpr int knobGap = 10, bandTitleHeight = 28;
+
+    // The knobs turn 0..1. Frequency and Q go on a log scale (each turn of
+    // the knob is the same musical step), gain straight across.
+    float logTo01 (float v, float lo, float hi)    { return std::log (v / lo) / std::log (hi / lo); }
+    float logFrom01 (float t, float lo, float hi)  { return lo * std::pow (hi / lo, juce::jlimit (0.0f, 1.0f, t)); }
+
+    juce::String gainText (float db)   { return (db > 0.05f ? "+" : "") + juce::String (db, 1) + " dB"; }
 
     // Each band has a colour of its own, so its point and its readout match.
     // static_assert checks at compile time that there's one colour per band.
@@ -54,6 +62,44 @@ EqView::EqView (AudioEngine& e) : engine (e)
     resetButton.setTooltip ("Put every band back to 0 dB and turn the cuts off");
     resetButton.onClick = [this] { engine.getTracks().eq().reset (target); };
     addAndMakeVisible (resetButton);
+
+    // The selected band's knobs. A drag is one undo step, like dragging its point.
+    for (auto* knob : { &frequencyKnob, &gainKnob, &qKnob })
+    {
+        knob->onDragStart = [this] { engine.beginUndoStep ("EQ"); };
+        addAndMakeVisible (knob);
+    }
+
+    frequencyKnob.onValueChange = [this] (float v)
+    {
+        const auto& b = settings.bands[(size_t) selectedBand];
+        turnSelectedCutOn();
+        setBand (selectedBand, logFrom01 (v, EqController::minFrequency, EqController::maxFrequency), b.gainDb, b.q);
+    };
+
+    gainKnob.onValueChange = [this] (float v)
+    {
+        const auto& b = settings.bands[(size_t) selectedBand];
+        setBand (selectedBand, b.frequencyHz, juce::jmap (v, EqController::minGain, EqController::maxGain), b.q);
+    };
+
+    qKnob.onValueChange = [this] (float v)
+    {
+        const auto& b = settings.bands[(size_t) selectedBand];
+        turnSelectedCutOn();
+        setBand (selectedBand, b.frequencyHz, b.gainDb, logFrom01 (v, EqController::minQ, EqController::maxQ));
+    };
+
+    cutButton.setColours (IconButton::borderedColours);
+    cutButton.setFont (fonts::uiSemiBold (textSize::md));
+    cutButton.setIconSize (14.0f);
+    cutButton.onClick = [this]
+    {
+        engine.beginUndoStep ("EQ");
+        engine.getTracks().eq().setBandOn (target, selectedBand, ! settings.bands[(size_t) selectedBand].on);
+        refresh();
+    };
+    addChildComponent (cutButton);
 }
 
 void EqView::setTarget (TrackId id, Family f)
@@ -83,8 +129,62 @@ void EqView::refresh()
     powerButton.setText (settings.enabled ? "On" : "Off");
     powerButton.setEnabled (target != 0);
     resetButton.setEnabled (target != 0);
+    updateKnobs();
     updateCurve();
     repaint();
+}
+
+void EqView::selectBand (int band)
+{
+    if (band == selectedBand || ! juce::isPositiveAndBelow (band, EqSettings::numBands))
+        return;
+
+    selectedBand = band;
+    updateKnobs();
+    repaint();
+}
+
+void EqView::updateKnobs()
+{
+    const auto& b = settings.bands[(size_t) selectedBand];
+
+    for (auto* knob : { &frequencyKnob, &gainKnob, &qKnob })
+    {
+        knob->setArcFamily (family);
+        knob->setEnabled (target != 0);
+    }
+
+    frequencyKnob.setValue (logTo01 (b.frequencyHz, EqController::minFrequency, EqController::maxFrequency),
+                            describeFrequency (b.frequencyHz));
+    gainKnob.setValue (juce::jmap (b.gainDb, EqController::minGain, EqController::maxGain, 0.0f, 1.0f), gainText (b.gainDb));
+    qKnob.setValue (logTo01 (b.q, EqController::minQ, EqController::maxQ), juce::String (b.q, 2));
+
+    // A cut has no gain: its On/Off sits where the Gain knob would be.
+    gainKnob.setVisible (! b.isCut());
+    cutButton.setVisible (b.isCut());
+    cutButton.setEnabled (target != 0);
+    cutButton.setToggleState (b.on, juce::dontSendNotification);
+    cutButton.setText (b.on ? "On" : "Off");
+    cutButton.setTitle ((b.on ? "Turn off " : "Turn on ") + b.name);
+    cutButton.setTooltip (b.on ? "On (click to turn it off)" : "Off (click to turn it on)");
+}
+
+void EqView::turnSelectedCutOn()
+{
+    // Turning a knob on a cut that's off turns it on (in the same undo step).
+    const auto& b = settings.bands[(size_t) selectedBand];
+
+    if (b.isCut() && ! b.on)
+        engine.getTracks().eq().setBandOn (target, selectedBand, true);
+}
+
+int EqView::readoutColumnAt (juce::Point<float> p) const
+{
+    if (! readoutArea.toFloat().contains (p))
+        return -1;
+
+    const auto columnWidth = (float) readoutArea.getWidth() / (float) EqSettings::numBands;
+    return juce::jlimit (0, EqSettings::numBands - 1, (int) ((p.x - (float) readoutArea.getX()) / columnWidth));
 }
 
 void EqView::updateCurve()
@@ -188,8 +288,16 @@ void EqView::mouseDown (const juce::MouseEvent& e)
 {
     dragBand = target != 0 ? bandAt (e.position) : -1;
 
+    // Clicking a band's readout selects it for the knobs.
     if (dragBand < 0)
+    {
+        if (const auto column = target != 0 ? readoutColumnAt (e.position) : -1; column >= 0)
+            selectBand (column);
+
         return;
+    }
+
+    selectBand (dragBand);
 
     engine.beginUndoStep ("EQ");   // the whole drag undoes in one go
 
@@ -255,6 +363,18 @@ void EqView::mouseWheelMove (const juce::MouseEvent& e, const juce::MouseWheelDe
 void EqView::paint (juce::Graphics& g)
 {
     LITHIUM_PERF_PAINT ("EqView");
+
+    // The selected band's name, over its knobs.
+    {
+        auto r = bandTitleArea;
+        g.setColour (settings.enabled && target != 0 ? bandColour (selectedBand) : theme().textSecondary);
+        g.fillEllipse (r.removeFromLeft (10).withSizeKeepingCentre (10, 10).toFloat());
+        r.removeFromLeft (8);
+        g.setColour (target != 0 ? theme().text : theme().textSecondary);
+        g.setFont (fonts::uiBold (textSize::md));
+        g.drawText (settings.bands[(size_t) selectedBand].name, r, juce::Justification::centredLeft, true);
+    }
+
     // The graph's background and grid.
     g.setColour (theme().wellBg);
     g.fillRoundedRectangle (graphArea.toFloat(), size::radius);
@@ -326,7 +446,7 @@ void EqView::paint (juce::Graphics& g)
     for (int b = 0; b < EqSettings::numBands; ++b)
     {
         const auto p = bandPoint (b);
-        const bool active = b == hoverBand || b == dragBand;
+        const bool active = b == hoverBand || b == dragBand || b == selectedBand;
         const bool off = ! settings.bands[(size_t) b].on;
         const auto c = settings.enabled ? bandColour (b) : theme().textSecondary;
         auto circle = juce::Rectangle<float> (pointRadius * 2.0f, pointRadius * 2.0f).withCentre (p);
@@ -357,6 +477,12 @@ void EqView::paint (juce::Graphics& g)
         const auto& band = settings.bands[(size_t) b];
         auto r = readoutArea.withX (readoutArea.getX() + b * columnWidth).withWidth (columnWidth).reduced (4, 0);
 
+        if (b == selectedBand)
+        {
+            g.setColour (theme().selectedRow);
+            g.fillRoundedRectangle (r.expanded (2, 0).toFloat(), size::radius);
+        }
+
         g.setColour (settings.enabled ? bandColour (b) : theme().textSecondary);
         const auto dot = r.removeFromLeft (8).withSizeKeepingCentre (8, 8).toFloat();
 
@@ -374,7 +500,7 @@ void EqView::paint (juce::Graphics& g)
         g.setColour (theme().textSecondary);
         g.setFont (fonts::ui (textSize::sm));
         // A cut shows Off, or its resonance; the other bands their gain and width.
-        const auto gain = (band.gainDb > 0.05f ? "+" : "") + juce::String (band.gainDb, 1) + " dB";
+        const auto gain = gainText (band.gainDb);
         const auto details = band.isCut() ? (band.on ? "Q " + juce::String (band.q, 1) : juce::String ("Off"))
                                           : gain + "  Q " + juce::String (band.q, 1);
         g.drawText (describeFrequency (band.frequencyHz) + "  " + details, r, juce::Justification::topLeft, true);
@@ -389,6 +515,21 @@ void EqView::resized()
     powerButton.setBounds (top.removeFromLeft (72));
     resetButton.setBounds (top.removeFromRight (72));
     r.removeFromTop (10);
+
+    // The selected band's knobs, to the right of the graph and readouts.
+    knobsArea = r.removeFromRight (3 * Knob::preferredWidth + 2 * knobGap);
+    r.removeFromRight (16);
+    bandTitleArea = knobsArea.removeFromTop (bandTitleHeight);
+    knobsArea.removeFromTop (6);
+
+    auto knobRow = knobsArea.removeFromTop (Knob::preferredHeight);
+    frequencyKnob.setBounds (knobRow.removeFromLeft (Knob::preferredWidth));
+    knobRow.removeFromLeft (knobGap);
+    const auto middle = knobRow.removeFromLeft (Knob::preferredWidth);
+    gainKnob.setBounds (middle);
+    cutButton.setBounds (middle.withSizeKeepingCentre (72, 28));
+    knobRow.removeFromLeft (knobGap);
+    qKnob.setBounds (knobRow.removeFromLeft (Knob::preferredWidth));
 
     readoutArea = r.removeFromBottom (readoutHeight);
     r.removeFromBottom (6);

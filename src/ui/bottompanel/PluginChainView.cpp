@@ -347,7 +347,9 @@ void PluginChainView::refresh()
     family = track.has_value() ? colour::familyOf (*track) : Family::master;
     instrument = tracks.effects().getInstrument (trackId);
     chain = tracks.effects().getEffectChain (trackId);
-    hasEq = trackId != 0 && tracks.eq().hasEq (trackId);
+    // Every track has the EQ row. Before its EQ is first used it reads as
+    // on (and flat); the power button adds the EQ when it's clicked.
+    hasEq = trackId != 0;
     eqEnabled = hasEq && tracks.eq().getEq (trackId).enabled;
 
     // This is called on every change in the session (many a second while

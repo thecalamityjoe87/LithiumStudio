@@ -26,6 +26,9 @@ namespace
 {
     // The built-in effects offered in the "+ Add effect" menu, with the names
     // and groups the user sees. Order here = order in the menu.
+    // There's no EQ here: every track has one on the EQ tab (see EqPlugin).
+    // Older sessions may still have Tracktion's 4-band EQ as an effect; it
+    // keeps working, shown under its own name.
     const std::vector<EffectType>& builtInEffects()
     {
         static const std::vector<EffectType> effects {
@@ -33,9 +36,8 @@ namespace
             { LimiterPlugin::xmlTypeName,        "Limiter",               "Dynamics" },
             { NoiseGatePlugin::xmlTypeName,      "Noise Gate",            "Dynamics" },
             { SlowSwellPlugin::xmlTypeName,      SlowSwellPlugin::getPluginName(),   "Dynamics" },
-            { te::EqualiserPlugin::xmlTypeName,  "EQ",                    "EQ & Filter" },
-            { te::LowPassPlugin::xmlTypeName,    "Low/High-Pass Filter",  "EQ & Filter" },
-            { EnvelopeWahPlugin::xmlTypeName,    EnvelopeWahPlugin::getPluginName(), "EQ & Filter" },
+            { te::LowPassPlugin::xmlTypeName,    "Low/High-Pass Filter",  "Filter" },
+            { EnvelopeWahPlugin::xmlTypeName,    EnvelopeWahPlugin::getPluginName(), "Filter" },
             { DistortionPlugin::xmlTypeName,     "Distortion",            "Distortion" },
             { GoldenBoostPlugin::xmlTypeName,    GoldenBoostPlugin::getPluginName(), "Distortion" },
             { YellowDrivePlugin::xmlTypeName,    YellowDrivePlugin::getPluginName(), "Distortion" },

@@ -2,6 +2,7 @@
 
 #include "engine/AudioEngine.h"
 #include "ui/widgets/IconButton.h"
+#include "ui/widgets/Knob.h"
 #include "ui/theme/Family.h"
 
 namespace lithium
@@ -27,6 +28,10 @@ namespace lithium
     The two cuts (① and ⑧) have no gain, so their points stay on the 0 dB
     line. They're off (a hollow point) until clicked or dragged; a
     double-click turns one off again.
+
+    Beside the graph, knobs for the selected band (click its point, or its
+    readout underneath, to select it): Frequency, Gain and Q. A cut has an
+    On/Off button instead of Gain, and turning one of its knobs turns it on.
 */
 class EqView  : public juce::Component
 {
@@ -62,8 +67,13 @@ private:
     IconButton powerButton { "EQ on/off", Icon::power, "On" };
     IconButton resetButton { "Reset EQ", std::nullopt, "Reset" };
 
-    juce::Rectangle<int> graphArea, readoutArea;
+    // The selected band's knobs (see updateKnobs).
+    Knob frequencyKnob { "Frequency" }, gainKnob { "Gain" }, qKnob { "Q" };
+    IconButton cutButton { "Turn band on or off", Icon::power, "Off" };
+
+    juce::Rectangle<int> graphArea, readoutArea, knobsArea, bandTitleArea;
     int dragBand = -1, hoverBand = -1;
+    int selectedBand = 1;   // Low, to start with
 
     // The graph: frequency across (on a log scale, like your ears hear it),
     // dB up and down.
@@ -75,6 +85,10 @@ private:
     int bandAt (juce::Point<float>) const;
 
     void setBand (int band, float frequencyHz, float gainDb, float q);
+    void selectBand (int band);
+    void updateKnobs();
+    void turnSelectedCutOn();
+    int readoutColumnAt (juce::Point<float>) const;
     void updateCurve();
     static juce::String describeFrequency (float hz);
 

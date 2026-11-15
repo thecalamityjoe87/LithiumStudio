@@ -7608,16 +7608,21 @@ int main (int argc, char* argv[])
         check (tracks.effects().getEffectChain (t2).empty(), "new tracks start with no effects");
         auto reverb = tracks.effects().addEffect (t2, "reverb");
         auto comp = tracks.effects().addEffect (t2, "compressor");
-        auto eq = tracks.effects().addEffect (t2, "4bandEq", 0);   // insert at the top
+        auto phaser = tracks.effects().addEffect (t2, "phaser", 0);   // insert at the top
         auto chain = tracks.effects().getEffectChain (t2);
-        check (reverb != 0 && comp != 0 && eq != 0, "effects can be added");
-        check (chain.size() == 3 && chain[0].id == eq && chain[1].id == reverb && chain[2].id == comp, "effects go where asked");
+        check (reverb != 0 && comp != 0 && phaser != 0, "effects can be added");
+        check (chain.size() == 3 && chain[0].id == phaser && chain[1].id == reverb && chain[2].id == comp, "effects go where asked");
         tracks.effects().moveEffect (t2, comp, 0);
         chain = tracks.effects().getEffectChain (t2);
-        check (chain.size() == 3 && chain[0].id == comp && chain[1].id == eq, "effects can be reordered");
+        check (chain.size() == 3 && chain[0].id == comp && chain[1].id == phaser, "effects can be reordered");
         tracks.effects().setEffectEnabled (t2, comp, false);
         check (! tracks.effects().getEffectChain (t2)[0].enabled, "effects can be bypassed");
-        auto echo = tracks.effects().replaceEffect (t2, eq, "delay");
+        {
+            const auto available = tracks.effects().getAvailableEffects();
+            check (std::none_of (available.begin(), available.end(), [] (const EffectType& e) { return e.type == "4bandEq"; }),
+                   "there's no separate EQ effect (the EQ tab is the EQ)");
+        }
+        auto echo = tracks.effects().replaceEffect (t2, phaser, "delay");
         chain = tracks.effects().getEffectChain (t2);
         check (echo != 0 && chain.size() == 3 && chain[1].id == echo && chain[1].name == "Echo", "effects can be replaced in place");
         tracks.effects().removeEffect (t2, reverb);
