@@ -253,6 +253,13 @@ void MainComponent::resized()
                                                                 getMaxBottomPanelHeight(), bottomPanelHeight)
                                                 : BottomPanel::collapsedHeight;
     bottomPanel.setBounds (r.removeFromBottom (bottomHeight));
+
+    // Collapsed, the panel's tab sticks up from its top edge at the right
+    // end, and the arrangement's scroll bar stops short of it.
+    bottomPanelTab.setVisible (! bottomPanelVisible);
+    bottomPanelTab.setBounds (bottomPanel.getRight() - PanelTab::rightMargin - PanelTab::width,
+                              bottomPanel.getY() - PanelTab::height + 1, PanelTab::width, PanelTab::height);
+    arrangement.setScrollBarEndInset (bottomPanelVisible ? 0 : PanelTab::rightMargin + PanelTab::width + 6);
     arrangement.setBounds (r);
 
     // The library's handle straddles its edge, on top of everything else. It
@@ -323,6 +330,9 @@ void MainComponent::setUpResizers()
 
     addAndMakeVisible (libraryResizer);
     addAndMakeVisible (bottomResizer);
+
+    bottomPanelTab.onClick = [this] { setBottomPanelVisible (true); };
+    addChildComponent (bottomPanelTab);
 }
 
 int MainComponent::getMaxBottomPanelHeight() const

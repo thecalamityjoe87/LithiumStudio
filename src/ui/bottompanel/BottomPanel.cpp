@@ -26,6 +26,7 @@ namespace
     constexpr float segmentRadius = 7.0f, segmentOutlineRadius = 10.0f;
     constexpr float smallSegmentRadius = 5.0f, smallSegmentOutlineRadius = 7.0f;
     constexpr int padding = size::panelPadding;
+    constexpr float hideIconSize = 14.0f;   // the Hide panel button's chevron
 }
 
 //==============================================================================
@@ -560,6 +561,8 @@ BottomPanel::BottomPanel (AudioEngine& e, Selection& s)
 
     // An ordinary button, like the rest of the header's.
     collapseButton.setColours (IconButton::raisedColours);
+    collapseButton.setFont (fonts::ui (textSize::md));   // like Inspector beside it
+    collapseButton.setIconSize (hideIconSize);
     collapseButton.setTooltip ("Hide panel");
     collapseButton.onClick = [this] { if (onCollapseRequested) onCollapseRequested (! collapsed); };
     addAndMakeVisible (collapseButton);
@@ -700,11 +703,7 @@ void BottomPanel::setCollapsed (bool shouldCollapse)
         return;
 
     collapsed = shouldCollapse;
-    const auto label = collapsed ? juce::String ("Show panel") : juce::String ("Hide panel");
-    collapseButton.setIcon (collapsed ? Icon::chevronUp : Icon::chevronDown);
-    collapseButton.setTitle (label);
-    collapseButton.setTooltip (label);
-    collapseButton.setIconSize (collapsed ? 12.0f : 16.0f);   // the collapsed strip is only 16px tall
+    collapseButton.setVisible (! collapsed);   // collapsed, the tab on the panel's edge shows it again (see PanelTab)
     showTabPage();
     resized();
     refresh();   // the mixer only refreshes while it's visible
@@ -1060,7 +1059,7 @@ void BottomPanel::paint (juce::Graphics& g)
 juce::Rectangle<int> BottomPanel::getHandleBounds() const
 {
     if (collapsed)
-        return getLocalBounds().withTrimmedRight (getWidth() - collapseButton.getX() + 8);
+        return getLocalBounds();
 
     return getLocalBounds().removeFromTop (handleHeight);
 }
@@ -1070,11 +1069,7 @@ void BottomPanel::resized()
     auto r = getLocalBounds();
 
     if (collapsed)
-    {
-        // The slim strip: the grip (see getHandleBounds) and the show button on the right.
-        collapseButton.setBounds (r.reduced (padding, 0).removeFromRight (32).withTrimmedTop (1));
-        return;
-    }
+        return;   // the slim strip is all grip (see getHandleBounds)
 
     r.removeFromTop (handleHeight);
 
@@ -1103,7 +1098,10 @@ void BottomPanel::resized()
     headerDivider = header.removeFromLeft (1).withSizeKeepingCentre (1, 20);
     header.removeFromLeft (dividerGap);
 
-    collapseButton.setBounds (header.removeFromRight (30).withSizeKeepingCentre (30, 30));
+    // Sized to its icon and text (as IconButton lays them out: icon, 6px, text), with 10px each side.
+    const int hideWidth = juce::roundToInt (hideIconSize + 6.0f
+                                            + juce::GlyphArrangement::getStringWidth (fonts::ui (textSize::md), "Hide panel")) + 20;
+    collapseButton.setBounds (header.removeFromRight (hideWidth).withSizeKeepingCentre (hideWidth, 30));
     header.removeFromRight (8);
     inspectorButton.setBounds (header.removeFromRight (96).withSizeKeepingCentre (96, 30));
     header.removeFromRight (14);

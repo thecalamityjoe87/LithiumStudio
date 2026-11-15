@@ -50,7 +50,7 @@ namespace lithium
     master's effects). Clicking an effect there shows its settings in the
     main area until "Done".
 
-    Collapsed, only a slim strip with the grip and a show button is left, so
+    Collapsed, only a slim strip with the grip is left (and the owner's PanelTab on its edge), so
     the arrangement gets the room. The owner (MainComponent) lays a
     ResizeHandle over getHandleBounds() and does the resizing.
 */
@@ -123,7 +123,7 @@ public:
     std::function<void (const juce::String& packId)> onDownloadPackRequested;
 
     /** Where the owner puts the resize handle: the grip along the top edge,
-        or (collapsed) the whole strip apart from the show button. */
+        or (collapsed) the whole strip. */
     juce::Rectangle<int> getHandleBounds() const;
 
     void paint (juce::Graphics&) override;
@@ -132,7 +132,7 @@ public:
     static constexpr int defaultHeight = tokens::size::bottomPanelHeight;
     static constexpr int minHeight = 180;        // the owner keeps it between this and half the window
     static constexpr int handleHeight = 8;       // the grip strip along the top edge
-    static constexpr int collapsedHeight = 16;   // collapsed: just the grip and the show button
+    static constexpr int collapsedHeight = 16;   // collapsed: just the grip
 
 private:
     class SoundPage;
@@ -162,7 +162,7 @@ private:
     IconButton tunerButton { "Tuner", Icon::tuningFork, "Tuner" };           // Rig tab only
     IconButton addPedalButton { "Add pedal", Icon::plus, "Add Pedal" };     // Rig tab only
     IconButton playToEndButton { "Play to end", std::nullopt, "Play to End" };   // Sound tab, tracks playing their own sound
-    IconButton collapseButton { "Hide panel", Icon::chevronDown };
+    IconButton collapseButton { "Hide panel", Icon::chevronDown, "Hide panel" };
 
     // The inspector column's switch: Track | Master, or Track | Region on the Editor tab.
     IconButton trackModeButton  { "Track", std::nullopt, "Track" };

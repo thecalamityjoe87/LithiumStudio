@@ -1,12 +1,13 @@
 #include "app/MainWindow.h"
+#include "engine/Preferences.h"
 #include "platform/WindowManagerHints.h"
 #include "ui/theme/Tokens.h"
 
 namespace lithium
 {
 
-MainWindow::MainWindow (const juce::String& name, AudioEngine& engine)
-    : juce::DocumentWindow (name, theme().windowBg, juce::DocumentWindow::allButtons)
+MainWindow::MainWindow (const juce::String& name, AudioEngine& e)
+    : juce::DocumentWindow (name, theme().windowBg, juce::DocumentWindow::allButtons), engine (e)
 {
     // No JUCE title bar: the app's MenuBar strip is the title bar.
     // On Windows and Linux there's no OS title bar either, and the strip has
@@ -33,23 +34,56 @@ MainWindow::MainWindow (const juce::String& name, AudioEngine& engine)
     platform::useInlineTitleBar (*this);
    #endif
 
-    // No bigger than the screen (a large interface size makes the window's units bigger on it).
-    auto size = juce::Point<int> (getWidth(), getHeight());
+    // Where the window was when the app last quit, kept on a screen that's
+    // still there; otherwise centred at the default size. Either way no
+    // bigger than the screen (a large interface size makes the window's
+    // units bigger on it).
+    auto& prefs = engine.getPreferences();
+    const auto& displays = juce::Desktop::getInstance().getDisplays();
+    const auto saved = juce::Rectangle<int>::fromString (prefs.get (settings::windowBounds));
+    const auto* display = saved.isEmpty() ? displays.getPrimaryDisplay() : displays.getDisplayForRect (saved);
 
-    if (auto* display = juce::Desktop::getInstance().getDisplays().getPrimaryDisplay())
+    if (display == nullptr)
+        display = displays.getPrimaryDisplay();
+
+    if (display != nullptr)
     {
         const auto area = display->userBounds.toNearestInt();
-        size = { juce::jmin (size.x, area.getWidth()), juce::jmin (size.y, area.getHeight()) };
+
+        if (! saved.isEmpty() && area.intersects (saved))
+        {
+            setBounds (saved.withSize (juce::jmin (saved.getWidth(), area.getWidth()),
+                                       juce::jmin (saved.getHeight(), area.getHeight()))
+                            .constrainedWithin (area));
+        }
+        else
+        {
+            centreWithSize (juce::jmin (getWidth(), area.getWidth()), juce::jmin (getHeight(), area.getHeight()));
+        }
+    }
+    else
+    {
+        centreWithSize (getWidth(), getHeight());
     }
 
-    centreWithSize (size.x, size.y);
+    restoredBounds = getBounds();
     setVisible (true);
 
-    restoredBounds = getBounds();
+    // Maximised last time: maximise it once the window manager has it (see
+    // timerCallback), just as the maximise button does.
+    maximiseWhenReady = prefs.get (settings::windowMaximised);
 
     // The OS or window manager can also maximise/restore the window (e.g.
-    // Super+Up on GNOME, or Aero Snap on Windows), so keep checking.
-    startTimerHz (5);
+    // Super+Up on GNOME, or Aero Snap on Windows), so keep checking. Quicker
+    // at first while it's waiting to maximise, so the normal size barely shows.
+    startTimerHz (maximiseWhenReady ? 50 : 5);
+}
+
+MainWindow::~MainWindow()
+{
+    auto& prefs = engine.getPreferences();
+    prefs.set (settings::windowMaximised, maximised || maximiseWhenReady);
+    prefs.set (settings::windowBounds, restoredBounds.toString());   // the size it goes back to from maximised
 }
 
 void MainWindow::closeButtonPressed()
@@ -106,6 +140,18 @@ int MainWindow::getNativeButtonsWidth() const
 
 void MainWindow::timerCallback()
 {
+    if (maximiseWhenReady)
+    {
+        // Give up waiting after about two seconds and ask anyway.
+        if (! platform::isReadyToMaximise (*this) && ++ticksWaitingToMaximise < 100)
+            return;
+
+        maximiseWhenReady = false;
+        setMaximised (true);
+        startTimerHz (5);
+        return;
+    }
+
     setMaximisedFlag (platform::isMaximised (*this));
 }
 

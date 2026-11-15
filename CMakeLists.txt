@@ -13,7 +13,7 @@ cmake_minimum_required(VERSION 3.22)
 # milestone starts, LITHIUM_PATCH for fix builds within one. LITHIUM_STAGE is the
 # label shown beside the version (About, splash) until 1.0.
 set(LITHIUM_MILESTONE 15)
-set(LITHIUM_PATCH 2)
+set(LITHIUM_PATCH 3)
 set(LITHIUM_STAGE "alpha")
 
 # The oldest macOS the app runs on. It has to be set before project(), which
@@ -527,6 +527,7 @@ set(LITHIUM_UI_SOURCES
     src/ui/arrangement/TrackHeader.h        src/ui/arrangement/TrackHeader.cpp
     src/ui/arrangement/RegionComponent.h    src/ui/arrangement/RegionComponent.cpp
     src/ui/bottompanel/BottomPanel.h        src/ui/bottompanel/BottomPanel.cpp
+    src/ui/bottompanel/PanelTab.h           src/ui/bottompanel/PanelTab.cpp
     src/ui/bottompanel/PianoKeyboard.h      src/ui/bottompanel/PianoKeyboard.cpp
     src/ui/bottompanel/AudioEditor.h        src/ui/bottompanel/AudioEditor.cpp
     src/ui/bottompanel/AudioEditorPitch.cpp

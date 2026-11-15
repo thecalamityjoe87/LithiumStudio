@@ -51,6 +51,7 @@ void RecordingView::refresh()
     trackId = selection.getTrack();
     auto track = tracks.getTrack (trackId);
     isAudio = track.has_value() && track->kind == TrackKind::audio;
+    isArmed = isAudio && track->armed;
 
     // This is called on every change in the session (many a second while
     // automation plays): only rebuild the input list and redraw when
@@ -114,12 +115,15 @@ void RecordingView::refresh()
 
 void RecordingView::updateMeter()
 {
-    if (isAudio && isShowing())
-    {
-        auto reading = engine.getTracks().inputs().getInputMeter (trackId);
-        meter.setLevel (reading.level);
-        clipLight.setClipped (reading.clipped);
-    }
+    if (! isAudio || ! isShowing())
+        return;
+
+    auto& tracks = engine.getTracks();
+    auto reading = tracks.inputs().getInputMeter (trackId);
+    clipLight.setClipped (reading.clipped);
+
+    // Like the track's header: the input while armed, else what the track plays.
+    meter.setLevel (isArmed ? reading.level : tracks.getTrackLevel (trackId));
 }
 
 int RecordingView::getIdealHeight() const

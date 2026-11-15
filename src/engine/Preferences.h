@@ -75,6 +75,10 @@ namespace settings
     inline constexpr IntSetting  interfaceScale      { "interfaceScale", 100 };       // percent
     namespace TrackHeight { enum { compact, tall }; }
     inline constexpr IntSetting  trackHeight         { "trackHeight", TrackHeight::compact };   // View > Compact/Tall Tracks
+
+    // The main window as it was when the app last quit
+    inline constexpr TextSetting windowBounds        { "windowBounds", "" };          // "x y width height" when not maximised; empty: centered at the default size
+    inline constexpr BoolSetting windowMaximised     { "windowMaximised", false };
 }
 
 //==============================================================================

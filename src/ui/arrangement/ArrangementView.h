@@ -125,6 +125,10 @@ public:
     /** Before the view first has a size, it's kept until it does. */
     void setViewPosition (const ViewPosition&);
 
+    /** Stops the time scroll bar this many pixels short of the right edge
+        (the collapsed bottom panel's tab sits there). */
+    void setScrollBarEndInset (int pixels);
+
     /** Shows the rename field on a region (scrolling it into view first). */
     void startRenaming (RegionId);
 
@@ -228,6 +232,8 @@ private:
     std::optional<ViewPosition> pendingViewPosition;   // set before zoomInitialised: applied once it is
     double startPixelsPerBeat = 20.0;   // the first zoom (16 bars across): tracks are their normal height here and below
     float lastPlayheadX = 0.0f;
+    double lastPositionBeats = 0.0;   // to tell a playhead jump while stopped from the user scrolling
+    int scrollBarEndInset = 0;
 
     //==============================================================================
     // Time: zoom and horizontal scroll

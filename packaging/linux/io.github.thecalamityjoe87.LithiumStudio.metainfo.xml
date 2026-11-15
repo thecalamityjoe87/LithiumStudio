@@ -63,6 +63,11 @@
   <!-- TODO(release): add screenshots before submitting to Flathub. -->
 
   <releases>
+    <release version="0.15.3" date="2026-11-14" type="development">
+      <description>
+        <p>Fixes: the arrangement follows the playhead when it jumps off screen while stopped, the inspector's meter moves with playback like the track's, the collapsed bottom panel has an easy-to-see Show Panel tab, the hide button is labeled, and the window remembers its size and whether it was maximized.</p>
+      </description>
+    </release>
     <release version="0.15.2" date="2026-11-13" type="development">
       <description>
         <p>New knobs and faders: machined metal knobs with a tick scale, and console-style faders with ribbed caps, in both the dark and light themes. The track volume sliders and the master volume have the same caps.</p>

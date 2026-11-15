@@ -19,6 +19,7 @@ class MainWindow  : public juce::DocumentWindow,
 {
 public:
     MainWindow (const juce::String& name, AudioEngine&);
+    ~MainWindow() override;   // remembers the window's size and maximised state for next time
 
     void closeButtonPressed() override;
 
@@ -40,8 +41,11 @@ public:
     WindowControlKind findControlAtPoint (juce::Point<float>) const override;
 
 private:
+    AudioEngine& engine;
     MainComponent* content = nullptr;   // non-owning; the window owns it
     bool maximised = false;
+    bool maximiseWhenReady = false;   // it was maximised when the app last quit
+    int ticksWaitingToMaximise = 0;
     juce::Rectangle<int> restoredBounds;
 
     void setMaximisedFlag (bool);

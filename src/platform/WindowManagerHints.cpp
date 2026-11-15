@@ -26,6 +26,7 @@ namespace
         Atom maximisedH   = intern ("_NET_WM_STATE_MAXIMIZED_HORZ");
         Atom maximisedV   = intern ("_NET_WM_STATE_MAXIMIZED_VERT");
         Atom fullScreen   = intern ("_NET_WM_STATE_FULLSCREEN");
+        Atom wmStateIcccm = intern ("WM_STATE");   // set by the window manager on windows it manages
 
         Atom intern (const char* name) const   { return display != nullptr ? XInternAtom (display, name, False) : 0; }
     };
@@ -117,6 +118,30 @@ void setMaximised (juce::DocumentWindow& window, bool shouldBeMaximised)
     XFlush (x.display);
 }
 
+bool isReadyToMaximise (juce::DocumentWindow& window)
+{
+    auto& x = x11();
+    auto xWindow = getXWindow (window);
+
+    if (x.display == nullptr || xWindow == 0)
+        return window.isShowing();
+
+    // The window manager puts WM_STATE on a window once it manages it (ICCCM).
+    Atom actualType = 0;
+    int actualFormat = 0;
+    unsigned long numItems = 0, bytesAfter = 0;
+    unsigned char* data = nullptr;
+
+    const auto result = XGetWindowProperty (x.display, xWindow, x.wmStateIcccm, 0, 2, False, AnyPropertyType,
+                                            &actualType, &actualFormat, &numItems, &bytesAfter, &data);
+    const bool managed = result == Success && actualType != 0 && numItems > 0;
+
+    if (data != nullptr)
+        XFree (data);
+
+    return managed;
+}
+
 bool startWindowManagerDrag (juce::DocumentWindow& window)
 {
     auto* peer = window.getPeer();
@@ -139,6 +164,7 @@ namespace lithium::platform
 {
     bool isMaximised (juce::DocumentWindow& window)                     { return window.isFullScreen(); }
     void setMaximised (juce::DocumentWindow& window, bool maximise)     { window.setFullScreen (maximise); }
+    bool isReadyToMaximise (juce::DocumentWindow& window)               { return window.isShowing(); }
     bool startWindowManagerDrag (juce::DocumentWindow&)                 { return false; }
 }
 

@@ -362,6 +362,18 @@ void ArrangementView::setViewPosition (const ViewPosition& position)
     setZoom (position.pixelsPerBeat > 0.0 ? position.pixelsPerBeat : startPixelsPerBeat, 0.0f);
     scrollToBeat (position.scrollBeats);
     viewport.setViewPosition (0, position.scrollY);
+
+    // A restored view stays where it was saved, even if the playhead isn't in it.
+    lastPositionBeats = engine.getTransportState().positionBeats;
+}
+
+void ArrangementView::setScrollBarEndInset (int pixels)
+{
+    if (scrollBarEndInset == pixels)
+        return;
+
+    scrollBarEndInset = pixels;
+    resized();
 }
 
 void ArrangementView::scrollToBeat (double beat)
@@ -557,6 +569,20 @@ void ArrangementView::updateTransport()
         x = geometry.beatToX (state.positionBeats);
     }
 
+    // While stopped, follow the playhead when it's moved somewhere off screen
+    // (back to the start, to the end, to a marker). Only when the playhead
+    // itself moved: scrolling the view away from it leaves the view alone.
+    const bool jumped = state.positionBeats != lastPositionBeats;
+
+    if (! state.playing && zoomInitialised && jumped && ! isVisible && ! regionDrag->isDragging()
+         && engine.getPreferences().get (settings::followPlayhead)
+         && ! juce::Component::isMouseButtonDownAnywhere())
+    {
+        scrollToBeat (state.positionBeats - getVisibleBeats() * 0.05);
+        x = geometry.beatToX (state.positionBeats);
+    }
+
+    lastPositionBeats = state.positionBeats;
     lastPlayheadX = x;
     playhead->setX (x);
 
@@ -656,6 +682,7 @@ void ArrangementView::resized()
         zoomArea.removeFromLeft (8);
         zoomSlider.setBounds (zoomArea.withSizeKeepingCentre (zoomArea.getWidth(), 22));
 
+        strip.removeFromRight (juce::jmin (scrollBarEndInset, strip.getWidth()));
         timeScrollBar.setBounds (strip.withTrimmedTop (1).withSizeKeepingCentre (strip.getWidth(), scrollBarHeight));
     }
     viewport.setBounds (r);

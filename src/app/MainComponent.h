@@ -5,6 +5,7 @@
 #include "engine/AudioEngine.h"
 #include "ui/arrangement/ArrangementView.h"
 #include "ui/bottompanel/BottomPanel.h"
+#include "ui/bottompanel/PanelTab.h"
 #include "ui/dialogs/SessionChooser.h"
 #include "ui/library/LibrarySidebar.h"
 #include "ui/preferences/PreferencesDialog.h"
@@ -97,6 +98,7 @@ private:
     // back the way it was. Each session remembers its own (see createViewState).
     ResizeHandle libraryResizer { ResizeHandle::Orientation::vertical };
     ResizeHandle bottomResizer { ResizeHandle::Orientation::horizontal };
+    PanelTab bottomPanelTab;   // on the collapsed panel's top edge: shows it again
     bool libraryVisible = true;
     bool bottomPanelVisible = true;
     int libraryWidth = tokens::size::sidebarWidth;

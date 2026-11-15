@@ -27,6 +27,11 @@ bool isMaximised (juce::DocumentWindow&);
     size arrives a moment later through the normal resize path. */
 void setMaximised (juce::DocumentWindow&, bool shouldBeMaximised);
 
+/** True once the window can be maximised: on Linux, once the window manager
+    has taken it on after it was first shown (a request before then is
+    ignored); elsewhere, once it's showing. */
+bool isReadyToMaximise (juce::DocumentWindow&);
+
 /** Lets the window manager take over a title-bar drag that's in progress
     (mouse button held). Linux only; returns false elsewhere. */
 bool startWindowManagerDrag (juce::DocumentWindow&);

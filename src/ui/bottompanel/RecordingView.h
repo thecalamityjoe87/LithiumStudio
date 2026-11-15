@@ -35,6 +35,7 @@ private:
     Selection& selection;
     TrackId trackId = 0;
     bool isAudio = false;
+    bool isArmed = false;   // the meter shows the input while armed, else what the track plays (as its header does)
     std::vector<AudioInput> inputs;
     juce::String shownState;   // what the section shows now (see refresh)
 
