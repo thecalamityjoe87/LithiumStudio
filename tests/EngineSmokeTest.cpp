@@ -8456,6 +8456,89 @@ int main (int argc, char* argv[])
         tracks.regions().moveRegions ({ { r2, audioTrackId, 0.0 } });
         check (tracks.regions().getRegion (r2)->trackId == t1, "MIDI regions can't move to audio tracks");
 
+        // MIDI files dropped on the arrangement (ArrangementView::filesDropped
+        // calls importMidiFiles). Everything here is undone at the end.
+        std::cout << "MIDI files\n";
+        {
+            // A groove exported by Lithium Drums: one track, 56 General MIDI
+            // drum notes over 4 bars, 480 ticks per quarter note, at 140 BPM.
+            const auto groove = juce::File (LITHIUM_TEST_FIXTURES).getChildFile ("midi/Halftime Rock 1 bars 21-24 140bpm.mid");
+            check (RegionEditor::isMidiFile (groove) && RegionEditor::isMidiFile (juce::File ("/songs/Song.MIDI")),
+                   ".mid and .midi files are MIDI files");
+            check (! RegionEditor::isMidiFile (imported) && ! tracks.regions().isSupportedAudioFile (groove),
+                   "audio files aren't, and MIDI files aren't audio");
+
+            const auto trackCount = tracks.getTracks().size();
+            std::vector<RegionId> ids;
+            checkUndoRoundTrip (engine, "Import MIDI File",
+                                [&] { ids = tracks.regions().importMidiFiles (t1, { groove.getFullPathName() }, 8.0); });
+
+            auto region = ids.size() == 1 ? tracks.regions().getRegion (ids.front()) : std::nullopt;
+            check (region && region->isMidi && region->trackId == t1 && tracks.getTracks().size() == trackCount,
+                   "dropping on an instrument track adds a MIDI region to it");
+            check (region && region->name == "Halftime Rock 1 bars 21-24 140bpm", "named after the file");
+            check (region && region->notes.size() == 56, "holding every note in the file");
+            check (region && std::abs (region->startBeat - 8.0) < 1.0e-6, "starting at the drop beat");
+            check (region && std::abs (region->lengthBeats - 16.0) < 1.0e-6,
+                   "as long as the file in beats (4 bars), not stretched by its tempo");
+            // (Not all General MIDI: Lithium Drums also uses keys like 22 and 98.)
+            auto countOf = [&region] (int pitch)
+            {
+                return std::count_if (region->notes.begin(), region->notes.end(), [pitch] (const NoteInfo& n) { return n.pitch == pitch; });
+            };
+            check (region && countOf (42) == 22 && countOf (38) == 12 && countOf (36) == 7 && countOf (98) == 1
+                     && std::all_of (region->notes.begin(), region->notes.end(), [] (const NoteInfo& n)
+                                     { return n.startBeat >= 0.0 && n.startBeat < 16.0; }),
+                   "the notes are the groove's (22 closed hi-hats, 12 snares, 7 kicks...), inside the region");
+
+            auto onAudio = tracks.regions().importMidiFiles (audioTrackId, { groove.getFullPathName() }, 0.0);
+            auto audioDropped = onAudio.size() == 1 ? tracks.regions().getRegion (onAudio.front()) : std::nullopt;
+            auto newTrack = audioDropped ? tracks.getTrack (audioDropped->trackId) : std::nullopt;
+            check (tracks.getTracks().size() == trackCount + 1 && newTrack && newTrack->kind == TrackKind::instrument
+                     && audioDropped->notes.size() == 56,
+                   "dropping on an audio track makes an instrument track");
+            check (tracks.regions().importMidiFiles (0, { groove.getFullPathName() }, 0.0).size() == 1
+                     && tracks.getTracks().size() == trackCount + 2,
+                   "so does dropping below the tracks");
+
+            // A type-1 file with two note tracks: merged into one region.
+            const auto multi = dir.getChildFile ("Two Tracks.mid");
+            {
+                juce::MidiFile file;
+                file.setTicksPerQuarterNote (96);
+                juce::MidiMessageSequence kick, hat;
+                kick.addEvent (juce::MidiMessage::noteOn (10, 36, (juce::uint8) 100), 0);
+                kick.addEvent (juce::MidiMessage::noteOff (10, 36), 96);
+                hat.addEvent (juce::MidiMessage::noteOn (10, 42, (juce::uint8) 80), 96);
+                hat.addEvent (juce::MidiMessage::noteOff (10, 42), 144);
+                hat.addEvent (juce::MidiMessage::noteOn (10, 42, (juce::uint8) 80), 288);
+                hat.addEvent (juce::MidiMessage::noteOff (10, 42), 384);   // ends at beat 4
+                file.addTrack (kick);
+                file.addTrack (hat);
+                multi.deleteFile();
+                juce::FileOutputStream out (multi);
+                check (out.openedOk() && file.writeTo (out, 1), "(wrote a two-track MIDI file)");
+            }
+
+            auto merged = tracks.regions().importMidiFiles (t1, { multi.getFullPathName(), groove.getFullPathName() }, 40.0);
+            auto first = merged.size() == 2 ? tracks.regions().getRegion (merged[0]) : std::nullopt;
+            auto second = merged.size() == 2 ? tracks.regions().getRegion (merged[1]) : std::nullopt;
+            check (first && first->notes.size() == 3 && std::abs (first->lengthBeats - 4.0) < 1.0e-6,
+                   "a file's tracks are merged into one region");
+            check (engine.getUndoDescription() == "Import MIDI Files" && second && std::abs (second->startBeat - 44.0) < 1.0e-6,
+                   "several files go one after another, in one undo step");
+
+            for (int step = 0; step < 4; ++step)
+            {
+                pumpMessages();
+                engine.undo();
+            }
+
+            pumpMessages();
+            check (tracks.getTracks().size() == trackCount && ! ids.empty() && ! tracks.regions().getRegion (ids.front()).has_value(),
+                   "undo takes the imports and their new tracks away");
+        }
+
         // A take from somewhere outside the session, with a name Windows
         // wouldn't accept (a track called "Verse: 1", say).
         auto takes = dir.getChildFile ("Takes");

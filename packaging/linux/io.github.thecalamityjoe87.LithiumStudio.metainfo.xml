@@ -63,6 +63,11 @@
   <!-- TODO(release): add screenshots before submitting to Flathub. -->
 
   <releases>
+    <release version="0.15.5" date="2026-11-18" type="development">
+      <description>
+        <p>MIDI files can be dragged onto the arrangement, from the file manager or from a plug-in such as Lithium Drums. On an instrument track the file becomes a MIDI region at the drop point, as long as the file; anywhere else it goes on a new instrument track. A file with several tracks becomes one region.</p>
+      </description>
+    </release>
     <release version="0.15.4" date="2026-11-15" type="development">
       <description>
         <p>The EQ now has eight bands, like the EQs in other studio apps: a Low Cut and a High Cut filter, low and high shelves, and four bells in between. The cut filters are off until you click or drag them. Sessions made with the old four-band EQ open with their settings kept.</p>

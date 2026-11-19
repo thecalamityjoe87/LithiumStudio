@@ -1030,8 +1030,8 @@ void ArrangementView::dragPlayheadTo (float laneX)
 }
 
 //==============================================================================
-// Audio files dragged in from the file manager
-ArrangementView::DropTarget ArrangementView::findDropTarget (int x, int y) const
+// Audio and MIDI files dragged in from the file manager
+ArrangementView::DropTarget ArrangementView::findDropTarget (int x, int y, TrackKind kind) const
 {
     DropTarget target;
     target.beat = snapBeat (juce::jmax (0.0, geometry.xToBeat ((float) (juce::jmax (x, headerWidth) - headerWidth))));
@@ -1042,8 +1042,9 @@ ArrangementView::DropTarget ArrangementView::findDropTarget (int x, int y) const
     {
         target.row = rowAt (y);
 
-        // On an audio track: add to it. On an instrument track: a new audio track.
-        if (tracks[(size_t) target.row].kind == TrackKind::audio)
+        // On a track of the kind the files need: add to it. On the other
+        // kind: a new track of the kind they need.
+        if (tracks[(size_t) target.row].kind == kind)
             target.track = tracks[(size_t) target.row].id;
     }
 
@@ -1053,7 +1054,7 @@ ArrangementView::DropTarget ArrangementView::findDropTarget (int x, int y) const
 bool ArrangementView::isInterestedInFileDrag (const juce::StringArray& files)
 {
     for (auto& f : files)
-        if (engine.getTracks().regions().isSupportedAudioFile (juce::File (f)))
+        if (engine.getTracks().regions().isSupportedAudioFile (juce::File (f)) || RegionEditor::isMidiFile (juce::File (f)))
             return true;
 
     return false;
@@ -1064,9 +1065,21 @@ void ArrangementView::fileDragEnter (const juce::StringArray& files, int x, int 
     fileDragMove (files, x, y);
 }
 
-void ArrangementView::fileDragMove (const juce::StringArray&, int x, int y)
+void ArrangementView::fileDragMove (const juce::StringArray& files, int x, int y)
 {
-    auto target = findDropTarget (x, y);
+    // MIDI files go on an instrument track. With any audio files among
+    // them, the drop is shown as going on an audio track.
+    bool anyMidi = false, anyAudio = false;
+
+    for (auto& f : files)
+    {
+        anyMidi = anyMidi || RegionEditor::isMidiFile (juce::File (f));
+        anyAudio = anyAudio || engine.getTracks().regions().isSupportedAudioFile (juce::File (f));
+    }
+
+    const auto kind = anyMidi && ! anyAudio ? TrackKind::instrument : TrackKind::audio;
+    auto target = findDropTarget (x, y, kind);
+    const juce::String newTrackText (kind == TrackKind::instrument ? "Add on a new instrument track" : "Add on a new audio track");
     juce::Rectangle<float> area;
     juce::String text;
 
@@ -1078,14 +1091,14 @@ void ArrangementView::fileDragMove (const juce::StringArray&, int x, int y)
     else if (target.row >= 0)
     {
         area = rowAreaInOverlay (target.row).reduced (2.0f);
-        text = "Add on a new audio track";
+        text = newTrackText;
     }
     else
     {
         // Below the tracks: the drop zone.
         area = { (float) dropZoneMargin, (float) (getTracksHeight() + dropZoneMargin - viewport.getViewPositionY()),
                  (float) (getLaneWidth() - dropZoneMargin * 2), (float) dropZoneHeight };
-        text = "Add on a new audio track";
+        text = newTrackText;
     }
 
     overlay->setDropTarget (area, geometry.beatToX (target.beat), text);
@@ -1162,7 +1175,8 @@ void ArrangementView::itemDragMove (const SourceDetails& details)
 
     if (soundId.isEmpty())
     {
-        fileDragMove ({}, details.localPosition.x, details.localPosition.y);
+        fileDragMove ({ dragtypes::getLibraryFile (details.description).getFullPathName() },
+                      details.localPosition.x, details.localPosition.y);
         return;
     }
 
@@ -1224,9 +1238,31 @@ void ArrangementView::itemDropped (const SourceDetails& details)
 void ArrangementView::filesDropped (const juce::StringArray& files, int x, int y)
 {
     overlay->clear();
-    auto target = findDropTarget (x, y);
     auto& tc = engine.getTracks();
-    auto ids = tc.regions().importAudioFiles (target.track, files, target.beat);
+
+    // Audio files and MIDI files each go where findDropTarget puts that kind
+    // (a drop with both makes one undo step for each).
+    juce::StringArray audioFiles, midiFiles;
+
+    for (auto& f : files)
+        (RegionEditor::isMidiFile (juce::File (f)) ? midiFiles : audioFiles).add (f);
+
+    std::vector<RegionId> ids;
+
+    if (! audioFiles.isEmpty())
+    {
+        auto target = findDropTarget (x, y, TrackKind::audio);
+        ids = tc.regions().importAudioFiles (target.track, audioFiles, target.beat);
+    }
+
+    if (! midiFiles.isEmpty())
+    {
+        auto target = findDropTarget (x, y, TrackKind::instrument);
+        auto midiIds = tc.regions().importMidiFiles (target.track, midiFiles, target.beat);
+
+        if (ids.empty())   // the selection takes one track's regions: the audio ones, if any
+            ids = std::move (midiIds);
+    }
 
     if (ids.empty())
         return;

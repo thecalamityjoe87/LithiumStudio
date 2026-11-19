@@ -56,7 +56,7 @@ void ArrangementView::Lane::setTrackInfo (const TrackInfo& t, bool isSelected)
     fade = newFade;
     isAudio = t.kind == TrackKind::audio;
     setTooltip (isAudio ? "Drop an audio file here, or press R to record"
-                        : "Double-click to add a 4-bar chord region");
+                        : "Drop a MIDI file here, or double-click to add a 4-bar chord region");
 }
 
 void ArrangementView::Lane::updateTrack (const TrackInfo& t, bool isSelected)

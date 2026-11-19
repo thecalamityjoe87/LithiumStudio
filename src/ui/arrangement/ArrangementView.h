@@ -295,9 +295,10 @@ private:
     int rowHeightOf (int row) const;
     int getTracksHeight() const;         // all the rows
 
-    // Audio file drops
+    // Audio and MIDI file drops. `kind` is the kind of track the files go
+    // on: audio files on an audio track, MIDI files on an instrument track.
     struct DropTarget { TrackId track = 0; int row = -1; double beat = 0.0; };
-    DropTarget findDropTarget (int x, int y) const;
+    DropTarget findDropTarget (int x, int y, TrackKind kind) const;
     int findSoundDropRow (int y) const;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ArrangementView)

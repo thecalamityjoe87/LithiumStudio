@@ -32,7 +32,7 @@ void ArrangementView::DropZone::paint (juce::Graphics& g)
 
     g.setColour (theme().arrangement.textSecondary);
     g.setFont (fonts::ui (textSize::lg));
-    g.drawText ("Drop a sound, loop or audio file here", r, juce::Justification::centred);
+    g.drawText ("Drop a sound, loop, audio or MIDI file here", r, juce::Justification::centred);
 }
 
 //==============================================================================

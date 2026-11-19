@@ -47,9 +47,10 @@ struct TrackController::Impl
 TrackController::TrackController (AudioEngine& o)
     : impl (std::make_unique<Impl>()), owner (o),
       inputRouter (std::make_unique<InputRouter> (o)),
-      // Importing audio may need a new audio track: RegionEditor gets a
-      // function that makes one, instead of depending on this class.
-      regionEditor (std::make_unique<RegionEditor> (o, [this] (const juce::String& name) { return createAudioTrack (name); })),
+      // Importing audio (or MIDI) may need a new audio (or instrument) track:
+      // RegionEditor gets functions that make them, instead of depending on this class.
+      regionEditor (std::make_unique<RegionEditor> (o, [this] (const juce::String& name) { return createAudioTrack (name); },
+                                                    [this] { return createInstrumentTrack(); })),
       takeEditor (std::make_unique<TakeEditor> (o)),
       noteEditor (std::make_unique<NoteEditor> (o)),
       effectsController (std::make_unique<EffectsController> (o)),

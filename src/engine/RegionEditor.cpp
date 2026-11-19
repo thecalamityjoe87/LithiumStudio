@@ -17,8 +17,8 @@ namespace lithium
 using namespace detail;
 
 //==============================================================================
-RegionEditor::RegionEditor (AudioEngine& o, CreateAudioTrackFn createTrack)
-    : owner (o), createAudioTrack (std::move (createTrack))
+RegionEditor::RegionEditor (AudioEngine& o, CreateAudioTrackFn createTrack, CreateInstrumentTrackFn createInstrument)
+    : owner (o), createAudioTrack (std::move (createTrack)), createInstrumentTrack (std::move (createInstrument))
 {
 }
 
@@ -1019,6 +1019,137 @@ std::vector<RegionId> RegionEditor::importAudioFiles (TrackId trackId, const juc
             applyTrackFlex (*clip);   // a recording on a Flex track is flexed
             added.push_back (clip.get());
             start = start + length;
+        }
+    }
+
+    clearSpaceForAll (added);
+    return idsOf (added);
+}
+
+//==============================================================================
+// MIDI files
+bool RegionEditor::isMidiFile (const juce::File& file)
+{
+    return file.hasFileExtension (".mid;.midi");
+}
+
+namespace
+{
+    struct MidiFileNote
+    {
+        int pitch, velocity;
+        double startBeat, lengthBeats;
+    };
+
+    struct MidiFileContent
+    {
+        std::vector<MidiFileNote> notes;   // every track's, merged
+        double lengthBeats = 0.0;
+    };
+
+    // The notes in a Standard MIDI File, timed in beats from its ticks per
+    // quarter note. Its length runs to its last event (the end-of-track
+    // marker, in an exported groove), so a pattern keeps its whole bars.
+    std::optional<MidiFileContent> readMidiFile (const juce::File& file)
+    {
+        juce::MidiFile midi;
+
+        {
+            juce::FileInputStream in (file);
+
+            if (! in.openedOk() || ! midi.readFrom (in))   // matches note-offs to note-ons
+                return std::nullopt;
+        }
+
+        const auto ticksPerBeat = (double) midi.getTimeFormat();
+
+        if (ticksPerBeat <= 0.0)
+            return std::nullopt;   // SMPTE timing: no beats to go by
+
+        MidiFileContent content;
+        double endTick = 0.0;
+
+        for (int t = 0; t < midi.getNumTracks(); ++t)
+        {
+            auto& track = *midi.getTrack (t);
+            endTick = juce::jmax (endTick, track.getEndTime());
+
+            for (auto* event : track)
+            {
+                if (! event->message.isNoteOn())   // (a note-on at velocity 0 is a note-off)
+                    continue;
+
+                const double on = event->message.getTimeStamp();
+
+                // A note without a note-off lasts a sixteenth.
+                const double off = event->noteOffObject != nullptr ? event->noteOffObject->message.getTimeStamp()
+                                                                   : on + ticksPerBeat / 4.0;
+
+                content.notes.push_back ({ event->message.getNoteNumber(), event->message.getVelocity(),
+                                           on / ticksPerBeat, juce::jmax (1.0, off - on) / ticksPerBeat });
+                endTick = juce::jmax (endTick, off);
+            }
+        }
+
+        content.lengthBeats = endTick / ticksPerBeat;
+
+        if (content.notes.empty() || content.lengthBeats < RegionEditor::minRegionBeats)
+            return std::nullopt;
+
+        return content;
+    }
+}
+
+std::vector<RegionId> RegionEditor::importMidiFiles (TrackId trackId, const juce::StringArray& paths, double beat)
+{
+    auto* edit = owner.getEdit();
+    std::vector<std::pair<juce::File, MidiFileContent>> files;
+
+    for (auto& path : paths)
+    {
+        juce::File file (path);
+
+        if (file.existsAsFile() && isMidiFile (file))
+            if (auto content = readMidiFile (file))
+                files.emplace_back (file, std::move (*content));
+    }
+
+    if (files.empty())
+        return {};
+
+    owner.beginUndoStep (files.size() == 1 ? "Import MIDI File" : "Import MIDI Files");
+
+    auto* track = findTrack (edit, trackId);
+
+    if (track == nullptr || isAudioTrack (*track))
+        track = findTrack (edit, createInstrumentTrack());
+
+    if (track == nullptr)
+        return {};
+
+    std::vector<te::Clip*> added;
+    auto& ts = edit->tempoSequence;
+    auto* um = &edit->getUndoManager();
+    double start = juce::jmax (0.0, beat);
+
+    for (auto& [file, content] : files)
+    {
+        const double end = start + content.lengthBeats;
+        te::TimeRange range (ts.toTime (te::BeatPosition::fromBeats (start)),
+                             ts.toTime (te::BeatPosition::fromBeats (end)));
+
+        if (auto* clip = dynamic_cast<te::MidiClip*> (track->insertNewClip (te::TrackItem::Type::midi,
+                                                                             file.getFileNameWithoutExtension(), range, nullptr)))
+        {
+            auto& seq = clip->getSequence();
+
+            for (auto& n : content.notes)
+                seq.addNote (n.pitch, te::BeatPosition::fromBeats (n.startBeat),
+                             te::BeatDuration::fromBeats (n.lengthBeats), n.velocity, 0, um);
+
+            assignNoteIds (*clip);   // as createChordRegion does
+            added.push_back (clip);
+            start = end;
         }
     }
 

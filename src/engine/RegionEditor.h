@@ -31,7 +31,11 @@ public:
         doesn't depend on TrackController. */
     using CreateAudioTrackFn = std::function<TrackId (const juce::String& name)>;
 
-    RegionEditor (AudioEngine&, CreateAudioTrackFn);
+    /** Likewise for importing MIDI files onto an audio track (or none): adds
+        an instrument track as part of the current undo step. */
+    using CreateInstrumentTrackFn = std::function<TrackId()>;
+
+    RegionEditor (AudioEngine&, CreateAudioTrackFn, CreateInstrumentTrackFn);
 
     //==============================================================================
     // Regions (Tracktion clips)
@@ -146,12 +150,27 @@ public:
         track named after the first file. Returns the new regions. */
     std::vector<RegionId> importAudioFiles (TrackId, const juce::StringArray& paths, double beat);
 
+    //==============================================================================
+    // MIDI files
+
+    /** True for Standard MIDI Files (.mid, .midi), going by the extension. */
+    static bool isMidiFile (const juce::File&);
+
+    /** Adds MIDI files as MIDI regions, one after another from `beat`, in one
+        undo step. Each region lasts as long as its file, in beats (from the
+        file's ticks per quarter note; its tempo is ignored), and holds the
+        notes of all its tracks and channels. Pass 0 (or an audio track) to
+        put them on a new instrument track. Files that can't be read, use
+        SMPTE timing or hold no notes are skipped. Returns the new regions. */
+    std::vector<RegionId> importMidiFiles (TrackId, const juce::StringArray& paths, double beat);
+
     /** @internal Called (via TrackController) after the Edit has been replaced. */
     void sessionChanged();
 
 private:
     AudioEngine& owner;
     CreateAudioTrackFn createAudioTrack;
+    CreateInstrumentTrackFn createInstrumentTrack;
 
     // `mutable`: reading regions (a const operation) fills the cache.
     mutable WaveformCache waveforms;
