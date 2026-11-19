@@ -1,6 +1,6 @@
 <p align="center"><img src="packaging/linux/icons/icon-128.png" alt="Lithium Studio icon" width="96"></p>
 
-# Lithium Studio
+<h1 align="center">Lithium Studio</h1>
 
 **A free, open-source music studio for making songs.** Instrument and audio tracks, a virtual drummer, a guitar pedalboard and amp, pitch correction for vocals, and a library of sounds and loops, in the spirit of GarageBand.
 
