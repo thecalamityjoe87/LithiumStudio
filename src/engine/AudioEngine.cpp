@@ -722,14 +722,19 @@ private:
         addTreeChange (classifyChange (parent, child));
     }
 
-    void valueTreeChildOrderChanged (juce::ValueTree& parent, int, int) override
+    // Pass the child that moved (it's at its new index by now), as for an
+    // add or remove: an empty child would read as a property change, and on
+    // the Edit itself that's Tracktion's time stamp, so a track moved up or
+    // down (Edit::moveTrack reorders the Edit's own children), or the undo
+    // or redo of one, would reach the UI as "nothing changed".
+    void valueTreeChildOrderChanged (juce::ValueTree& parent, int, int newIndex) override
     {
-        addTreeChange (classifyChange (parent, {}));
+        addTreeChange (classifyChange (parent, parent.getChild (newIndex)));
     }
 
     /** Works out what kind of thing a change touched from where it happened
         in the session's ValueTree. `tree` is the tree whose property changed,
-        or the parent a child was added to or removed from (`child`).
+        or the parent a child was added to, removed from or moved within (`child`).
 
         The Edit's tree looks roughly like this:
 
@@ -803,7 +808,7 @@ private:
             if (t.hasType (te::IDs::EDIT))
             {
                 if (te::TrackList::isTrack (child))
-                    c.tracks = c.regions = true;   // a track added or removed (with its regions)
+                    c.tracks = c.regions = true;   // a track added, removed or moved (with its regions)
                 else if (SectionEditor::isSectionState (child))
                     c.transport = true;            // the first section added (or the last undone)
                 else if (child.isValid())

@@ -1,4 +1,5 @@
 #include "ui/arrangement/TrackHeader.h"
+#include "ui/arrangement/ArrangementLayout.h"
 #include "ui/widgets/PaintProbe.h"
 #include "ui/theme/Fonts.h"
 #include "ui/theme/LithiumLookAndFeel.h"
@@ -17,16 +18,18 @@ using namespace tokens;
 
 namespace
 {
-    // The header's layout (see the picture in TrackHeader.h).
+    // The header's layout (see the picture in TrackHeader.h). The rows are
+    // one block, centred top to bottom in the track; the y values below are
+    // measured from the block's top.
     constexpr int edgeWidth = 3;          // the track-colour edge on the left
-    constexpr int topPadding = 10;
+    constexpr int contentHeight = 71;     // from the top of the icon tile and arm button to the pan setting's baseline
     constexpr int tileSize = 32;          // the icon tile
     constexpr int tileGap = 10;           // between the tile and the rows beside it
     constexpr int topRowHeight = 24;      // name, Flex, arm
     constexpr int nameHeight = 20;        // the name sits at the top of that row...
-    constexpr int soundRowY = 31;         // ...right above sound · dB (measured from the top)
+    constexpr int soundRowY = 21;         // ...right above sound · dB
     constexpr int soundRowHeight = 14;
-    constexpr int bottomRowY = 51;        // the buttons, volume and pan
+    constexpr int bottomRowY = 41;        // the buttons, volume and pan
     constexpr int bottomRowHeight = 22;
     constexpr int smallButtonWidth = 26;  // Mute, Solo, Monitor, Automation
     constexpr int smallButtonGap = 4;
@@ -34,7 +37,7 @@ namespace
     constexpr int armSize = 24;   // the arm button: as wide as the pan knob's ring (not its whole box), so they look the same size
     constexpr int flexWidth = 38, flexHeight = 22;   // as tall as the Monitor button beside it
     constexpr int panValueWidth = 36, panValueHeight = 12;   // the pan knob's setting, under it
-
+    constexpr int panValueLift = 4;   // ...raised into the knob box's empty bottom (below the skirt, between the ring's ends)
     // The text a slider's value bubble shows while it's dragged.
     juce::String panText (double pan)
     {
@@ -231,6 +234,7 @@ void TrackHeader::update (const TrackInfo& t, bool isSelected)
         automationTargetAutomated = isAutomated;
     }
 
+    const bool automationToggled = t.automationShown != info.automationShown;   // resized() centres the controls above the picker
     info = t;
     selected = isSelected;
 
@@ -276,7 +280,7 @@ void TrackHeader::update (const TrackInfo& t, bool isSelected)
     clipLight.setVisible (t.kind == TrackKind::audio && t.armed);
 
     if (wasAudio != monitorButton.isVisible() || hadClipLight != clipLight.isVisible()
-         || hadDownload != downloadButton.isVisible())
+         || hadDownload != downloadButton.isVisible() || automationToggled)
         resized();
     updateAccessibleNames();
 
@@ -580,21 +584,26 @@ void TrackHeader::paint (juce::Graphics& g)
 
 void TrackHeader::resized()
 {
-    // Laid out from the top: when zooming (or Tall Tracks) makes the row
-    // taller, the controls stay together and the lane gets the extra room.
+    // The controls stay together as one block, centred top to bottom with
+    // an even gap above and below, whether the track is compact, tall or
+    // zoomed. The row's 1px line at the bottom isn't part of the space, and
+    // nor is the line the automation picker adds under the block (the
+    // block stays put when automation is shown or hidden).
     // Left and right edges have the column's padding, so the tile lines up
     // with "TRACKS" above, and the arm button and pan knob sit in one column
     // with the tracks bar's "+" and the Sections row's flag button.
     const int padding = size::panelPadding;
     const int right = getWidth() - padding;
+    const int space = getHeight() - 1 - (info.automationShown ? arrangement::automationPickerHeight : 0);
+    const int y0 = juce::jmax (0, (space - contentHeight) / 2);   // the block's top
 
-    iconArea = { padding, topPadding, tileSize, tileSize };
+    iconArea = { padding, y0, tileSize, tileSize };
     const int left = iconArea.getRight() + tileGap;   // the three rows start here
 
     // Top row: name ... [Flex] [~] (arm). Flex and Monitor are audio tracks
     // only; they sit up here so the volume slider below is as long on
     // every track.
-    auto top = juce::Rectangle<int> (left, topPadding, right - left, topRowHeight);
+    auto top = juce::Rectangle<int> (left, y0, right - left, topRowHeight);
     armButton.setBounds (top.removeFromRight (roundSize).withSizeKeepingCentre (armSize, armSize));   // centred over the pan knob
     top.removeFromRight (8);
 
@@ -623,10 +632,10 @@ void TrackHeader::resized()
 
     // Middle row: sound · dB. It stops short of the pan knob, which is
     // taller than the bottom row and reaches up beside it.
-    soundArea = { left, soundRowY, right - left - roundSize - 8, soundRowHeight };
+    soundArea = { left, y0 + soundRowY, right - left - roundSize - 8, soundRowHeight };
 
     // Bottom row: [M][S][⟋] ─── volume ───  (pan)
-    auto bottom = juce::Rectangle<int> (left, bottomRowY, right - left, bottomRowHeight);
+    auto bottom = juce::Rectangle<int> (left, y0 + bottomRowY, right - left, bottomRowHeight);
     const auto bottomRow = bottom;
 
     for (auto* b : { &muteButton, &soloButton, &automationButton })
@@ -637,9 +646,11 @@ void TrackHeader::resized()
 
     // The pan knob shares the arm button's column, centred under it. Its
     // ring is as wide as the arm button; the box around it is the column.
-    // Its setting goes under it (wider than the column: "L 100").
+    // Its setting goes under it (wider than the column: "L 100"), lifted
+    // into the knob box's empty bottom (clear of the ring's ends): its
+    // baseline is the bottom of the block (contentHeight).
     pan.setBounds (bottom.removeFromRight (roundSize).withSizeKeepingCentre (roundSize, roundSize));
-    panValueArea = juce::Rectangle<int> (panValueWidth, panValueHeight).withCentre ({ pan.getBounds().getCentreX(), pan.getBottom() + panValueHeight / 2 });
+    panValueArea = juce::Rectangle<int> (panValueWidth, panValueHeight).withCentre ({ pan.getBounds().getCentreX(), pan.getBottom() + panValueHeight / 2 - panValueLift });
     bottom.removeFromRight (18);   // room for the clip light, clear of the volume's thumb
 
     // The clip light sits midway between where the meter's bars end (the
